@@ -17,4 +17,4 @@ RUN dotnet publish "COMP4911Timesheets.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "COMP4911Timesheets.dll"]
+ENTRYPOINT ["dotnet", "watch", "run", "COMP4911Timesheets.dll"]
