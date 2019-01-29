@@ -18,6 +18,7 @@ namespace COMP4911Timesheets.Controllers
         public IActionResult Privacy()
         {
             return View();
+            //this is a change
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
