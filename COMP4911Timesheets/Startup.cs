@@ -30,7 +30,7 @@ namespace COMP4911Timesheets
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                // This lambda determines whether user consetial cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
@@ -70,7 +70,7 @@ namespace COMP4911Timesheets
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Privacy}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
