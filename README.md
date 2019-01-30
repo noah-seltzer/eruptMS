@@ -17,6 +17,11 @@ Troubleshooting:
 
 Restart docker 
 
+##Branches
+Master > UAT > STAGE > TEST
+Master is protected, requiring 2 code reviewers
+UAT & STAGE are unprotected, requiring 1 code reviewer
+TEST is unprotected. please branch off from this.
 
 ## Deploy SQL DB on Azure
 1.  Go to [portal.azure.com](http://portal.azure.com)
