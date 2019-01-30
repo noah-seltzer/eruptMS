@@ -18,12 +18,14 @@ namespace COMP4911Timesheets
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            IsDev = env.IsDevelopment();
         }
 
         public IConfiguration Configuration { get; }
+        public bool IsDev { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -35,9 +37,10 @@ namespace COMP4911Timesheets
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            string connectionString = IsDev ? Environment.GetEnvironmentVariable("ConnectionStrings_DefaultConnection") : Environment.GetEnvironmentVariable("Prod_Connection");
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(connectionString));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
