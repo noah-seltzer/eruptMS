@@ -1,6 +1,7 @@
 # comp4911timesheets
 
 [Code Conventions](/docs/conventions.md)
+[Database Setup] (/docs/dbsetup.md)
 
 to deploy on docker with live compiling (windows tested only)
 
@@ -46,3 +47,11 @@ TEST is unprotected. please branch off from this.
 	   `Server=tcp:{YOUR_SERVER_NAME}.database.windows.net,1433;Initial Catalog={YOUR_DB_NAME};Persist Security Info=False;User ID={YOUR_ID};Password={YOUR_PASSWORD};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;`
 15.  Done!!!
 16.  `$ dotnet run` on windows
+
+
+
+##Branches	## Setting up DB for Local Dev Environment
+Master > UAT > STAGE > TEST	[Database Setup](./doc/dbsetup.md)
+Master is protected, requiring 2 code reviewers	
+UAT & STAGE are unprotected, requiring 1 code reviewer	
+TEST is unprotected. please branch off from this.
