@@ -4,8 +4,9 @@ services:
     image: mcr.microsoft.com/mssql/server
     hostname: 'sqlserver'
     environment:
-      MSSQL_SA_PASSWORD: ${LOCAL_PASSWORD}
+      MSSQL_SA_PASSWORD: ${ERUPT_PASSWORD}
       ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
     ports:
       - 1433:1433
 
@@ -16,7 +17,8 @@ services:
       context: ./COMP4911Timesheets
       dockerfile: run.Dockerfile
     environment:
-      ASPNET_CONN: ${ASPNET_CONN}
+      ConnectionStrings_DefaultConnection: ${ConnectionStrings_DefaultConnection}
+      Prod_Connection: ${Prod_Connection}
     ports:
       - 5000:80
     volumes:
