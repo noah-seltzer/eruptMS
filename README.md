@@ -1,5 +1,7 @@
 # comp4911timesheets
 
+[Code Conventions](/docs/conventions.md)
+
 to deploy on docker with live compiling (windows tested only)
 
 1. navigate to project folder (outer folder)
