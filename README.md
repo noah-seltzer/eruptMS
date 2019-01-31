@@ -1,7 +1,7 @@
 # comp4911timesheets
 
 [Code Conventions](/docs/conventions.md)
-[Database Setup] (/docs/dbsetup.md)
+[Database Setup](/docs/dbsetup.md)
 
 to deploy on docker with live compiling (windows tested only)
 
