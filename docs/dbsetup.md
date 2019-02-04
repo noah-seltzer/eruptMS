@@ -3,10 +3,11 @@
 [Deploy SQL DB on Azure](#deploy-sql-db-on-azure)
 
 ## Set up EF Core with model classes
-1. If there is a changes on database schema, run `dotnet ef database drop` and `dotnet ef migrations remove`
-2. Then run `dotnet ef migrations add EruptMigration -c ApplicationDbContext -o Data/Migrations`
-3. Run `dotnet ef database update`
-4. You should be able to see the tables created.
+1. Make sure that correct `Connection_String` is set
+2. If there is a changes on database schema, run `dotnet ef database drop` and `dotnet ef migrations remove`
+3. Then run `dotnet ef migrations add EruptMigration -c ApplicationDbContext -o Data/Migrations`
+4. Run `dotnet ef database update`
+5. You should be able to see the tables created
 
 ## Deploy SQL DB on Azure
 1.  Go to [portal.azure.com](http://portal.azure.com)
