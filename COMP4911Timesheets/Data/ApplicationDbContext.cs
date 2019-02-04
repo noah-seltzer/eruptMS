@@ -7,11 +7,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Approver)
+                .WithMany(a => a.Employees)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Supervisor)
+                .WithMany(s => s.Employees)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<WorkPackage>()
+                .HasOne(wp => wp.ParentWorkPackage)
+                .WithMany(pwp => pwp.WorkPackages)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PayGrade> PayGrade { get; set; }

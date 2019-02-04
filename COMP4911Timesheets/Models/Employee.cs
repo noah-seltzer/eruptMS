@@ -21,16 +21,14 @@ namespace COMP4911Timesheets.Models
         public List<EmployeePay> EmployeePays { get; set; }
         public List<Credential> Credentials { get; set; }
         public List<Signature> Signatures { get; set; }
-        [InverseProperty("Supervsr")]
-        public List<Supervisor> Supervsrs { get; set; }
-        [InverseProperty("Employee")]
-        public List<Supervisor> SupervisedEmployees { get; set; }
-        [InverseProperty("Approvr")]
-        public List<Approver> Approvrs { get; set; }
-        [InverseProperty("Employee")]
-        public List<Approver> ApprovedEmployees { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
         public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<Timesheet> Timesheets { get; set; }
+
+        public int ApproverId { get; set; }
+        public Approver Approver { get; set; }
+
+        public int SupervisorId { get; set; }
+        public Supervisor Supervisor { get; set; }
     }
 }

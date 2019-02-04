@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,12 +22,11 @@ namespace COMP4911Timesheets.Models
         public int ProjectId { get; set; }
         public Project Project { get; set; }
 
+        public int ParentWorkPackageId { get; set; }
+        public ParentWorkPackage ParentWorkPackage { get; set; }
+
         public List<Budget> Budgets { get; set; }
         public List<WorkPackageReport> WorkPackageReports { get; set; }
-        [InverseProperty("ParentWorkPckage")]
-        public List<ParentWorkPackage> ParentWorkPackges { get; set; }
-        [InverseProperty("ChildWorkPackage")]
-        public List<ParentWorkPackage> ChildWorkPackages { get; set; }
         public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<TimesheetRow> TimesheetRows { get; set; }
     }
