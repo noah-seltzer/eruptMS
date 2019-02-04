@@ -1,7 +1,7 @@
 # Table of Contents
-[Set up EF Core with model classes](#set-up-ef-core-with-model-classes)
-[Deploy SQL DB on Azure](#deploy-sql-db-on-azure)
-[Troubleshooting](#troubleshooting)
+- [Set up EF Core with model classes](#set-up-ef-core-with-model-classes)
+- [Deploy SQL DB on Azure](#deploy-sql-db-on-azure)
+- [Troubleshooting](#troubleshooting)
 
 ## Set up EF Core with model classes
 1. Make sure that correct `Connection_String` is set
