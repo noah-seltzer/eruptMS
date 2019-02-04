@@ -22,7 +22,7 @@ namespace COMP4911Timesheets.Models
         public int ProjectId { get; set; }
         public Project Project { get; set; }
 
-        public int ParentWorkPackageId { get; set; }
+        public int? ParentWorkPackageId { get; set; }
         public ParentWorkPackage ParentWorkPackage { get; set; }
 
         public List<Budget> Budgets { get; set; }
