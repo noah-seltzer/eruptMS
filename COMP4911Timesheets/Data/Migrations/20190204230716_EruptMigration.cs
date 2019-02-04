@@ -119,7 +119,7 @@ namespace COMP4911Timesheets.Data.Migrations
                     Activity = table.Column<string>(nullable: true),
                     IsParent = table.Column<bool>(nullable: false),
                     ProjectId = table.Column<int>(nullable: false),
-                    ParentWorkPackageId = table.Column<int>(nullable: false)
+                    ParentWorkPackageId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -151,8 +151,8 @@ namespace COMP4911Timesheets.Data.Migrations
                     FlexTime = table.Column<double>(nullable: false),
                     VacationTime = table.Column<double>(nullable: false),
                     Status = table.Column<int>(nullable: false),
-                    ApproverId = table.Column<int>(nullable: false),
-                    SupervisorId = table.Column<int>(nullable: false)
+                    ApproverId = table.Column<int>(nullable: true),
+                    SupervisorId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

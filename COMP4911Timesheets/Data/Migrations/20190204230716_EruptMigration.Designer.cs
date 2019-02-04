@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP4911Timesheets.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190204221637_EruptMigration")]
+    [Migration("20190204230716_EruptMigration")]
     partial class EruptMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,7 +86,7 @@ namespace COMP4911Timesheets.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ApproverId");
+                    b.Property<int?>("ApproverId");
 
                     b.Property<DateTime>("CreatedTime");
 
@@ -98,7 +98,7 @@ namespace COMP4911Timesheets.Data.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<int>("SupervisorId");
+                    b.Property<int?>("SupervisorId");
 
                     b.Property<int>("Title");
 
@@ -353,7 +353,7 @@ namespace COMP4911Timesheets.Data.Migrations
 
                     b.Property<string>("Output");
 
-                    b.Property<int>("ParentWorkPackageId");
+                    b.Property<int?>("ParentWorkPackageId");
 
                     b.Property<int>("ProjectId");
 

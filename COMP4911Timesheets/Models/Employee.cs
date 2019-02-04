@@ -25,10 +25,10 @@ namespace COMP4911Timesheets.Models
         public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<Timesheet> Timesheets { get; set; }
 
-        public int ApproverId { get; set; }
+        public int? ApproverId { get; set; }
         public Approver Approver { get; set; }
 
-        public int SupervisorId { get; set; }
+        public int? SupervisorId { get; set; }
         public Supervisor Supervisor { get; set; }
     }
 }
