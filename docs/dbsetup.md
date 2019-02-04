@@ -4,7 +4,7 @@
 
 ## Set up EF Core with model classes
 1. Make sure that correct `Connection_String` is set
-2. If there is a changes on database schema, run `dotnet ef database drop` and `dotnet ef migrations remove`
+2. If there are any changes on database schema (which is likely always the case), run `dotnet ef database drop` and `dotnet ef migrations remove`
 3. Then run `dotnet ef migrations add EruptMigration -c ApplicationDbContext -o Data/Migrations`
 4. Run `dotnet ef database update`
 5. You should be able to see the tables created
