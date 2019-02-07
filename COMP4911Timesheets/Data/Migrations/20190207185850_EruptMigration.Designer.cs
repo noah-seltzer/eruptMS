@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COMP4911Timesheets.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190204230716_EruptMigration")]
+    [Migration("20190207185850_EruptMigration")]
     partial class EruptMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -90,6 +90,8 @@ namespace COMP4911Timesheets.Data.Migrations
 
                     b.Property<DateTime>("CreatedTime");
 
+                    b.Property<string>("Email");
+
                     b.Property<string>("FirstName");
 
                     b.Property<double>("FlexTime");
@@ -119,13 +121,13 @@ namespace COMP4911Timesheets.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<DateTime>("AssignedDate");
+
                     b.Property<int>("EmployeeId");
 
                     b.Property<int>("PayGradeId");
 
                     b.Property<int>("Status");
-
-                    b.Property<int>("Year");
 
                     b.HasKey("EmployeePayId");
 

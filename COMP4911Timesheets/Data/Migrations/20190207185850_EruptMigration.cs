@@ -144,6 +144,7 @@ namespace COMP4911Timesheets.Data.Migrations
                 {
                     EmployeeId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Email = table.Column<string>(nullable: true),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
                     Title = table.Column<int>(nullable: false),
@@ -254,7 +255,7 @@ namespace COMP4911Timesheets.Data.Migrations
                 {
                     EmployeePayId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Year = table.Column<int>(nullable: false),
+                    AssignedDate = table.Column<DateTime>(nullable: false),
                     Status = table.Column<int>(nullable: false),
                     EmployeeId = table.Column<int>(nullable: false),
                     PayGradeId = table.Column<int>(nullable: false)
