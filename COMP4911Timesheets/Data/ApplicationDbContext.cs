@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Employee, ApplicationRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

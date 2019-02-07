@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -5,8 +6,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace COMP4911Timesheets.Models
 {
-    public class Employee
+    public class Employee : IdentityUser
     {
+        public Employee() : base() { }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmployeeId { get; set; }
