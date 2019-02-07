@@ -1,24 +1,41 @@
+# New Document
+
 # comp4911timesheets
 
 [Code Conventions](/docs/conventions.md)
 [Database Setup](/docs/dbsetup.md)
 
-to deploy on docker with live compiling (windows tested only)
+#### To deploy on docker with live compiling (windows tested only)
 
 1. navigate to project folder (outer folder)
 2. run ```docker-compose -f run.yml up --build```
-  - on mac ```docker-compose -f mac_run.yml up --build```
+   - on mac ```docker-compose -f mac_run.yml up --build```
 3. point browser to localhost:5000 (NOT https://localhost:5000)
 
-Can also use visual studio
+#### To build and run a production docker container
+1. navigate to project folder
+2.  run `docker-compose -f build.yml up --build`
+3.  point browser to localhost:5000
 
-To debug, set solution configuration (drop down on toolbar) to debug. this will activate break points and other debug features (will not recompile live)
+##### visual studio
+
+To debug, set solution configuration (drop down on toolbar) to debug and . this will activate break points and other debug features (will not recompile live)
 
 To build and run a production container set solution configuration to realease. 
 
+##### Important docker commands
+these commands are compatible with powershell and bash
+
+- stop all docker containers `docker stop $(docker ps -a -q)`
+- remove all stopped docker containers `docker rm $(docker ps -a -q)`
+- list docker images `docker images`
+- list docker containers which are running `docker ps`
+  - `docker ps -a` to list stopped containers as well
+- list docker images `docker images`
+
 Troubleshooting:
 
-Restart docker 
+Restart docker for windows!
 
 ##Branches
 Master > UAT > STAGE > TEST
