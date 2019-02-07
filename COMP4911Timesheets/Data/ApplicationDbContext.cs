@@ -15,6 +15,8 @@ namespace COMP4911Timesheets.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Employee>()
                 .HasOne(e => e.Approver)
                 .WithMany(a => a.Employees)
@@ -29,7 +31,7 @@ namespace COMP4911Timesheets.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<PayGrade> PayGrade { get; set; }
+        public DbSet<PayGrade> PayGrades { get; set; }
         public DbSet<EmployeePay> EmployeePays { get; set; }
         public DbSet<Credential> Credentials { get; set; }
         public DbSet<Signature> Signatures { get; set; }

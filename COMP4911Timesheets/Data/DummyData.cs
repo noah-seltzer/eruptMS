@@ -39,7 +39,7 @@ namespace COMP4911Timesheets.Data
                 var user = new Employee
                 {
                     UserName = "555",
-                    EmployeeId = 555,
+                    //EmployeeId = 555,
                     Email = "test@test.t",
                     FirstName = "John",
                     LastName = "Doe",
@@ -63,7 +63,7 @@ namespace COMP4911Timesheets.Data
                 var user = new Employee
                 {
                     UserName = "001",
-                    EmployeeId = 001,
+                    //EmployeeId = 001,
                     Email = "admin@admin.a",
                     FirstName = "Jane",
                     LastName = "Doe",

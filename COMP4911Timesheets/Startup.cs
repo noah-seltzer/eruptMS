@@ -85,8 +85,6 @@ namespace COMP4911Timesheets
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            DummyData.Initialize(context, userManager, roleManager).Wait();
         }
     }
 }
