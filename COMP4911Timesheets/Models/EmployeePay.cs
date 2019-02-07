@@ -9,7 +9,7 @@ namespace COMP4911Timesheets.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmployeePayId { get; set; }
-        public DateTime AssignedDate { get; set; }
+        public int Year { get; set; }
         public int Status { get; set; }
 
         public int EmployeeId { get; set; }
