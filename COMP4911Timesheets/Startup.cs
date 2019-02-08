@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using COMP4911Timesheets.Controllers;
 
 namespace COMP4911Timesheets
 {
