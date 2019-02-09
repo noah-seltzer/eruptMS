@@ -27,9 +27,13 @@ namespace COMP4911Timesheets.Data
                 .HasOne(wp => wp.ParentWorkPackage)
                 .WithMany(pwp => pwp.WorkPackages)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Timesheet>()
+                .HasOne(t => t.EmployeePay)
+                .WithMany(ep => ep.Timesheets)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<Employee> Employees { get; set; }
-        public DbSet<PayGrade> PayGrade { get; set; }
+        public DbSet<PayGrade> PayGrades { get; set; }
         public DbSet<EmployeePay> EmployeePays { get; set; }
         public DbSet<Credential> Credentials { get; set; }
         public DbSet<Signature> Signatures { get; set; }

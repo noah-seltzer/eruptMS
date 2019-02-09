@@ -6,6 +6,10 @@ namespace COMP4911Timesheets.Models
 {
     public class Signature
     {
+
+        public static readonly int INVALID = 0;
+        public static readonly int VALID = 1;
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SignatureId { get; set; }
