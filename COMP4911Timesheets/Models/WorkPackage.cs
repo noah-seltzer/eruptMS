@@ -19,7 +19,7 @@ namespace COMP4911Timesheets.Models
         public string Activity { get; set; }
         public bool IsParent { get; set; }
 
-        public int ProjectId { get; set; }
+        public string ProjectId { get; set; }
         public Project Project { get; set; }
 
         public int? ParentWorkPackageId { get; set; }

@@ -23,8 +23,5 @@ namespace COMP4911Timesheets.Models
 
         public int WorkPackageId { get; set; }
         public WorkPackage WorkPackage { get; set; }
-
-        public int PayGradeId { get; set; }
-        public PayGrade PayGrade { get; set; }
     }
 }
