@@ -1,6 +1,7 @@
 IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
 BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
+    CREATE TABLE [__EFMigrationsHistory]
+    (
         [MigrationId] nvarchar(150) NOT NULL,
         [ProductVersion] nvarchar(32) NOT NULL,
         CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
@@ -9,67 +10,75 @@ END;
 
 GO
 
-CREATE TABLE [Approvers] (
-    [ApproverId] int NOT NULL IDENTITY,
+CREATE TABLE [Approvers]
+(
+    [ApproverId] int NOT NULL,
     [Status] int NOT NULL,
     CONSTRAINT [PK_Approvers] PRIMARY KEY ([ApproverId])
 );
 
 GO
 
-CREATE TABLE [ParentWorkPackages] (
-    [ParentWorkPckageId] int NOT NULL IDENTITY,
+CREATE TABLE [ParentWorkPackages]
+(
+    [ParentWorkPckageId] int NOT NULL,
     [Status] int NOT NULL,
     CONSTRAINT [PK_ParentWorkPackages] PRIMARY KEY ([ParentWorkPckageId])
 );
 
 GO
 
-CREATE TABLE [PayGrade] (
+CREATE TABLE [PayGrades]
+(
     [PayGradeId] int NOT NULL IDENTITY,
     [PayLevel] nvarchar(max) NULL,
     [Cost] float NOT NULL,
     [Year] int NOT NULL,
-    CONSTRAINT [PK_PayGrade] PRIMARY KEY ([PayGradeId])
+    CONSTRAINT [PK_PayGrades] PRIMARY KEY ([PayGradeId])
 );
 
 GO
 
-CREATE TABLE [Projects] (
-    [ProjectId] int NOT NULL IDENTITY,
+CREATE TABLE [Projects]
+(
+    [ProjectId] nvarchar(450) NOT NULL,
     [Name] nvarchar(max) NULL,
     [Description] nvarchar(max) NULL,
-    [CostingProposal] nvarchar(max) NULL,
-    [OriginalBudget] nvarchar(max) NULL,
-    [CostAtImplementation] nvarchar(max) NULL,
+    [CostingProposal] float NOT NULL,
+    [OriginalBudget] float NOT NULL,
     [Status] int NOT NULL,
     CONSTRAINT [PK_Projects] PRIMARY KEY ([ProjectId])
 );
 
 GO
 
-CREATE TABLE [Supervisors] (
-    [SupervisorId] int NOT NULL IDENTITY,
+CREATE TABLE [Supervisors]
+(
+    [SupervisorId] int NOT NULL,
     [Status] int NOT NULL,
     CONSTRAINT [PK_Supervisors] PRIMARY KEY ([SupervisorId])
 );
 
 GO
 
-CREATE TABLE [ProjectReports] (
+CREATE TABLE [ProjectReports]
+(
     [ProjectReportId] int NOT NULL IDENTITY,
     [StartingPercentage] float NOT NULL,
     [CompletedPercentage] float NOT NULL,
+    [CostStarted] float NOT NULL,
+    [CostFinished] float NOT NULL,
     [CreatedTime] datetime2 NOT NULL,
     [Status] int NOT NULL,
-    [ProjectId] int NOT NULL,
+    [ProjectId] nvarchar(450) NULL,
     CONSTRAINT [PK_ProjectReports] PRIMARY KEY ([ProjectReportId]),
-    CONSTRAINT [FK_ProjectReports_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE CASCADE
+    CONSTRAINT [FK_ProjectReports_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE NO ACTION
 );
 
 GO
 
-CREATE TABLE [WorkPackages] (
+CREATE TABLE [WorkPackages]
+(
     [WorkPackageId] int NOT NULL IDENTITY,
     [WorkPackageCode] nvarchar(max) NULL,
     [Name] nvarchar(max) NULL,
@@ -80,17 +89,19 @@ CREATE TABLE [WorkPackages] (
     [Output] nvarchar(max) NULL,
     [Activity] nvarchar(max) NULL,
     [IsParent] bit NOT NULL,
-    [ProjectId] int NOT NULL,
+    [ProjectId] nvarchar(450) NULL,
     [ParentWorkPackageId] int NULL,
     CONSTRAINT [PK_WorkPackages] PRIMARY KEY ([WorkPackageId]),
     CONSTRAINT [FK_WorkPackages_ParentWorkPackages_ParentWorkPackageId] FOREIGN KEY ([ParentWorkPackageId]) REFERENCES [ParentWorkPackages] ([ParentWorkPckageId]) ON DELETE NO ACTION,
-    CONSTRAINT [FK_WorkPackages_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE CASCADE
+    CONSTRAINT [FK_WorkPackages_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE NO ACTION
 );
 
 GO
 
-CREATE TABLE [Employees] (
+CREATE TABLE [Employees]
+(
     [EmployeeId] int NOT NULL IDENTITY,
+    [Email] nvarchar(max) NULL,
     [FirstName] nvarchar(max) NULL,
     [LastName] nvarchar(max) NULL,
     [Title] int NOT NULL,
@@ -107,26 +118,32 @@ CREATE TABLE [Employees] (
 
 GO
 
-CREATE TABLE [Budgets] (
+CREATE TABLE [Budgets]
+(
     [BudgetId] int NOT NULL IDENTITY,
     [Hour] float NOT NULL,
     [Status] int NOT NULL,
+    [WeekNumber] int NOT NULL,
     [Type] int NOT NULL,
-    [WorkPacakgeId] int NOT NULL,
-    [WorkPackageId] int NULL,
+    [WorkPackageId] int NOT NULL,
     [PayGradeId] int NOT NULL,
     CONSTRAINT [PK_Budgets] PRIMARY KEY ([BudgetId]),
-    CONSTRAINT [FK_Budgets_PayGrade_PayGradeId] FOREIGN KEY ([PayGradeId]) REFERENCES [PayGrade] ([PayGradeId]) ON DELETE CASCADE,
-    CONSTRAINT [FK_Budgets_WorkPackages_WorkPackageId] FOREIGN KEY ([WorkPackageId]) REFERENCES [WorkPackages] ([WorkPackageId]) ON DELETE NO ACTION
+    CONSTRAINT [FK_Budgets_PayGrades_PayGradeId] FOREIGN KEY ([PayGradeId]) REFERENCES [PayGrades] ([PayGradeId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Budgets_WorkPackages_WorkPackageId] FOREIGN KEY ([WorkPackageId]) REFERENCES [WorkPackages] ([WorkPackageId]) ON DELETE CASCADE
 );
 
 GO
 
-CREATE TABLE [WorkPackageReports] (
+CREATE TABLE [WorkPackageReports]
+(
     [WorkPackageReportId] int NOT NULL IDENTITY,
     [WeekNumber] int NOT NULL,
     [Status] int NOT NULL,
     [Comments] nvarchar(max) NULL,
+    [StartingPercentage] float NOT NULL,
+    [CompletedPercentage] float NOT NULL,
+    [CostStarted] float NOT NULL,
+    [CostFinished] float NOT NULL,
     [WorkAccomplished] nvarchar(max) NULL,
     [WorkAccomplishedNP] nvarchar(max) NULL,
     [Problem] nvarchar(max) NULL,
@@ -138,7 +155,8 @@ CREATE TABLE [WorkPackageReports] (
 
 GO
 
-CREATE TABLE [Credentials] (
+CREATE TABLE [Credentials]
+(
     [CredentialId] int NOT NULL IDENTITY,
     [Password] nvarchar(max) NULL,
     [Status] int NOT NULL,
@@ -149,33 +167,36 @@ CREATE TABLE [Credentials] (
 
 GO
 
-CREATE TABLE [EmployeePays] (
+CREATE TABLE [EmployeePays]
+(
     [EmployeePayId] int NOT NULL IDENTITY,
-    [Year] int NOT NULL,
+    [AssignedDate] datetime2 NOT NULL,
     [Status] int NOT NULL,
     [EmployeeId] int NOT NULL,
     [PayGradeId] int NOT NULL,
     CONSTRAINT [PK_EmployeePays] PRIMARY KEY ([EmployeePayId]),
     CONSTRAINT [FK_EmployeePays_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [Employees] ([EmployeeId]) ON DELETE CASCADE,
-    CONSTRAINT [FK_EmployeePays_PayGrade_PayGradeId] FOREIGN KEY ([PayGradeId]) REFERENCES [PayGrade] ([PayGradeId]) ON DELETE CASCADE
+    CONSTRAINT [FK_EmployeePays_PayGrades_PayGradeId] FOREIGN KEY ([PayGradeId]) REFERENCES [PayGrades] ([PayGradeId]) ON DELETE CASCADE
 );
 
 GO
 
-CREATE TABLE [ProjectEmployees] (
+CREATE TABLE [ProjectEmployees]
+(
     [ProjectEmployeeId] int NOT NULL IDENTITY,
     [Status] int NOT NULL,
     [Role] int NOT NULL,
-    [ProjectId] int NOT NULL,
+    [ProjectId] nvarchar(450) NULL,
     [EmployeeId] int NOT NULL,
     CONSTRAINT [PK_ProjectEmployees] PRIMARY KEY ([ProjectEmployeeId]),
     CONSTRAINT [FK_ProjectEmployees_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [Employees] ([EmployeeId]) ON DELETE CASCADE,
-    CONSTRAINT [FK_ProjectEmployees_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE CASCADE
+    CONSTRAINT [FK_ProjectEmployees_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [Projects] ([ProjectId]) ON DELETE NO ACTION
 );
 
 GO
 
-CREATE TABLE [Signatures] (
+CREATE TABLE [Signatures]
+(
     [SignatureId] int NOT NULL IDENTITY,
     [PassPhrase] nvarchar(max) NULL,
     [HashedSignature] nvarchar(max) NULL,
@@ -188,20 +209,8 @@ CREATE TABLE [Signatures] (
 
 GO
 
-CREATE TABLE [Timesheets] (
-    [TimesheetId] int NOT NULL IDENTITY,
-    [WeekEnding] datetime2 NOT NULL,
-    [WeekNumber] int NOT NULL,
-    [FlexTime] float NOT NULL,
-    [Status] int NOT NULL,
-    [EmployeeId] int NOT NULL,
-    CONSTRAINT [PK_Timesheets] PRIMARY KEY ([TimesheetId]),
-    CONSTRAINT [FK_Timesheets_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [Employees] ([EmployeeId]) ON DELETE CASCADE
-);
-
-GO
-
-CREATE TABLE [WorkPackageEmployees] (
+CREATE TABLE [WorkPackageEmployees]
+(
     [WorkPackageEmployeeId] int NOT NULL IDENTITY,
     [Role] int NOT NULL,
     [Status] int NOT NULL,
@@ -214,7 +223,25 @@ CREATE TABLE [WorkPackageEmployees] (
 
 GO
 
-CREATE TABLE [TimesheetRows] (
+CREATE TABLE [Timesheets]
+(
+    [TimesheetId] int NOT NULL IDENTITY,
+    [WeekEnding] datetime2 NOT NULL,
+    [WeekNumber] int NOT NULL,
+    [ESignature] nvarchar(max) NULL,
+    [FlexTime] float NOT NULL,
+    [Status] int NOT NULL,
+    [EmployeeId] int NOT NULL,
+    [EmployeePayId] int NULL,
+    CONSTRAINT [PK_Timesheets] PRIMARY KEY ([TimesheetId]),
+    CONSTRAINT [FK_Timesheets_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [Employees] ([EmployeeId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Timesheets_EmployeePays_EmployeePayId] FOREIGN KEY ([EmployeePayId]) REFERENCES [EmployeePays] ([EmployeePayId]) ON DELETE NO ACTION
+);
+
+GO
+
+CREATE TABLE [TimesheetRows]
+(
     [TimesheetRowId] int NOT NULL IDENTITY,
     [SatHour] float NOT NULL,
     [SunHour] float NOT NULL,
@@ -226,9 +253,7 @@ CREATE TABLE [TimesheetRows] (
     [Notes] nvarchar(max) NULL,
     [TimesheetId] int NOT NULL,
     [WorkPackageId] int NOT NULL,
-    [PayGradeId] int NOT NULL,
     CONSTRAINT [PK_TimesheetRows] PRIMARY KEY ([TimesheetRowId]),
-    CONSTRAINT [FK_TimesheetRows_PayGrade_PayGradeId] FOREIGN KEY ([PayGradeId]) REFERENCES [PayGrade] ([PayGradeId]) ON DELETE CASCADE,
     CONSTRAINT [FK_TimesheetRows_Timesheets_TimesheetId] FOREIGN KEY ([TimesheetId]) REFERENCES [Timesheets] ([TimesheetId]) ON DELETE CASCADE,
     CONSTRAINT [FK_TimesheetRows_WorkPackages_WorkPackageId] FOREIGN KEY ([WorkPackageId]) REFERENCES [WorkPackages] ([WorkPackageId]) ON DELETE CASCADE
 );
@@ -279,10 +304,6 @@ CREATE INDEX [IX_Signatures_EmployeeId] ON [Signatures] ([EmployeeId]);
 
 GO
 
-CREATE INDEX [IX_TimesheetRows_PayGradeId] ON [TimesheetRows] ([PayGradeId]);
-
-GO
-
 CREATE INDEX [IX_TimesheetRows_TimesheetId] ON [TimesheetRows] ([TimesheetId]);
 
 GO
@@ -292,6 +313,10 @@ CREATE INDEX [IX_TimesheetRows_WorkPackageId] ON [TimesheetRows] ([WorkPackageId
 GO
 
 CREATE INDEX [IX_Timesheets_EmployeeId] ON [Timesheets] ([EmployeeId]);
+
+GO
+
+CREATE INDEX [IX_Timesheets_EmployeePayId] ON [Timesheets] ([EmployeePayId]);
 
 GO
 
@@ -315,7 +340,9 @@ CREATE INDEX [IX_WorkPackages_ProjectId] ON [WorkPackages] ([ProjectId]);
 
 GO
 
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20190204230716_EruptMigration', N'2.2.1-servicing-10028');
+INSERT INTO [__EFMigrationsHistory]
+    ([MigrationId], [ProductVersion])
+VALUES
+    (N'20190209054837_EruptMigration', N'2.2.1-servicing-10028');
 
 GO
