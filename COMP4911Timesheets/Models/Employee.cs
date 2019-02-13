@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace COMP4911Timesheets.Models
 {
-    public class Employee : IdentityUser
+    public class Employee : IdentityUser <string>
     {
         public Employee() : base() { }
 
