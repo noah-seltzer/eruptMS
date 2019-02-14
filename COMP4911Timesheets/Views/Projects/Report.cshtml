@@ -12,6 +12,9 @@
                 @Html.DisplayNameFor(model => model.WorkPackageName)
             </th>
             <th>
+                $ACTUALS/$ESTIMATES
+            </th>
+            <th>
                 ACTUAL TO DATE ACMP
             </th>
             <th>
@@ -28,13 +31,16 @@
     </thead>
     <tbody>
         @foreach (var item in Model)
-        {
+        {         
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageName)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.ACost) / $@Html.DisplayFor(modelItem => item.ECost)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.AHour)

@@ -9,6 +9,10 @@ namespace COMP4911Timesheets.Models
     {
         public int WorkPackageCode { get; set; }
         public string WorkPackageName { get; set; }
+
+        public double ACost { get; set; }
+        public double ECost { get; set; }
+
         public double AHour { get; set; }
         public double EHour { get; set; }
         public int Variance { get; set; }

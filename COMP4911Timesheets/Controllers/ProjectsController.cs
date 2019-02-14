@@ -59,38 +59,45 @@ namespace COMP4911Timesheets.Controllers
 
             ViewData["ProjectName"] = project.Name;
 
-            List<ProjectSumReport> reportList = new List<ProjectSumReport>();
+            List<ProjectSumReport> projectSumReports = new List<ProjectSumReport>();
 
-            var workPackage = await  _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
+            var workPackages = await  _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
 
-            foreach (WorkPackage wp in workPackage)
-            {
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {   
                 ProjectSumReport tempReport = new ProjectSumReport();
                 double aHour = 0;
                 double eHour = 0;
-                var budget = await _context.Budgets.Where(u => u.WorkPackageId == wp.WorkPackageId).ToListAsync();
-                foreach (Budget bt in budget)
+                double aCost = 0;
+                double eCost = 0;
+                var budgets = await _context.Budgets.Where(u => u.WorkPackageId == tempWorkPackage.WorkPackageId).ToListAsync();
+                foreach (Budget tempBudget in budgets)
                 {
-                    if (bt.Type == 20) {
-                        aHour += bt.Hour;
-                    } else if (bt.Type == 10) {
-                        eHour += bt.Hour;
-                    }
+                    var payGrade = await _context.PayGrades.Where(p => p.PayGradeId == tempBudget.PayGradeId).FirstOrDefaultAsync();
+                    if (tempBudget.Type == Budget.ACTUAL) {
+                        aHour += tempBudget.Hour;
+                        aCost += payGrade.Cost * aHour;
+                    } else if (tempBudget.Type == Budget.ESTIMATE) {
+                        eHour += tempBudget.Hour;
+                        eCost += payGrade.Cost * eHour;
+                    }                    
+
                 }
 
-                var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == wp.WorkPackageId);
+                var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId);
 
-                tempReport.WorkPackageCode = wp.WorkPackageId;
-                tempReport.WorkPackageName = wp.Name;
+                tempReport.WorkPackageCode = tempWorkPackage.WorkPackageId;
+                tempReport.WorkPackageName = tempWorkPackage.Name;
+                tempReport.ACost = aCost;
+                tempReport.ECost = eCost;
                 tempReport.AHour = aHour;
                 tempReport.EHour = eHour;
                 tempReport.Variance = (int)(aHour / eHour * 100);
                 tempReport.Comment = workPackageReport.Comments;
-                reportList.Add(tempReport);
+                projectSumReports.Add(tempReport);
             }
 
-            var projectReprot = reportList;
-            return View(projectReprot);
+            return View(projectSumReports);
         }
 
         private bool ProjectExists(string id)
