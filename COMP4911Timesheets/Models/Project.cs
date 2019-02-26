@@ -7,14 +7,35 @@ namespace COMP4911Timesheets.Models
 {
     public class Project
     {
+
+        public static readonly int INVALID = 0;
+        public static readonly int ONGOING = 1;
+        public static readonly int INTERNAL = 2;
+        public static readonly int PAUSED = 3;
+
+        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        {
+            {0, "Invalid"},
+            {1, "Ongoing"},
+            {2, "Internal"},
+            {3, "Paused"}
+        };
+
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ProjectId { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Display(Name = "Project ID")]
+        public string ProjectId { get; set; }
+
         public string Name { get; set; }
+
         public string Description { get; set; }
-        public string CostingProposal { get; set; }
-        public string OriginalBudget { get; set; }
-        public string CostAtImplementation { get; set; }
+
+        [Display(Name = "Costing Proposal")]
+        public double CostingProposal { get; set; }
+
+        [Display(Name = "Original Budget")]
+        public double OriginalBudget { get; set; }
+
         public int Status { get; set; }
 
         public List<ProjectReport> ProjectReports { get; set; }

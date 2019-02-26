@@ -9,10 +9,12 @@ namespace COMP4911Timesheets.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Display(Name = "Credential ID")]
         public int CredentialId { get; set; }
         public string Password { get; set; }
         public int Status { get; set; }
 
+        [Display(Name = "Employee ID")]
         public int EmployeeId { get; set; }
         public Employee Employee { get; set; }
     }
