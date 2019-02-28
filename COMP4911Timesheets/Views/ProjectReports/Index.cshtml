@@ -1,0 +1,71 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.ProjectReport>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.StartingPercentage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompletedPercentage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CostStarted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CostFinished)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartingPercentage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CompletedPercentage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CostStarted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CostFinished)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.ProjectId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProjectReportId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ProjectReportId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProjectReportId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
