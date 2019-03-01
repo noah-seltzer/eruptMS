@@ -13,9 +13,15 @@
 3. point browser to localhost:5000 (NOT https://localhost:5000)
 
 #### To build and run a production docker container
-1. navigate to project folder
+1.  navigate to project folder
 2.  run `docker-compose -f build.yml up --build`
 3.  point browser to localhost:5000
+
+##### To run in background
+
+append `-d` to the end of the docker-compose command
+
+`docker-compose -f run.yml up --build -d`
 
 ##### visual studio
 
@@ -31,6 +37,7 @@ these commands are compatible with powershell and bash
 - list docker images `docker images`
 - list docker containers which are running `docker ps`
   - `docker ps -a` to list stopped containers as well
+- to open a bash console inside of the container `docker exec -i -t container_name /bin/bash` 
 - list docker images `docker images`
 
 Troubleshooting:

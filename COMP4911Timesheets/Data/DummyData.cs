@@ -866,7 +866,7 @@ namespace COMP4911Timesheets.Data
                     Hour=12,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -875,7 +875,7 @@ namespace COMP4911Timesheets.Data
                     Hour=12,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -884,7 +884,7 @@ namespace COMP4911Timesheets.Data
                     Hour=57,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -893,7 +893,7 @@ namespace COMP4911Timesheets.Data
                     Hour=40,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -902,7 +902,7 @@ namespace COMP4911Timesheets.Data
                     Hour=23,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -911,7 +911,7 @@ namespace COMP4911Timesheets.Data
                     Hour=54,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 },
                 new Budget
                 {
@@ -920,7 +920,7 @@ namespace COMP4911Timesheets.Data
                     Hour=48,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
-                    Type=Budget.ESTIMATE
+                    Type=Budget.ACTUAL
                 }
             };
             return budgets;
