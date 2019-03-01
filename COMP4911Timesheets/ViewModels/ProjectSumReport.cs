@@ -15,7 +15,7 @@ namespace COMP4911Timesheets.Models
 
         public double AHour { get; set; }
         public double EHour { get; set; }
-        public int Variance { get; set; }
+        public double Variance { get; set; }
         public string Comment { get; set; }
 
     }

@@ -3,45 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 
 namespace COMP4911Timesheets.Controllers
 {
-    public class ProjectsController : Controller
+    public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ProjectsController(ApplicationDbContext context)
+        public ProjectSumReportController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Projects
+        // GET: ProjectSumReport
         public async Task<IActionResult> Index()
         {
             return View(await _context.Projects.ToListAsync());
         }
 
-        // GET: Projects/Details/5
-        public async Task<IActionResult> Details(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
-            if (project == null)
-            {
-                return NotFound();
-            }
-            return View(project);
-        }
-
-        // GET: Projects/Report/5
+        // GET: ProjectSumReport/Report/5
         public async Task<IActionResult> Report(string id)
         {
             if (id == null)
@@ -61,10 +46,10 @@ namespace COMP4911Timesheets.Controllers
 
             List<ProjectSumReport> projectSumReports = new List<ProjectSumReport>();
 
-            var workPackages = await  _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
 
             foreach (WorkPackage tempWorkPackage in workPackages)
-            {   
+            {
                 ProjectSumReport tempReport = new ProjectSumReport();
                 double aHour = 0;
                 double eHour = 0;
@@ -74,13 +59,16 @@ namespace COMP4911Timesheets.Controllers
                 foreach (Budget tempBudget in budgets)
                 {
                     var payGrade = await _context.PayGrades.Where(p => p.PayGradeId == tempBudget.PayGradeId).FirstOrDefaultAsync();
-                    if (tempBudget.Type == Budget.ACTUAL) {
+                    if (tempBudget.Type == Budget.ACTUAL)
+                    {
                         aHour += tempBudget.Hour;
                         aCost += payGrade.Cost * aHour;
-                    } else if (tempBudget.Type == Budget.ESTIMATE) {
+                    }
+                    else if (tempBudget.Type == Budget.ESTIMATE)
+                    {
                         eHour += tempBudget.Hour;
                         eCost += payGrade.Cost * eHour;
-                    }                    
+                    }
 
                 }
 
@@ -92,7 +80,8 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.ECost = eCost;
                 tempReport.AHour = aHour;
                 tempReport.EHour = eHour;
-                tempReport.Variance = (int)(aHour / eHour * 100);
+                double tempVar = (int)(aHour / eHour * 10000);
+                tempReport.Variance = tempVar / 100;
                 tempReport.Comment = workPackageReport.Comments;
                 projectSumReports.Add(tempReport);
             }
@@ -104,5 +93,7 @@ namespace COMP4911Timesheets.Controllers
         {
             return _context.Projects.Any(e => e.ProjectId == id);
         }
+
     }
+
 }
