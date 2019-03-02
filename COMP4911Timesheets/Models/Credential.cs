@@ -15,7 +15,7 @@ namespace COMP4911Timesheets.Models
         public int Status { get; set; }
 
         [Display(Name = "Employee ID")]
-        public int EmployeeId { get; set; }
+        public string Id { get; set; }
         public Employee Employee { get; set; }
     }
 }
