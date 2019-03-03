@@ -32,8 +32,8 @@
             @Html.DisplayNameFor(model => model.Title)
         </dt>
         <dd class="col-sm-10">
-            @{ string titleDescription = this.Model.jobTitles[Model.Title]; }
-            @Html.DisplayFor(model => titleDescription)
+            @*@{ string titleDescription = this.Model.JobTitles(this.Model.Title); }*@
+            @Html.DisplayFor(model => model.JobTitles[model.Title])
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FlexTime)
