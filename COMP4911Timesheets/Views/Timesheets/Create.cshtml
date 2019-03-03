@@ -36,14 +36,20 @@
                 <label asp-for="Status" class="control-label"></label>
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
+                INVALID = 0
+                NOT_SUBMITTED_NOT_APPROVED = 1
+                SUBMITTED_NOT_APPROVED = 2
+                SUBMITTED_APPROVED = 3
+                REJECTED_NEED_RESUBMISSION = 4
             </div>
+
             <div class="form-group">
                 <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class ="form-control" asp-items="ViewBag.EmployeeId"></select>
+                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="EmployeePayId" class="control-label"></label>
-                <select asp-for="EmployeePayId" class ="form-control" asp-items="ViewBag.EmployeePayId"></select>
+                <select asp-for="EmployeePayId" class="form-control" asp-items="ViewBag.EmployeePayId"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

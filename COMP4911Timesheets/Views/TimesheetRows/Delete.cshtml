@@ -1,0 +1,81 @@
+﻿@model COMP4911Timesheets.Models.TimesheetRow
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TimesheetRow</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SatHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SatHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SunHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SunHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MonHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MonHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TueHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TueHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.WedHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.WedHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ThuHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ThuHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FriHour)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FriHour)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Timesheet)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Timesheet.TimesheetId)
+        </dd class>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.WorkPackage)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.WorkPackage.WorkPackageId)
+        </dd class>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="TimesheetRowId" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

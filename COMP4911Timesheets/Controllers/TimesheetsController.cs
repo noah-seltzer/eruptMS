@@ -13,17 +13,23 @@ namespace COMP4911Timesheets.Controllers
     public class TimesheetsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        private TimesheetRowsController timesheetRowsController;
         public TimesheetsController(ApplicationDbContext context)
         {
             _context = context;
+            timesheetRowsController = new TimesheetRowsController(context);
         }
 
         // GET: Timesheets
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay);
-            return View(await applicationDbContext.ToListAsync());
+            var timesheets = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay);
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
+
+            return View(await timesheets.ToListAsync());
         }
 
         // GET: Timesheets/Details/5
@@ -33,11 +39,14 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
             var timesheet = await _context.Timesheets
                 .Include(t => t.Employee)
                 .Include(t => t.EmployeePay)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
             if (timesheet == null)
             {
                 return NotFound();
@@ -49,6 +58,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets/Create
         public IActionResult Create()
         {
+
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId");
             ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId");
             return View();
@@ -61,6 +71,10 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
         {
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
             if (ModelState.IsValid)
             {
                 _context.Add(timesheet);
@@ -81,6 +95,12 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var timesheet = await _context.Timesheets.FindAsync(id);
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
+
+
             if (timesheet == null)
             {
                 return NotFound();
@@ -134,7 +154,10 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
             var timesheet = await _context.Timesheets
                 .Include(t => t.Employee)
                 .Include(t => t.EmployeePay)
@@ -152,11 +175,27 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
             var timesheet = await _context.Timesheets.FindAsync(id);
             _context.Timesheets.Remove(timesheet);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
+        //[HttpPost, ActionName("DeleteRow")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRow(int id)
+        {
+            var timesheetRow = await _context.TimesheetRows.FindAsync(id);
+            _context.TimesheetRows.Remove(timesheetRow);
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
 
         private bool TimesheetExists(int id)
         {
