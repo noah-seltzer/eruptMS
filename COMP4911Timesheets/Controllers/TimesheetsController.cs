@@ -14,6 +14,7 @@ namespace COMP4911Timesheets.Controllers
     {
         private readonly ApplicationDbContext _context;
         private TimesheetRowsController timesheetRowsController;
+        private static int employeeid = 2;
         public TimesheetsController(ApplicationDbContext context)
         {
             _context = context;
@@ -21,14 +22,18 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Timesheets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
-            var timesheets = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay);
+            if(id > 0){
+                employeeid = id;
+            }
+            var timesheets = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay).Where(t => t.EmployeeId == employeeid);
             var employees = await _context.Employees.ToListAsync();
             var payments = await _context.PayGrades.ToListAsync();
             var timesheetrows = await _context.TimesheetRows.ToListAsync();
             var employeepays = await _context.EmployeePays.ToListAsync();
-
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == employeeid);
+            ViewData["EmployeeName"] = employee.LastName;
             return View(await timesheets.ToListAsync());
         }
 
@@ -58,9 +63,8 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets/Create
         public IActionResult Create()
         {
-
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId");
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId");
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId");
+            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e=>e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId");
             return View();
         }
 
@@ -69,20 +73,21 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
+        public async Task<IActionResult> Create([Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeePayId")] Timesheet timesheet)
         {
             var employees = await _context.Employees.ToListAsync();
             var payments = await _context.PayGrades.ToListAsync();
             var timesheetrows = await _context.TimesheetRows.ToListAsync();
             var employeepays = await _context.EmployeePays.ToListAsync();
+            timesheet.EmployeeId = employeeid;
             if (ModelState.IsValid)
             {
                 _context.Add(timesheet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
+            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e => e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
             return View(timesheet);
         }
 
@@ -105,8 +110,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
+            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e => e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
             return View(timesheet);
         }
 
@@ -115,8 +120,9 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
+        public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeePayId")] Timesheet timesheet)
         {
+            timesheet.EmployeeId = employeeid;
             if (id != timesheet.TimesheetId)
             {
                 return NotFound();
@@ -142,8 +148,8 @@ namespace COMP4911Timesheets.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
+            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
+            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e => e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
             return View(timesheet);
         }
 
