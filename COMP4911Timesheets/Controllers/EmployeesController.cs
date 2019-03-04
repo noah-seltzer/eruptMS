@@ -54,8 +54,9 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["ApproverId"] = new SelectList(_context.Approvers, "ApproverId", "ApproverId");
-            ViewData["SupervisorId"] = new SelectList(_context.Supervisors, "SupervisorId", "SupervisorId");
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId");
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId");
+
             return View();
         }
 
@@ -69,10 +70,10 @@ namespace COMP4911Timesheets.Controllers
             if (ModelState.IsValid)
             {
                 //_context.Add(employee);
-                
+
 
                 //var user = new Employee { UserName = Input.Email, Email = Input.Email };
-                await _userManager.CreateAsync(employee,"P@ssw0rd");
+                await _userManager.CreateAsync(employee, "P@ssw0rd");
                 //if (result.Succeeded)
                 //{
                 //    var code = await _userManager.GenerateEmailConfirmationTokenAsync(employee);
@@ -92,9 +93,10 @@ namespace COMP4911Timesheets.Controllers
                 //await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApproverId"] = new SelectList(_context.Approvers, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Supervisors, "SupervisorId", "SupervisorId", employee.SupervisorId);
-            
+
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+
             return View(employee);
         }
 
@@ -111,8 +113,10 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-            ViewData["ApproverId"] = new SelectList(_context.Approvers, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Supervisors, "SupervisorId", "SupervisorId", employee.SupervisorId);
+
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+
             return View(employee);
         }
 
@@ -148,8 +152,10 @@ namespace COMP4911Timesheets.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApproverId"] = new SelectList(_context.Approvers, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Supervisors, "SupervisorId", "SupervisorId", employee.SupervisorId);
+
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+
             return View(employee);
         }
 

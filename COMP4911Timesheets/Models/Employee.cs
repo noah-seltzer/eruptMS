@@ -14,6 +14,7 @@ namespace COMP4911Timesheets.Models
         public static readonly int CURRENTLY_EMPLOYEED = 1;
         public static readonly int MATERNITY_LEAVE = 2;
 
+        public static readonly int NOT_YET_ASSIGNED = 0;
         public static readonly int ADMIN = 10;
         public static readonly int HR_MANAGER = 100;
         public static readonly int LINE_MANAGER = 200;
@@ -37,6 +38,7 @@ namespace COMP4911Timesheets.Models
 
         public readonly Dictionary<int, string> JobTitles = new Dictionary<int, string>
         {
+            {0, "Not Yet Assigned"},
             {10, "Administrator"},
             {100, "HR Manager"},
             {200, "Line Manager"},
@@ -46,7 +48,8 @@ namespace COMP4911Timesheets.Models
             {610, "Software Architect"},
             {620, "Software Developer"},
             {621, "Senior Software Developer"},
-            {622, "Junior Software Developer"},
+            {623, "Junior Software Developer"},
+            {622, "Intermediate Software Developer"},
             {630, "Software Tester"},
             {710, "UI Designer"}
         };
@@ -78,19 +81,23 @@ namespace COMP4911Timesheets.Models
 
         public int Status { get; set; }
 
+        [ForeignKey("Approver")]
+        public string ApproverId { get; set; }
+        public Employee Approver { get; set; }
+
+        [ForeignKey("Supervisor")]
+        public string SupervisorId { get; set; }
+        public Employee Supervisor { get; set; }
+
+        [InverseProperty("Approver")]
+        public List<Employee> Approvees { get; set; }
+        [InverseProperty("Supervisor")]
+        public List<Employee> Supervisees { get; set; }
+
         public List<EmployeePay> EmployeePays { get; set; }
-        public List<Credential> Credentials { get; set; }
         public List<Signature> Signatures { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
         public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<Timesheet> Timesheets { get; set; }
-
-        [Display(Name = "Approver ID")]
-        public int? ApproverId { get; set; }
-        public Approver Approver { get; set; }
-
-        [Display(Name = "Supervisor ID")]
-        public int? SupervisorId { get; set; }
-        public Supervisor Supervisor { get; set; }
     }
 }

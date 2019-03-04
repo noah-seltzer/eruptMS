@@ -25,16 +25,16 @@ namespace COMP4911Timesheets.Data
                     return;   // DB has already been seeded
                 }
 
-                var supervisors = GetSupervisors().ToArray();
-                context.Supervisors.AddRange(supervisors);
+                var admins = GetAdminEmployees().ToArray();
+                context.Employees.AddRange(admins);
                 context.SaveChanges();
 
-                var approvers = GetApprovers().ToArray();
-                context.Approvers.AddRange(approvers);
+                var approversAndSupervisors = GetSupervisorAndApproverEmployees(context).ToArray();
+                context.Employees.AddRange(approversAndSupervisors);
                 context.SaveChanges();
 
-                var employees = GetEmployees(context).ToArray();
-                context.Employees.AddRange(employees);
+                var normalEmployees = GetNormalEmployees(context).ToArray();
+                context.Employees.AddRange(normalEmployees);
                 context.SaveChanges();
 
                 var payGrades = GetPayGrades().ToArray();
@@ -44,10 +44,6 @@ namespace COMP4911Timesheets.Data
                 var employeePays = GetEmployeePays(context).ToArray();
                 context.EmployeePays.AddRange(employeePays);
                 context.SaveChanges();
-
-                // var credentials = GetCredentials(context).ToArray();
-                // context.Credentials.AddRange(credentials);
-                // context.SaveChanges();
 
                 var signatures = GetSignatures(context).ToArray();
                 context.Signatures.AddRange(signatures);
@@ -95,53 +91,7 @@ namespace COMP4911Timesheets.Data
             }
         }
 
-        public static List<Supervisor> GetSupervisors()
-        {
-            List<Supervisor> supervisors = new List<Supervisor>()
-            {
-                new Supervisor
-                {
-                    SupervisorId=2,
-                    Status=Supervisor.VALID
-                },
-                new Supervisor
-                {
-                    SupervisorId=3,
-                    Status=Supervisor.VALID
-                },
-                new Supervisor
-                {
-                    SupervisorId=4,
-                    Status=Supervisor.VALID
-                }
-            };
-            return supervisors;
-        }
-
-        public static List<Approver> GetApprovers()
-        {
-            List<Approver> approvers = new List<Approver>()
-            {
-                new Approver
-                {
-                    ApproverId=2,
-                    Status=Approver.VALID
-                },
-                new Approver
-                {
-                    ApproverId=3,
-                    Status=Approver.VALID
-                },
-                new Approver
-                {
-                    ApproverId=4,
-                    Status=Approver.VALID
-                }
-            };
-            return approvers;
-        }
-
-        public static List<Employee> GetEmployees(ApplicationDbContext context)
+        public static List<Employee> GetAdminEmployees()
         {
             List<Employee> employees = new List<Employee>()
             {
@@ -166,7 +116,15 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED
-                },
+                }
+            };
+            return employees;
+        }
+
+        public static List<Employee> GetSupervisorAndApproverEmployees(ApplicationDbContext context)
+        {
+            List<Employee> employees = new List<Employee>()
+            {
                 new Employee
                 {
                     Email="john.doe@infosys.ca",
@@ -177,8 +135,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(2).SupervisorId,
-                    ApproverId=context.Approvers.Find(2).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
                 },
                 new Employee
                 {
@@ -190,9 +148,17 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(2).SupervisorId,
-                    ApproverId=context.Approvers.Find(2).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
+                }
+            };
+            return employees;
+        }
+
+        public static List<Employee> GetNormalEmployees(ApplicationDbContext context)
+        {
+            List<Employee> employees = new List<Employee>()
+            {
                 new Employee
                 {
                     Email="bruce.link@infosys.ca",
@@ -203,8 +169,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 },
                 new Employee
                 {
@@ -216,8 +182,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
@@ -229,8 +195,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
@@ -242,8 +208,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
@@ -255,8 +221,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 },
                 new Employee
                 {
@@ -268,8 +234,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 },
                 new Employee
                 {
@@ -281,8 +247,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
@@ -294,8 +260,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
@@ -307,8 +273,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 }
             };
 
