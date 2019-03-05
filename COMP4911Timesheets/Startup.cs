@@ -87,7 +87,7 @@ namespace COMP4911Timesheets
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            DummyData.Initialize(app);
+            DummyData.InitializeAsync(app);
         }
     }
 }

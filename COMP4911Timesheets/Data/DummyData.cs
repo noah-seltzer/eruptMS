@@ -6,17 +6,20 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using COMP4911Timesheets.Controllers;
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Data
 {
     public class DummyData
     {
-        public static void Initialize(IApplicationBuilder app)
+        public static async void InitializeAsync(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
+                var userManager = serviceScope.ServiceProvider.GetService<UserManager<Employee>>();
                 //context.Database.Migrate();
 
                 // Look for any teams.
@@ -25,17 +28,25 @@ namespace COMP4911Timesheets.Data
                     return;   // DB has already been seeded
                 }
 
+                var password = "Password123!";
+
                 var admins = GetAdminEmployees().ToArray();
-                context.Employees.AddRange(admins);
-                context.SaveChanges();
+                foreach (var admin in admins)
+                {
+                    await userManager.CreateAsync(admin, password);
+                }
 
                 var approversAndSupervisors = GetSupervisorAndApproverEmployees(context).ToArray();
-                context.Employees.AddRange(approversAndSupervisors);
-                context.SaveChanges();
+                foreach (var approverAndSupervisor in approversAndSupervisors)
+                {
+                    await userManager.CreateAsync(approverAndSupervisor, password);
+                }
 
                 var normalEmployees = GetNormalEmployees(context).ToArray();
-                context.Employees.AddRange(normalEmployees);
-                context.SaveChanges();
+                foreach (var normalEmployee in normalEmployees)
+                {
+                    await userManager.CreateAsync(normalEmployee, password);
+                }
 
                 var payGrades = GetPayGrades().ToArray();
                 context.PayGrades.AddRange(payGrades);
@@ -98,6 +109,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="cameron.lay@infosys.ca",
+                    UserName="cameron.lay@infosys.ca",
                     FirstName="Cameron",
                     LastName="Lay",
                     Title=Employee.ADMIN,
@@ -109,6 +121,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="edmund.ham@infosys.ca",
+                    UserName="edmund.ham@infosys.ca",
                     FirstName="Edmund",
                     LastName="Ham",
                     Title=Employee.HR_MANAGER,
@@ -128,6 +141,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="john.doe@infosys.ca",
+                    UserName="john.doe@infosys.ca",
                     FirstName="John",
                     LastName="Doe",
                     Title=Employee.LINE_MANAGER,
@@ -141,6 +155,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="tim.smith@infosys.ca",
+                    UserName="tim.smith@infosys.ca",
                     FirstName="Tim",
                     LastName="Smith",
                     Title=Employee.SUPERVISOR,
@@ -162,6 +177,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="bruce.link@infosys.ca",
+                    UserName="bruce.link@infosys.ca",
                     FirstName="Bruce",
                     LastName="Link",
                     Title=Employee.BUSINESS_ANALYST,
@@ -175,6 +191,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="garth.nelson@infosys.ca",
+                    UserName="garth.nelson@infosys.ca",
                     FirstName="Garth",
                     LastName="Nelson",
                     Title=Employee.TECHNICAL_WRITER,
@@ -188,6 +205,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="danny.diiorio@infosys.ca",
+                    UserName="danny.diiorio@infosys.ca",
                     FirstName="Danny",
                     LastName="Di Iorio",
                     Title=Employee.SOFTWARE_ARCHITECT,
@@ -201,6 +219,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="tony.pacheco@infosys.ca",
+                    UserName="tony.pacheco@infosys.ca",
                     FirstName="Tony",
                     LastName="Pacheco",
                     Title=Employee.SOFTWARE_DEVELOPER,
@@ -214,6 +233,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="yipan.wu@infosys.ca",
+                    UserName="yipan.wu@infosys.cs",
                     FirstName="Yipan",
                     LastName="Wu",
                     Title=Employee.SOFTWARE_TESTER,
@@ -227,6 +247,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="david.lee@infosys.ca",
+                    UserName="david.lee@infosys.ca",
                     FirstName="David",
                     LastName="Lee",
                     Title=Employee.SENIOR_SOFTWARE_DEVELOPER,
@@ -240,6 +261,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="ryan.liang@infosys.ca",
+                    UserName="ryan.liang@infosys.ca",
                     FirstName="Ryan",
                     LastName="Liang",
                     Title=Employee.JUNIOR_SOFTWARE_DEVELOPER,
@@ -253,6 +275,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="noah.seltzer@infosys.ca",
+                    UserName="noah.seltzer@infosys.ca",
                     FirstName="Noah",
                     LastName="Seltzer",
                     Title=Employee.INTERMEDIATE_SOFTWARE_DEVELOPER,
@@ -266,6 +289,7 @@ namespace COMP4911Timesheets.Data
                 new Employee
                 {
                     Email="felix.lin@infosys.ca",
+                    UserName="felix.lin@infosys.ca",
                     FirstName="Felix",
                     LastName="Lin",
                     Title=Employee.UI_DESIGNER,
