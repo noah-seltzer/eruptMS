@@ -21,17 +21,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.LastName)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Title)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Approver)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Supervisor)
             </th>
             <th></th>
         </tr>
@@ -49,17 +43,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
-                <td>
+                <td class="priority-2">
                     @Html.DisplayFor(modelItem => item.JobTitles[item.Title])
                 </td>
-                <td>
+                <td class="priority-2">
                     @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Approver.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Supervisor.Email)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

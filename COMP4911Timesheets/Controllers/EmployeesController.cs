@@ -15,6 +15,7 @@ namespace COMP4911Timesheets.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Employee> _userManager;
+        private readonly string defaultPassword = "Password123!";
 
         public EmployeesController(
             ApplicationDbContext context,
@@ -57,8 +58,8 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId");
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId");
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email");
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email");
 
             return View();
         }
@@ -75,12 +76,12 @@ namespace COMP4911Timesheets.Controllers
                 employee.Status = 1;
                 employee.CreatedTime = DateTime.Now;
                 employee.UserName = employee.Email;
-                await _userManager.CreateAsync(employee, "P@ssw0rd");
+                await _userManager.CreateAsync(employee, defaultPassword);
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
 
             return View(employee);
         }
@@ -99,8 +100,8 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.SupervisorId);
 
             return View(employee);
         }
@@ -138,8 +139,8 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "ApproverId", "ApproverId", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "SupervisorId", "SupervisorId", employee.SupervisorId);
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.SupervisorId);
 
             return View(employee);
         }
