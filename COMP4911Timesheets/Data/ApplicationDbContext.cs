@@ -26,6 +26,7 @@ namespace COMP4911Timesheets.Data
                 .WithMany(ep => ep.Timesheets)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+        public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PayGrade> PayGrades { get; set; }
         public DbSet<EmployeePay> EmployeePays { get; set; }

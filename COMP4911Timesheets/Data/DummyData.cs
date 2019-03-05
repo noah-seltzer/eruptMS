@@ -20,6 +20,7 @@ namespace COMP4911Timesheets.Data
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<Employee>>();
+                var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<ApplicationRole>>();
                 //context.Database.Migrate();
 
                 // Look for any teams.
@@ -29,6 +30,12 @@ namespace COMP4911Timesheets.Data
                 }
 
                 var password = "Password123!";
+
+                var applicationRoles = GetApplicationRoles().ToArray();
+                foreach (var applicationRole in applicationRoles)
+                {
+                    await roleManager.CreateAsync(applicationRole);
+                }
 
                 var admins = GetAdminEmployees().ToArray();
                 foreach (var admin in admins)
@@ -46,6 +53,46 @@ namespace COMP4911Timesheets.Data
                 foreach (var normalEmployee in normalEmployees)
                 {
                     await userManager.CreateAsync(normalEmployee, password);
+                }
+
+                var employees = context.Employees.OrderBy(e => e.EmployeeId).ToList();
+                foreach (var employee in employees)
+                {
+                    if (employee.EmployeeId == 1)
+                    {
+                        await userManager.AddToRoleAsync(employee, "AD");
+                    }
+                    else if (employee.EmployeeId == 2)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "HR", "PM", "RE"
+                        });
+                    }
+                    else if (employee.EmployeeId == 3)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "PM", "PA"
+                        });
+                    }
+                    else if (employee.EmployeeId == 4)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "PM", "PA", "RE"
+                        });
+                    }
+                    else if (employee.EmployeeId == 7)
+                    {
+                        await userManager.AddToRoleAsync(employee, "PA");
+                    }
+                    else if (employee.EmployeeId == 8)
+                    {
+                        await userManager.AddToRoleAsync(employee, "RE");
+                    }
+                    else if (employee.EmployeeId == 9)
+                    {
+                        await userManager.AddToRoleAsync(employee, "RE");
+                    }
+                    await userManager.AddToRoleAsync(employee, "EM");
                 }
 
                 var payGrades = GetPayGrades().ToArray();
@@ -102,6 +149,54 @@ namespace COMP4911Timesheets.Data
             }
         }
 
+        public static List<ApplicationRole> GetApplicationRoles()
+        {
+            List<ApplicationRole> applicationRoles = new List<ApplicationRole>()
+            {
+                new ApplicationRole
+                {
+                    Name="AD",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="HR",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="PM",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="PA",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="LM",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="TA",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="RE",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="EM",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                }
+            };
+            return applicationRoles;
+        }
+
         public static List<Employee> GetAdminEmployees()
         {
             List<Employee> employees = new List<Employee>()
@@ -117,7 +212,7 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED
-                },
+                }, // AD
                 new Employee
                 {
                     Email="edmund.ham@infosys.ca",
@@ -129,7 +224,7 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED
-                }
+                } // HR, PM, RE
             };
             return employees;
         }
@@ -151,7 +246,7 @@ namespace COMP4911Timesheets.Data
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
-                },
+                }, // PM, PA
                 new Employee
                 {
                     Email="tim.smith@infosys.ca",
@@ -165,7 +260,7 @@ namespace COMP4911Timesheets.Data
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
-                }
+                } // PM, PA, RE
             };
             return employees;
         }
@@ -215,7 +310,7 @@ namespace COMP4911Timesheets.Data
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
-                },
+                }, // PA
                 new Employee
                 {
                     Email="tony.pacheco@infosys.ca",
@@ -229,7 +324,7 @@ namespace COMP4911Timesheets.Data
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
-                },
+                }, // RE
                 new Employee
                 {
                     Email="yipan.wu@infosys.ca",
@@ -243,7 +338,7 @@ namespace COMP4911Timesheets.Data
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
-                },
+                }, // RE
                 new Employee
                 {
                     Email="david.lee@infosys.ca",
