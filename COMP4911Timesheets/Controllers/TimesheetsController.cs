@@ -24,7 +24,8 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets
         public async Task<IActionResult> Index(int id)
         {
-            if(id > 0){
+            if (id > 0)
+            {
                 employeeid = id;
             }
             var timesheets = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay).Where(t => t.EmployeeId == employeeid);
@@ -33,6 +34,12 @@ namespace COMP4911Timesheets.Controllers
             var timesheetrows = await _context.TimesheetRows.ToListAsync();
             var employeepays = await _context.EmployeePays.ToListAsync();
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == employeeid);
+            List<int> EmployeeId = new List<int>();
+            foreach (Employee e in employees)
+            {
+                if (e.EmployeeId > 1) EmployeeId.Add(e.EmployeeId);
+            }
+            ViewData["EmployeeId"] = EmployeeId;
             ViewData["EmployeeName"] = employee.LastName;
             return View(await timesheets.ToListAsync());
         }
@@ -64,7 +71,7 @@ namespace COMP4911Timesheets.Controllers
         public IActionResult Create()
         {
             //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId");
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e=>e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId");
+            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e => e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId");
             return View();
         }
 
