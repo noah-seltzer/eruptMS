@@ -27,7 +27,10 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor);
+            var applicationDbContext = _context.Employees
+                .Include(e => e.Approver)
+                .Include(e => e.Supervisor)
+                .OrderBy(s => s.EmployeeId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -69,28 +72,10 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
-                //_context.Add(employee);
-
-
-                //var user = new Employee { UserName = Input.Email, Email = Input.Email };
+                employee.Status = 1;
+                employee.CreatedTime = DateTime.Now;
+                employee.UserName = employee.Email;
                 await _userManager.CreateAsync(employee, "P@ssw0rd");
-                //if (result.Succeeded)
-                //{
-                //    var code = await _userManager.GenerateEmailConfirmationTokenAsync(employee);
-                //    var callbackUrl = Url.Page(
-                //        "/Account/ConfirmEmail",
-                //        pageHandler: null,
-                //        values: new { userId = employee.Id, code },
-                //        protocol: Request.Scheme);
-
-                //    await _signInManager.SignInAsync(employee, isPersistent: false);
-                //    //return LocalRedirect(returnUrl);
-                //}
-                //foreach (var error in result.Errors)
-                //{
-                //    ModelState.AddModelError(string.Empty, error.Description);
-                //}
-                //await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 

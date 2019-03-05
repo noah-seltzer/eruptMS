@@ -56,10 +56,10 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Approver.ApproverId)
+                    @Html.DisplayFor(modelItem => item.Approver.Email)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Supervisor.SupervisorId)
+                    @Html.DisplayFor(modelItem => item.Supervisor.Email)
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

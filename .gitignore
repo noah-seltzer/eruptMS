@@ -264,3 +264,4 @@ __pycache__/
 
 COMP4911Timesheets/Data/Migrations/
 .vscode/
+COMP4911Timesheets/Migrations/
