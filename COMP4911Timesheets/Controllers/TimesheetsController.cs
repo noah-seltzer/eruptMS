@@ -14,6 +14,8 @@ namespace COMP4911Timesheets.Controllers
     {
         private readonly ApplicationDbContext _context;
         private TimesheetRowsController timesheetRowsController;
+
+        //whose timesheets are being showed
         private static int employeeid = 2;
         public TimesheetsController(ApplicationDbContext context)
         {
@@ -21,7 +23,7 @@ namespace COMP4911Timesheets.Controllers
             timesheetRowsController = new TimesheetRowsController(context);
         }
 
-        // GET: Timesheets
+        // GET: Timesheets/Index/2(employeeid)
         public async Task<IActionResult> Index(int id)
         {
             if (id > 0)
@@ -44,7 +46,9 @@ namespace COMP4911Timesheets.Controllers
             return View(await timesheets.ToListAsync());
         }
 
-        // GET: Timesheets/Details/5
+
+
+        // GET: Timesheets/Details/5(timesheetid)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -98,7 +102,7 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        // GET: Timesheets/Edit/5
+        // GET: Timesheets/Edit/5(timesheetid)
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -122,7 +126,7 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        // POST: Timesheets/Edit/5
+        // POST: Timesheets/Edit/5(timesheetid)
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -160,7 +164,7 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        // GET: Timesheets/Delete/5
+        // GET: Timesheets/Delete/5(timesheetid)
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -183,7 +187,7 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        // POST: Timesheets/Delete/5
+        // POST: Timesheets/Delete/5(timesheetid)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -199,10 +203,9 @@ namespace COMP4911Timesheets.Controllers
         }
 
 
-        //[HttpPost, ActionName("DeleteRow")]
-        //[ValidateAntiForgeryToken]
+        // POST: Timesheets/DeleteRow/5(timesheetrowid)
         public async Task<IActionResult> DeleteRow(int id)
-        {
+        { 
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
             _context.TimesheetRows.Remove(timesheetRow);
             await _context.SaveChangesAsync();
