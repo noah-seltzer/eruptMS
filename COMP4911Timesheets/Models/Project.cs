@@ -13,13 +13,29 @@ namespace COMP4911Timesheets.Models
         public static readonly int INTERNAL = 2;
         public static readonly int PAUSED = 3;
 
+        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        {
+            {0, "Invalid"},
+            {1, "Ongoing"},
+            {2, "Internal"},
+            {3, "Paused"}
+        };
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Display(Name = "Project ID")]
         public string ProjectId { get; set; }
+
         public string Name { get; set; }
+
         public string Description { get; set; }
+
+        [Display(Name = "Costing Proposal")]
         public double CostingProposal { get; set; }
+
+        [Display(Name = "Original Budget")]
         public double OriginalBudget { get; set; }
+
         public int Status { get; set; }
 
         public List<ProjectReport> ProjectReports { get; set; }

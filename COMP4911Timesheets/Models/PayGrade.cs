@@ -18,11 +18,29 @@ namespace COMP4911Timesheets.Models
         public static readonly string JS = "JS";
         public static readonly string DS = "DS";
 
+        public readonly Dictionary<string, string> PayLevels = new Dictionary<string, string>
+        {
+            {"P1", "P1"},
+            {"P2", "P2"},
+            {"P3", "P3"},
+            {"P4", "P4"},
+            {"P5", "P5"},
+            {"P6", "P6"},
+            {"SS", "SS"},
+            {"JS", "JS"},
+            {"DS", "DS"}
+        };
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Display(Name = "Pay Grade ID")]
         public int PayGradeId { get; set; }
+
+        [Display(Name = "Pay Level")]
         public string PayLevel { get; set; }
+
         public double Cost { get; set; }
+
         public int Year { get; set; }
 
         public List<EmployeePay> EmployeePays { get; set; }

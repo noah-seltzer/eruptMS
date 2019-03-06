@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<Employee, ApplicationRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -15,14 +15,8 @@ namespace COMP4911Timesheets.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Approver)
-                .WithMany(a => a.Employees)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Supervisor)
-                .WithMany(s => s.Employees)
-                .OnDelete(DeleteBehavior.Restrict);
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<WorkPackage>()
                 .HasOne(wp => wp.ParentWorkPackage)
                 .WithMany(pwp => pwp.WorkPackages)
@@ -32,13 +26,11 @@ namespace COMP4911Timesheets.Data
                 .WithMany(ep => ep.Timesheets)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+        public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PayGrade> PayGrades { get; set; }
         public DbSet<EmployeePay> EmployeePays { get; set; }
-        public DbSet<Credential> Credentials { get; set; }
         public DbSet<Signature> Signatures { get; set; }
-        public DbSet<Supervisor> Supervisors { get; set; }
-        public DbSet<Approver> Approvers { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectReport> ProjectReports { get; set; }
         public DbSet<ProjectEmployee> ProjectEmployees { get; set; }

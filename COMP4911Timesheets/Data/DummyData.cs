@@ -6,17 +6,21 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using COMP4911Timesheets.Controllers;
 using System.Globalization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Data
 {
     public class DummyData
     {
-        public static void Initialize(IApplicationBuilder app)
+        public static async void InitializeAsync(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
+                var userManager = serviceScope.ServiceProvider.GetService<UserManager<Employee>>();
+                var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<ApplicationRole>>();
                 //context.Database.Migrate();
 
                 // Look for any teams.
@@ -25,17 +29,71 @@ namespace COMP4911Timesheets.Data
                     return;   // DB has already been seeded
                 }
 
-                var supervisors = GetSupervisors().ToArray();
-                context.Supervisors.AddRange(supervisors);
-                context.SaveChanges();
+                var password = "Password123!";
 
-                var approvers = GetApprovers().ToArray();
-                context.Approvers.AddRange(approvers);
-                context.SaveChanges();
+                var applicationRoles = GetApplicationRoles().ToArray();
+                foreach (var applicationRole in applicationRoles)
+                {
+                    await roleManager.CreateAsync(applicationRole);
+                }
 
-                var employees = GetEmployees(context).ToArray();
-                context.Employees.AddRange(employees);
-                context.SaveChanges();
+                var admins = GetAdminEmployees().ToArray();
+                foreach (var admin in admins)
+                {
+                    await userManager.CreateAsync(admin, password);
+                }
+
+                var approversAndSupervisors = GetSupervisorAndApproverEmployees(context).ToArray();
+                foreach (var approverAndSupervisor in approversAndSupervisors)
+                {
+                    await userManager.CreateAsync(approverAndSupervisor, password);
+                }
+
+                var normalEmployees = GetNormalEmployees(context).ToArray();
+                foreach (var normalEmployee in normalEmployees)
+                {
+                    await userManager.CreateAsync(normalEmployee, password);
+                }
+
+                var employees = context.Employees.OrderBy(e => e.EmployeeId).ToList();
+                foreach (var employee in employees)
+                {
+                    if (employee.EmployeeId == 1)
+                    {
+                        await userManager.AddToRoleAsync(employee, "AD");
+                    }
+                    else if (employee.EmployeeId == 2)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "HR", "PM", "RE"
+                        });
+                    }
+                    else if (employee.EmployeeId == 3)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "PM", "PA"
+                        });
+                    }
+                    else if (employee.EmployeeId == 4)
+                    {
+                        await userManager.AddToRolesAsync(employee, new List<string>() {
+                            "PM", "PA", "RE"
+                        });
+                    }
+                    else if (employee.EmployeeId == 7)
+                    {
+                        await userManager.AddToRoleAsync(employee, "PA");
+                    }
+                    else if (employee.EmployeeId == 8)
+                    {
+                        await userManager.AddToRoleAsync(employee, "RE");
+                    }
+                    else if (employee.EmployeeId == 9)
+                    {
+                        await userManager.AddToRoleAsync(employee, "RE");
+                    }
+                    await userManager.AddToRoleAsync(employee, "EM");
+                }
 
                 var payGrades = GetPayGrades().ToArray();
                 context.PayGrades.AddRange(payGrades);
@@ -44,10 +102,6 @@ namespace COMP4911Timesheets.Data
                 var employeePays = GetEmployeePays(context).ToArray();
                 context.EmployeePays.AddRange(employeePays);
                 context.SaveChanges();
-
-                // var credentials = GetCredentials(context).ToArray();
-                // context.Credentials.AddRange(credentials);
-                // context.SaveChanges();
 
                 var signatures = GetSignatures(context).ToArray();
                 context.Signatures.AddRange(signatures);
@@ -95,59 +149,62 @@ namespace COMP4911Timesheets.Data
             }
         }
 
-        public static List<Supervisor> GetSupervisors()
+        public static List<ApplicationRole> GetApplicationRoles()
         {
-            List<Supervisor> supervisors = new List<Supervisor>()
+            List<ApplicationRole> applicationRoles = new List<ApplicationRole>()
             {
-                new Supervisor
+                new ApplicationRole
                 {
-                    SupervisorId=2,
-                    Status=Supervisor.VALID
+                    Name="AD",
+                    CreatedDate=new DateTime(2018, 1, 1)
                 },
-                new Supervisor
+                new ApplicationRole
                 {
-                    SupervisorId=3,
-                    Status=Supervisor.VALID
+                    Name="HR",
+                    CreatedDate=new DateTime(2018, 1, 1)
                 },
-                new Supervisor
+                new ApplicationRole
                 {
-                    SupervisorId=4,
-                    Status=Supervisor.VALID
+                    Name="PM",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="PA",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="LM",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="TA",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="RE",
+                    CreatedDate=new DateTime(2018, 1, 1)
+                },
+                new ApplicationRole
+                {
+                    Name="EM",
+                    CreatedDate=new DateTime(2018, 1, 1)
                 }
             };
-            return supervisors;
+            return applicationRoles;
         }
 
-        public static List<Approver> GetApprovers()
-        {
-            List<Approver> approvers = new List<Approver>()
-            {
-                new Approver
-                {
-                    ApproverId=2,
-                    Status=Approver.VALID
-                },
-                new Approver
-                {
-                    ApproverId=3,
-                    Status=Approver.VALID
-                },
-                new Approver
-                {
-                    ApproverId=4,
-                    Status=Approver.VALID
-                }
-            };
-            return approvers;
-        }
-
-        public static List<Employee> GetEmployees(ApplicationDbContext context)
+        public static List<Employee> GetAdminEmployees()
         {
             List<Employee> employees = new List<Employee>()
             {
                 new Employee
                 {
                     Email="cameron.lay@infosys.ca",
+                    UserName="cameron.lay@infosys.ca",
                     FirstName="Cameron",
                     LastName="Lay",
                     Title=Employee.ADMIN,
@@ -155,10 +212,11 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED
-                },
+                }, // AD
                 new Employee
                 {
                     Email="edmund.ham@infosys.ca",
+                    UserName="edmund.ham@infosys.ca",
                     FirstName="Edmund",
                     LastName="Ham",
                     Title=Employee.HR_MANAGER,
@@ -166,36 +224,55 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED
-                },
+                } // HR, PM, RE
+            };
+            return employees;
+        }
+
+        public static List<Employee> GetSupervisorAndApproverEmployees(ApplicationDbContext context)
+        {
+            List<Employee> employees = new List<Employee>()
+            {
                 new Employee
                 {
-                    Email="john.doe@infosys.ca",
-                    FirstName="John",
-                    LastName="Doe",
+                    Email="ruize.ma@infosys.ca",
+                    UserName="ruize.ma@infosys.ca",
+                    FirstName="Ruize",
+                    LastName="Ma",
                     Title=Employee.LINE_MANAGER,
                     CreatedTime=new DateTime(2018, 12, 25),
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(2).SupervisorId,
-                    ApproverId=context.Approvers.Find(2).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
+                }, // PM, PA
                 new Employee
                 {
-                    Email="tim.smith@infosys.ca",
-                    FirstName="Tim",
-                    LastName="Smith",
+                    Email="yang.tong@infosys.ca",
+                    UserName="yang.tong@infosys.ca",
+                    FirstName="Yang",
+                    LastName="Tong",
                     Title=Employee.SUPERVISOR,
                     CreatedTime=new DateTime(2019, 1, 1),
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(2).SupervisorId,
-                    ApproverId=context.Approvers.Find(2).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
+                } // PM, PA, RE
+            };
+            return employees;
+        }
+
+        public static List<Employee> GetNormalEmployees(ApplicationDbContext context)
+        {
+            List<Employee> employees = new List<Employee>()
+            {
                 new Employee
                 {
                     Email="bruce.link@infosys.ca",
+                    UserName="bruce.link@infosys.ca",
                     FirstName="Bruce",
                     LastName="Link",
                     Title=Employee.BUSINESS_ANALYST,
@@ -203,12 +280,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 },
                 new Employee
                 {
                     Email="garth.nelson@infosys.ca",
+                    UserName="garth.nelson@infosys.ca",
                     FirstName="Garth",
                     LastName="Nelson",
                     Title=Employee.TECHNICAL_WRITER,
@@ -216,12 +294,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
                     Email="danny.diiorio@infosys.ca",
+                    UserName="danny.diiorio@infosys.ca",
                     FirstName="Danny",
                     LastName="Di Iorio",
                     Title=Employee.SOFTWARE_ARCHITECT,
@@ -229,12 +308,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
+                }, // PA
                 new Employee
                 {
                     Email="tony.pacheco@infosys.ca",
+                    UserName="tony.pacheco@infosys.ca",
                     FirstName="Tony",
                     LastName="Pacheco",
                     Title=Employee.SOFTWARE_DEVELOPER,
@@ -242,12 +322,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
+                }, // RE
                 new Employee
                 {
                     Email="yipan.wu@infosys.ca",
+                    UserName="yipan.wu@infosys.cs",
                     FirstName="Yipan",
                     LastName="Wu",
                     Title=Employee.SOFTWARE_TESTER,
@@ -255,12 +336,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
-                },
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
+                }, // RE
                 new Employee
                 {
                     Email="david.lee@infosys.ca",
+                    UserName="david.lee@infosys.ca",
                     FirstName="David",
                     LastName="Lee",
                     Title=Employee.SENIOR_SOFTWARE_DEVELOPER,
@@ -268,25 +350,27 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 },
                 new Employee
                 {
-                    Email="ryan.liang@infosys.ca",
-                    FirstName="Ryan",
-                    LastName="Liang",
+                    Email="andrew.le@infosys.ca",
+                    UserName="andrew.le@infosys.ca",
+                    FirstName="Andrew",
+                    LastName="Le",
                     Title=Employee.JUNIOR_SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
                     Email="noah.seltzer@infosys.ca",
+                    UserName="noah.seltzer@infosys.ca",
                     FirstName="Noah",
                     LastName="Seltzer",
                     Title=Employee.INTERMEDIATE_SOFTWARE_DEVELOPER,
@@ -294,12 +378,13 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(4).SupervisorId,
-                    ApproverId=context.Approvers.Find(4).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
                 },
                 new Employee
                 {
                     Email="felix.lin@infosys.ca",
+                    UserName="felix.lin@infosys.ca",
                     FirstName="Felix",
                     LastName="Lin",
                     Title=Employee.UI_DESIGNER,
@@ -307,8 +392,8 @@ namespace COMP4911Timesheets.Data
                     FlexTime=0,
                     VacationTime=0,
                     Status=Employee.CURRENTLY_EMPLOYEED,
-                    SupervisorId=context.Supervisors.Find(3).SupervisorId,
-                    ApproverId=context.Approvers.Find(3).ApproverId
+                    SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
+                    ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
                 }
             };
 
@@ -379,88 +464,89 @@ namespace COMP4911Timesheets.Data
 
         public static List<EmployeePay> GetEmployeePays(ApplicationDbContext context)
         {
+
             List<EmployeePay> employeePays = new List<EmployeePay>
             {
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     PayGradeId=context.PayGrades.Find(6).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     PayGradeId=context.PayGrades.Find(5).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     PayGradeId=context.PayGrades.Find(5).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     PayGradeId=context.PayGrades.Find(3).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     PayGradeId=context.PayGrades.Find(3).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     PayGradeId=context.PayGrades.Find(2).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     PayGradeId=context.PayGrades.Find(1).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
                 },
                 new EmployeePay
                 {
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     PayGradeId=context.PayGrades.Find(2).PayGradeId,
                     AssignedDate=DateTime.Now.AddDays(-31),
                     Status=EmployeePay.VALID
@@ -469,14 +555,14 @@ namespace COMP4911Timesheets.Data
             return employeePays;
         }
 
-        public static List<Credential> GetCredentials(ApplicationDbContext context)
-        {
-            List<Credential> credentials = new List<Credential>
-            {
+        // public static List<Credential> GetCredentials(ApplicationDbContext context)
+        // {
+        //     List<Credential> credentials = new List<Credential>
+        //     {
 
-            };
-            return credentials;
-        }
+        //     };
+        //     return credentials;
+        // }
 
         public static List<Signature> GetSignatures(ApplicationDbContext context)
         {
@@ -484,7 +570,7 @@ namespace COMP4911Timesheets.Data
             {
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     PassPhrase="Employee Two",
                     HashedSignature=Utility.HashEncrypt("Employee Two"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -492,7 +578,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     PassPhrase="Employee Three",
                     HashedSignature=Utility.HashEncrypt("Employee Three"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -500,7 +586,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     PassPhrase="Employee Four",
                     HashedSignature=Utility.HashEncrypt("Employee Four"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -508,7 +594,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     PassPhrase="Employee Five",
                     HashedSignature=Utility.HashEncrypt("Employee Five"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -516,7 +602,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     PassPhrase="Employee Six",
                     HashedSignature=Utility.HashEncrypt("Employee Six"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -524,7 +610,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     PassPhrase="Employee Seven",
                     HashedSignature=Utility.HashEncrypt("Employee Seven"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -532,7 +618,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     PassPhrase="Employee Eight",
                     HashedSignature=Utility.HashEncrypt("Employee Eight"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -540,7 +626,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     PassPhrase="Employee Nine",
                     HashedSignature=Utility.HashEncrypt("Employee Nine"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -548,7 +634,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     PassPhrase="Employee Ten",
                     HashedSignature=Utility.HashEncrypt("Employee Ten"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -556,7 +642,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     PassPhrase="Employee Eleven",
                     HashedSignature=Utility.HashEncrypt("Employee Eleven"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -564,7 +650,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     PassPhrase="Employee Twelve",
                     HashedSignature=Utility.HashEncrypt("Employee Twelve"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -572,7 +658,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Signature
                 {
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     PassPhrase="Employee Thirteen",
                     HashedSignature=Utility.HashEncrypt("Employee Thirteen"),
                     CreatedTime=DateTime.Now.AddDays(-31),
@@ -600,8 +686,8 @@ namespace COMP4911Timesheets.Data
                     ProjectId="1205",
                     Name="BCIT Construction",
                     Description="Another description?",
-                    CostingProposal=500000000.00,
-                    OriginalBudget=600000000.00,
+                    CostingProposal=50000.00,
+                    OriginalBudget=60000.00,
                     Status=Project.ONGOING
                 }
             };
@@ -623,37 +709,37 @@ namespace COMP4911Timesheets.Data
             {
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("010").ProjectId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("010").ProjectId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("010").ProjectId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("1205").ProjectId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("1205").ProjectId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find("1205").ProjectId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
                 }
@@ -782,7 +868,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(1).PayGradeId,
-                    Hour=1000000,
+                    Hour=100,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -791,7 +877,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(2).PayGradeId,
-                    Hour=500000,
+                    Hour=50,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -800,7 +886,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
-                    Hour=400000,
+                    Hour=40,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -809,7 +895,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(3).PayGradeId,
-                    Hour=500000,
+                    Hour=50,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -818,7 +904,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
-                    Hour=400000,
+                    Hour=40,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -827,7 +913,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(5).PayGradeId,
-                    Hour=8000000,
+                    Hour=800,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -836,7 +922,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(2).PayGradeId,
-                    Hour=500000,
+                    Hour=50,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -845,7 +931,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(3).PayGradeId,
-                    Hour=500000,
+                    Hour=50,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -854,7 +940,7 @@ namespace COMP4911Timesheets.Data
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
                     PayGradeId=context.PayGrades.Find(4).PayGradeId,
-                    Hour=200000,
+                    Hour=20,
                     Status=Budget.VALID,
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-21), DayOfWeek.Friday)),
                     Type=Budget.ESTIMATE
@@ -937,7 +1023,7 @@ namespace COMP4911Timesheets.Data
                     Status=WorkPackageReport.VALID,
                     Comments="This is comment part",
                     StartingPercentage=0.0,
-                    CompletedPercentage=(52.0/1900000),
+                    CompletedPercentage=(52.0/190),
                     CostStarted=0.0,
                     CostFinished=640.0,
                     WorkAccomplished="Maybe something",
@@ -952,7 +1038,7 @@ namespace COMP4911Timesheets.Data
                     Status=WorkPackageReport.VALID,
                     Comments="This is comment part",
                     StartingPercentage=0.0,
-                    CompletedPercentage=(69.0/1200000),
+                    CompletedPercentage=(69.0/120),
                     CostStarted=0.0,
                     CostFinished=1950.0,
                     WorkAccomplished="nope",
@@ -967,7 +1053,7 @@ namespace COMP4911Timesheets.Data
                     Status=WorkPackageReport.VALID,
                     Comments="This is comment part",
                     StartingPercentage=0.0,
-                    CompletedPercentage=(125.0/8900000),
+                    CompletedPercentage=(125.0/890),
                     CostStarted=0.0,
                     CostFinished=5770.0,
                     WorkAccomplished="nope",
@@ -999,483 +1085,483 @@ namespace COMP4911Timesheets.Data
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(7).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(7).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(7).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(6).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(7).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(8).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
+                    Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
+                    Status=WorkPackageEmployee.CURRENTLY_WORKING
+                },
+                // new WorkPackageEmployee
+                // {
+                //     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
+                //     EmployeeId=context.Employees.Where(e => e.EmployeeId == 1).First().Id,
+                //     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
+                //     Status=WorkPackageEmployee.CURRENTLY_WORKING
+                // },
+                new WorkPackageEmployee
+                {
+                    WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(1).EmployeeId,
-                    Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
-                    Status=WorkPackageEmployee.CURRENTLY_WORKING
-                },
-                new WorkPackageEmployee
-                {
-                    WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
+                // new WorkPackageEmployee
+                // {
+                //     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
+                //     EmployeeId=context.Employees.Where(e => e.EmployeeId == 1).First().Id,
+                //     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
+                //     Status=WorkPackageEmployee.CURRENTLY_WORKING
+                // },
                 new WorkPackageEmployee
                 {
-                    WorkPackageId=context.WorkPackages.Find(1).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(1).EmployeeId,
-                    Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
-                    Status=WorkPackageEmployee.CURRENTLY_WORKING
-                },
-                new WorkPackageEmployee
-                {
-                    WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
+                // new WorkPackageEmployee
+                // {
+                //     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
+                //     EmployeeId=context.Employees.Find(1).EmployeeId,
+                //     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
+                //     Status=WorkPackageEmployee.CURRENTLY_WORKING
+                // },
                 new WorkPackageEmployee
                 {
-                    WorkPackageId=context.WorkPackages.Find(2).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(1).EmployeeId,
-                    Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
-                    Status=WorkPackageEmployee.CURRENTLY_WORKING
-                },
-                new WorkPackageEmployee
-                {
-                    WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
-                new WorkPackageEmployee
-                {
-                    WorkPackageId=context.WorkPackages.Find(3).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
-                    Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
-                    Status=WorkPackageEmployee.CURRENTLY_WORKING
-                },
-                new WorkPackageEmployee
-                {
-                    WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(1).EmployeeId,
-                    Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
-                    Status=WorkPackageEmployee.CURRENTLY_WORKING
-                },
+                // new WorkPackageEmployee
+                // {
+                //     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
+                //     EmployeeId=context.Employees.Find(1).EmployeeId,
+                //     Role=WorkPackageEmployee.RESPONSIBLE_ENGINEER,
+                //     Status=WorkPackageEmployee.CURRENTLY_WORKING
+                // },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(5).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 5).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(6).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 6).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(11).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 11).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 },
                 new WorkPackageEmployee
                 {
                     WorkPackageId=context.WorkPackages.Find(4).WorkPackageId,
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     Role=WorkPackageEmployee.ASSIGNED_EMPLOYEE,
                     Status=WorkPackageEmployee.CURRENTLY_WORKING
                 }
@@ -1489,7 +1575,7 @@ namespace COMP4911Timesheets.Data
             {
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     EmployeePayId=context.EmployeePays.Find(1).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1498,7 +1584,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     EmployeePayId=context.EmployeePays.Find(2).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1507,7 +1593,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     EmployeePayId=context.EmployeePays.Find(3).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1516,7 +1602,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     EmployeePayId=context.EmployeePays.Find(6).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1525,7 +1611,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     EmployeePayId=context.EmployeePays.Find(7).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1534,7 +1620,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     EmployeePayId=context.EmployeePays.Find(8).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1543,7 +1629,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     EmployeePayId=context.EmployeePays.Find(9).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1552,7 +1638,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     EmployeePayId=context.EmployeePays.Find(11).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1561,7 +1647,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     EmployeePayId=context.EmployeePays.Find(12).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
@@ -1570,7 +1656,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(2).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     EmployeePayId=context.EmployeePays.Find(1).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1579,7 +1665,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(3).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     EmployeePayId=context.EmployeePays.Find(2).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1588,7 +1674,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(4).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     EmployeePayId=context.EmployeePays.Find(3).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1597,7 +1683,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(7).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     EmployeePayId=context.EmployeePays.Find(6).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1606,7 +1692,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(8).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 8).First().Id,
                     EmployeePayId=context.EmployeePays.Find(7).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1615,7 +1701,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(9).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 9).First().Id,
                     EmployeePayId=context.EmployeePays.Find(8).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1624,7 +1710,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(10).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 10).First().Id,
                     EmployeePayId=context.EmployeePays.Find(9).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1633,7 +1719,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(12).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
                     EmployeePayId=context.EmployeePays.Find(11).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
@@ -1642,7 +1728,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Find(13).EmployeeId,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 13).First().Id,
                     EmployeePayId=context.EmployeePays.Find(12).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
