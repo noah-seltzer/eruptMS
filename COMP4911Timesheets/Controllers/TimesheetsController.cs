@@ -46,6 +46,17 @@ namespace COMP4911Timesheets.Controllers
             return View(await timesheets.ToListAsync());
         }
 
+        // GET: Timesheets/Manage
+        public async Task<IActionResult> Manage()
+        {
+            var timesheets = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay);
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
+
+            return View(await timesheets.ToListAsync());
+        }
 
 
         // GET: Timesheets/Details/5(timesheetid)
@@ -70,6 +81,31 @@ namespace COMP4911Timesheets.Controllers
 
             return View(timesheet);
         }
+
+
+        // GET: Timesheets/ManageDetails/5(timesheetid)
+        public async Task<IActionResult> ManageDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var employees = await _context.Employees.ToListAsync();
+            var payments = await _context.PayGrades.ToListAsync();
+            var employeepays = await _context.EmployeePays.ToListAsync();
+            var timesheet = await _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.EmployeePay)
+                .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheetrows = await _context.TimesheetRows.ToListAsync();
+            if (timesheet == null)
+            {
+                return NotFound();
+            }
+
+            return View(timesheet);
+        }
+
 
         // GET: Timesheets/Create
         public IActionResult Create()

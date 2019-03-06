@@ -1,0 +1,110 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Timesheet>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>Timesheets view for Manager</h1>
+
+<p>
+    <a asp-action="Create">Create New Timesheet</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekEnding)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekNumber)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.FlexTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
+            <th>
+                Employee Name
+            </th>
+            <th>
+                Total Hours
+            </th>
+            <th>
+                Payment
+            </th>
+            <th>
+                Payment Status
+            </th>
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.WeekEnding.ToString("yyyy/MM/dd")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.FlexTime)
+                </td>
+                <td>
+                    @{string status = "";}
+                    @if (item.Status == 0) { status = "INVALID"; }
+                    @if (item.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
+                    @if (item.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
+                    @if (item.Status == 3) { status = "SUBMITTED_APPROVED"; }
+                    @if (item.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
+                    @status
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                </td>
+                <td>
+                    @{double total = 0;}
+                    @if (item.TimesheetRows != null)
+                    {
+                        foreach (var tr in item.TimesheetRows)
+                        {
+                            total += tr.MonHour + tr.TueHour + tr.WedHour + tr.ThuHour + tr.FriHour + tr.SatHour + tr.SunHour;
+                        }
+                    }
+                    @total
+                <td>
+                    @{double pay = 0; }
+                    @if (item.TimesheetRows != null)
+                    {
+                        foreach (var tr in item.TimesheetRows)
+                        {
+                            pay += (item.EmployeePay.PayGrade.Cost) * (tr.MonHour + tr.TueHour + tr.WedHour + tr.ThuHour + tr.FriHour + tr.SatHour + tr.SunHour);
+                        }
+                    }
+                    @pay
+                </td>
+                <td>
+                    @{string paystatus = "";}
+                    @if (item.EmployeePay.Status == 0) { paystatus = "INVALID"; }
+                    @if (item.EmployeePay.Status == 1) { paystatus = "VALID"; }
+                    @paystatus
+                </td>
+                <td>
+                    <a asp-action="ManageDetails" asp-route-id="@item.TimesheetId">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
