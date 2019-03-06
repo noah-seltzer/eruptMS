@@ -1,0 +1,60 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.ProjectSumReport>
+
+<h1>Project Summary Reprot</h1>
+<p>PROJECT TITLE: @ViewData["ProjectName"]</P>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackageCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackageName)
+            </th>
+            <th>
+                $ACTUALS/$ESTIMATES
+            </th>
+            <th>
+                ACTUAL TO DATE ACMP
+            </th>
+            <th>
+                ESTIMATE COMPLETE EAC
+            </th>
+            <th>
+                %@Html.DisplayNameFor(model => model.Variance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {         
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageName)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.ACost) / $@Html.DisplayFor(modelItem => item.ECost)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AHour)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EHour)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Variance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
