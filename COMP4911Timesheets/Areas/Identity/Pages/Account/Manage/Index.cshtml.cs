@@ -52,6 +52,12 @@ namespace COMP4911Timesheets.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+            var approver = await _userManager.FindByIdAsync(user.ApproverId);
+            var supervisor = await _userManager.FindByIdAsync(user.SupervisorId);
+
+            ViewData["approver"] = approver.Email;
+            ViewData["supervisor"] = supervisor.Email;
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
