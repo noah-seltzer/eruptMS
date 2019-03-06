@@ -55,8 +55,22 @@ namespace COMP4911Timesheets.Areas.Identity.Pages.Account.Manage
             var approver = await _userManager.FindByIdAsync(user.ApproverId);
             var supervisor = await _userManager.FindByIdAsync(user.SupervisorId);
 
-            ViewData["approver"] = approver.Email;
-            ViewData["supervisor"] = supervisor.Email;
+            if (approver != null)
+            {
+                ViewData["approver"] = approver.Email;
+            }
+            else
+            {
+                ViewData["approver"] = "N/A";
+            }
+            if (supervisor != null)
+            {
+                ViewData["supervisor"] = supervisor.Email;
+            }
+            else
+            {
+                ViewData["supervisor"] = "N/A";
+            }
 
             if (user == null)
             {
