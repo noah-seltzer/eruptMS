@@ -235,10 +235,10 @@ namespace COMP4911Timesheets.Data
             {
                 new Employee
                 {
-                    Email="john.doe@infosys.ca",
-                    UserName="john.doe@infosys.ca",
-                    FirstName="John",
-                    LastName="Doe",
+                    Email="ruize.ma@infosys.ca",
+                    UserName="ruize.ma@infosys.ca",
+                    FirstName="Ruize",
+                    LastName="Ma",
                     Title=Employee.LINE_MANAGER,
                     CreatedTime=new DateTime(2018, 12, 25),
                     FlexTime=0,
@@ -249,10 +249,10 @@ namespace COMP4911Timesheets.Data
                 }, // PM, PA
                 new Employee
                 {
-                    Email="tim.smith@infosys.ca",
-                    UserName="tim.smith@infosys.ca",
-                    FirstName="Tim",
-                    LastName="Smith",
+                    Email="yang.tong@infosys.ca",
+                    UserName="yang.tong@infosys.ca",
+                    FirstName="Yang",
+                    LastName="Tong",
                     Title=Employee.SUPERVISOR,
                     CreatedTime=new DateTime(2019, 1, 1),
                     FlexTime=0,
@@ -355,10 +355,10 @@ namespace COMP4911Timesheets.Data
                 },
                 new Employee
                 {
-                    Email="ryan.liang@infosys.ca",
-                    UserName="ryan.liang@infosys.ca",
-                    FirstName="Ryan",
-                    LastName="Liang",
+                    Email="andrew.le@infosys.ca",
+                    UserName="andrew.le@infosys.ca",
+                    FirstName="Andrew",
+                    LastName="Le",
                     Title=Employee.JUNIOR_SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
