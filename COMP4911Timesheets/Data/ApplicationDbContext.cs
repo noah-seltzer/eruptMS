@@ -17,9 +17,13 @@ namespace COMP4911Timesheets.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Timesheet>()
-                .HasOne(t => t.EmployeePay)
-                .WithMany(ep => ep.Timesheets)
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Supervisor)
+                .WithMany(s => s.Supervisees)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Approver)
+                .WithMany(a => a.Approvees)
                 .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }

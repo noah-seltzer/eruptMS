@@ -76,6 +76,8 @@ namespace COMP4911Timesheets.Controllers
                 employee.Status = 1;
                 employee.CreatedTime = DateTime.Now;
                 employee.UserName = employee.Email;
+                employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
+                employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
                 await _userManager.CreateAsync(employee, defaultPassword);
                 return RedirectToAction(nameof(Index));
             }
@@ -122,6 +124,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
+                    employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
+                    employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
