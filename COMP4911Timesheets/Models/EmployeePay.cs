@@ -31,7 +31,7 @@ namespace COMP4911Timesheets.Models
         public Employee Employee { get; set; }
 
         [Display(Name = "Pay Grade ID")]
-        public int PayGradeId { get; set; }
+        public int? PayGradeId { get; set; }
         public PayGrade PayGrade { get; set; }
 
         public List<Timesheet> Timesheets { get; set; }

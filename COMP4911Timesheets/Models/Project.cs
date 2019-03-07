@@ -22,9 +22,12 @@ namespace COMP4911Timesheets.Models
         };
 
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Display(Name = "Project ID")]
-        public string ProjectId { get; set; }
+        public int ProjectId { get; set; }
+
+        [Display(Name = "Project Code")]
+        public string ProjectCode { get; set; }
 
         public string Name { get; set; }
 

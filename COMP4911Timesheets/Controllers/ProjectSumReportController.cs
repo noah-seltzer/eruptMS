@@ -29,9 +29,9 @@ namespace COMP4911Timesheets.Controllers
 
 
         // GET: ProjectSumReport/Report/5
-        public async Task<IActionResult> Report(string id)
+        public async Task<IActionResult> Report(int id)
         {
-            if (id == null)
+            if (id == 0)
             {
                 return NotFound();
             }
@@ -91,7 +91,7 @@ namespace COMP4911Timesheets.Controllers
             return View(projectSumReports);
         }
 
-        private bool ProjectExists(string id)
+        private bool ProjectExists(int id)
         {
             return _context.Projects.Any(e => e.ProjectId == id);
         }
