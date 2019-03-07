@@ -39,7 +39,7 @@ namespace COMP4911Timesheets.Models
         public int Status { get; set; }
 
         [Display(Name = "Project ID")]
-        public int ProjectId { get; set; }
+        public int? ProjectId { get; set; }
         public Project Project { get; set; }
     }
 }

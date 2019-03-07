@@ -35,11 +35,11 @@ namespace COMP4911Timesheets.Models
         public string Notes { get; set; }
 
         [Display(Name = "Timesheet ID")]
-        public int TimesheetId { get; set; }
+        public int? TimesheetId { get; set; }
         public Timesheet Timesheet { get; set; }
 
         [Display(Name = "Work Package ID")]
-        public int WorkPackageId { get; set; }
+        public int? WorkPackageId { get; set; }
         public WorkPackage WorkPackage { get; set; }
     }
 }
