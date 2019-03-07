@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize]
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;
