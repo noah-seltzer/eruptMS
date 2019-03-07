@@ -34,9 +34,6 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Week Number")]
         public int WeekNumber { get; set; }
 
-        [Display(Name = "Electric Signature")]
-        public string ESignature { get; set; }
-
         [Display(Name = "Flex Time")]
         public double FlexTime { get; set; }
 
@@ -49,6 +46,10 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Employee Pay ID")]
         public int? EmployeePayId { get; set; }
         public EmployeePay EmployeePay { get; set; }
+
+        [Display(Name = "Signature ID")]
+        public int? SignatureId { get; set; }
+        public Signature Signature { get; set; }
 
         public List<TimesheetRow> TimesheetRows { get; set; }
     }

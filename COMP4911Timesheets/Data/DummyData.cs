@@ -119,12 +119,16 @@ namespace COMP4911Timesheets.Data
                 context.ProjectEmployees.AddRange(projectEmployees);
                 context.SaveChanges();
 
-                var parentWorkPackages = GetParentWorkPackages().ToArray();
-                context.ParentWorkPackages.AddRange(parentWorkPackages);
-                context.SaveChanges();
-
                 var workPackages = GetWorkPackages(context).ToArray();
                 context.WorkPackages.AddRange(workPackages);
+                context.SaveChanges();
+
+                var childWorkPackages = GetChildWorkPackages(context).ToArray();
+                context.WorkPackages.AddRange(childWorkPackages);
+                context.SaveChanges();
+
+                var managedWorkPackages = GetManagedWorkPackages(context).ToArray();
+                context.WorkPackages.AddRange(managedWorkPackages);
                 context.SaveChanges();
 
                 var budgets = GetBudgets(context).ToArray();
@@ -674,7 +678,7 @@ namespace COMP4911Timesheets.Data
             {
                 new Project
                 {
-                    ProjectId="010",
+                    ProjectCode="010",
                     Name="HR Reserved",
                     Description="I need descriptions.",
                     CostingProposal=0,
@@ -683,7 +687,7 @@ namespace COMP4911Timesheets.Data
                 },
                 new Project
                 {
-                    ProjectId="1205",
+                    ProjectCode="1205",
                     Name="BCIT Construction",
                     Description="Another description?",
                     CostingProposal=50000.00,
@@ -708,37 +712,37 @@ namespace COMP4911Timesheets.Data
             List<ProjectEmployee> projectEmployees = new List<ProjectEmployee>
             {
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
                 },
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
                 },
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_MANAGER
                 },
                 new ProjectEmployee {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 7).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
@@ -753,7 +757,7 @@ namespace COMP4911Timesheets.Data
             {
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageCode="SICK",
                     Name="Sick Leave",
                     Description="Sick Leave itself is description",
@@ -761,12 +765,11 @@ namespace COMP4911Timesheets.Data
                     Purpose="Purpose",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 },
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageCode="VACN",
                     Name="Vacation",
                     Description="Vacation is good",
@@ -774,12 +777,11 @@ namespace COMP4911Timesheets.Data
                     Purpose="Purpose",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 },
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageCode="SHOL",
                     Name="SHOL, I forgot what it is",
                     Description="I can't explain",
@@ -787,12 +789,11 @@ namespace COMP4911Timesheets.Data
                     Purpose="Purpose",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 },
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageCode="FLEX",
                     Name="Flex Hour",
                     Description="Flex hour",
@@ -800,12 +801,11 @@ namespace COMP4911Timesheets.Data
                     Purpose="Purpose",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 },
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     WorkPackageCode="AB",
                     Name="Buying the Land",
                     Description="We should buy the land first to build BCIT",
@@ -813,12 +813,19 @@ namespace COMP4911Timesheets.Data
                     Purpose="To build BCIT",
                     Input="Nothing",
                     Output="Nothing",
-                    Activity="Something",
-                    IsParent=true
-                },
+                    Activity="Something"
+                }
+            };
+            return workPackages;
+        }
+
+        public static List<WorkPackage> GetChildWorkPackages(ApplicationDbContext context)
+        {
+            List<WorkPackage> workPackages = new List<WorkPackage>
+            {
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     WorkPackageCode="CD",
                     Name="Borrow money from the banks",
                     Description="We should have the money to buy the land",
@@ -827,12 +834,19 @@ namespace COMP4911Timesheets.Data
                     Input="Input can be anything",
                     Output="Output could be anything",
                     Activity="Something may be activity",
-                    ParentWorkPackageId=context.ParentWorkPackages.Find(5).ParentWorkPckageId,
-                    IsParent=false
-                },
+                    ParentWorkPackageId=context.WorkPackages.Where(wp => wp.WorkPackageCode == "AB").First().WorkPackageId
+                }
+            };
+            return workPackages;
+        }
+
+        public static List<WorkPackage> GetManagedWorkPackages(ApplicationDbContext context)
+        {
+            List<WorkPackage> workPackages = new List<WorkPackage>
+            {
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("010").ProjectId,
+                    ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageCode="00000",
                     Name="Management",
                     Description="This is for management of the project",
@@ -840,12 +854,11 @@ namespace COMP4911Timesheets.Data
                     Purpose="Purpose",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 },
                 new WorkPackage
                 {
-                    ProjectId=context.Projects.Find("1205").ProjectId,
+                    ProjectId=context.Projects.Find(2).ProjectId,
                     WorkPackageCode="00000",
                     Name="Management",
                     Description="This is for management of the project",
@@ -853,8 +866,7 @@ namespace COMP4911Timesheets.Data
                     Purpose="Management",
                     Input="Input",
                     Output="Output",
-                    Activity="Activity",
-                    IsParent=false
+                    Activity="Activity"
                 }
             };
             return workPackages;
@@ -1063,19 +1075,6 @@ namespace COMP4911Timesheets.Data
                 }
             };
             return workPackageReports;
-        }
-
-        public static List<ParentWorkPackage> GetParentWorkPackages()
-        {
-            List<ParentWorkPackage> parentWorkPackages = new List<ParentWorkPackage>
-            {
-                new ParentWorkPackage
-                {
-                    ParentWorkPckageId=5,
-                    Status=ParentWorkPackage.VALID
-                }
-            };
-            return parentWorkPackages;
         }
 
         public static List<WorkPackageEmployee> GetWorkPackageEmployees(ApplicationDbContext context)
@@ -1575,11 +1574,11 @@ namespace COMP4911Timesheets.Data
             {
                 new Timesheet
                 {
-                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 12).First().Id,
+                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     EmployeePayId=context.EmployeePays.Find(1).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Two"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 2).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1588,7 +1587,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(2).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Three"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 3).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1597,7 +1596,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(3).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Four"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 4).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1606,7 +1605,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(6).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Seven"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 7).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1615,7 +1614,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(7).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Eight"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 8).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1624,7 +1623,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(8).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Nine"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 9).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1633,7 +1632,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(9).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Ten"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 10).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1642,7 +1641,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(11).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Twelve"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 12).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1651,7 +1650,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(12).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Thirteen"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 13).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1660,7 +1659,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(1).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Two"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 2).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1669,7 +1668,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(2).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Three"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 3).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1678,7 +1677,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(3).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Four"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 4).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1687,7 +1686,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(6).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Seven"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 7).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1696,7 +1695,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(7).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Eight"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 8).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1705,7 +1704,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(8).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Nine"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 9).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1714,7 +1713,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(9).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Ten"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 10).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1723,7 +1722,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(11).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Twelve"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 12).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 },
                 new Timesheet
@@ -1732,7 +1731,7 @@ namespace COMP4911Timesheets.Data
                     EmployeePayId=context.EmployeePays.Find(12).EmployeePayId,
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
-                    ESignature=Utility.HashEncrypt("Employee Thirteen"),
+                    SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 13).First().Id).First().SignatureId,
                     Status=Timesheet.SUBMITTED_APPROVED
                 }
             };

@@ -53,7 +53,7 @@ namespace COMP4911Timesheets.Models
         public string ProblemAnticipated { get; set; }
 
         [Display(Name = "Work Package ID")]
-        public int WorkPackageId { get; set; }
+        public int? WorkPackageId { get; set; }
         public WorkPackage WorkPackage { get; set; }
     }
 }
