@@ -70,3 +70,8 @@ body {
 #logout-btn:hover {
     color: #00bc8c !important;
 }
+
+.btn.logout {
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+}

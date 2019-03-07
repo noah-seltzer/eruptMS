@@ -25,6 +25,14 @@ namespace COMP4911Timesheets.Data
                 .HasOne(e => e.Approver)
                 .WithMany(a => a.Approvees)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Supervisor)
+                .WithMany(s => s.Supervisees)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Approver)
+                .WithMany(a => a.Approvees)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
