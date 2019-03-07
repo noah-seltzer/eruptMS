@@ -21,15 +21,17 @@ namespace COMP4911Timesheets.Models
         public string Input { get; set; }
         public string Output { get; set; }
         public string Activity { get; set; }
-        public bool IsParent { get; set; }
 
         [Display(Name = "Project ID")]
-        public string ProjectId { get; set; }
+        public int ProjectId { get; set; }
         public Project Project { get; set; }
 
-        [Display(Name = "Parent Work Package ID")]
+        [ForeignKey("ParentWorkPackage")]
         public int? ParentWorkPackageId { get; set; }
-        public ParentWorkPackage ParentWorkPackage { get; set; }
+        public WorkPackage ParentWorkPackage { get; set; }
+
+        [InverseProperty("ParentWorkPackage")]
+        public List<WorkPackage> ChildWorkPackages { get; set; }
 
         public List<Budget> Budgets { get; set; }
         public List<WorkPackageReport> WorkPackageReports { get; set; }

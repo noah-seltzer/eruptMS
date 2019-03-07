@@ -39,11 +39,11 @@ namespace COMP4911Timesheets.Models
         public int Type { get; set; }
 
         [Display(Name = "Work Package ID")]
-        public int WorkPackageId { get; set; }
+        public int? WorkPackageId { get; set; }
         public WorkPackage WorkPackage { get; set; }
 
         [Display(Name = "Pay Grade ID")]
-        public int PayGradeId { get; set; }
+        public int? PayGradeId { get; set; }
         public PayGrade PayGrade { get; set; }
     }
 }
