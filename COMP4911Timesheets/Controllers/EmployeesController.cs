@@ -122,6 +122,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
+                    employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
+                    employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
