@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    dockerfile {
-      filename '/COMP4911timesheets/build.Dockerfile'
-    }
-
-  }
+  agent none
   stages {
     stage('build container') {
       steps {
