@@ -3,6 +3,7 @@ pipeline {
   stages {
     stage('Test Stage') {
       steps {
+        sh 'pwd'
         sh 'touch new_file'
       }
     }
