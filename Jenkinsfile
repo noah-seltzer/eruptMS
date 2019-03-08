@@ -3,8 +3,8 @@ pipeline {
   stages {
     stage('build container') {
       steps {
-        sh 'docker stop eruptTEST'
-        sh 'docker-compose -f build.yml up --build -d'
+        sh 'sudo docker stop eruptTEST'
+        sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
   }
