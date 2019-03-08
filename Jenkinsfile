@@ -1,9 +1,10 @@
 pipeline {
   agent any
   stages {
-    stage('') {
+    stage('Test Stage') {
       steps {
-        sh 'pwd'
+        sh '''pwd
+echo new_file > new_file'''
       }
     }
   }
