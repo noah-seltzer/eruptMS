@@ -190,14 +190,14 @@ namespace COMP4911Timesheets.Controllers
                 }
             }
 
-            //put children workpackages under parents workpackages
-            
+            //put children workpackages under parents workpackages          
             for (int i = 0; i < maxWorkPackageCodeLength - 5; i++) {
 
                 for (int n = 0; n < workPackages.Count; n++)
                 {
+                    //checkout the children workpackages
                     if (workPackages[n].WorkPackageCode.Length == PROJECT_CODE_LENGTH + i + 2) {
-                        
+                        //compare children workpackagecode with other possible parents workpackagecode
                         for (int m = 0; m < tempWorkPackages.Count; m++) {
                             string tempCode1 = tempWorkPackages[m].WorkPackageCode;
                             string tempCode2 = workPackages[n].WorkPackageCode.Substring(0, PROJECT_CODE_LENGTH + i + 1);
