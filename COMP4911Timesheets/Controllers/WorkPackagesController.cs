@@ -13,7 +13,7 @@ namespace COMP4911Timesheets.Controllers
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        public static int PROJECT_CODE_LENGTH = 4;
         public WorkPackagesController(ApplicationDbContext context)
         {
             _context = context;
@@ -170,6 +170,48 @@ namespace COMP4911Timesheets.Controllers
 
             var workPackages = await _context.WorkPackages
              .Where(u => u.ProjectId == id).ToListAsync();
+
+            int maxWorkPackageCodeLength = 0;
+            
+            foreach (WorkPackage tempWorkPackage in workPackages) {
+                if (tempWorkPackage.WorkPackageCode.Length > maxWorkPackageCodeLength) {
+                    maxWorkPackageCodeLength = tempWorkPackage.WorkPackageCode.Length;
+                }
+            }
+
+            var tempWorkPackages = new List<WorkPackage>();
+
+            //add the root workpackages to tempWorkPackages
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {
+                if (tempWorkPackage.WorkPackageCode.Length == (PROJECT_CODE_LENGTH + 1))
+                {
+                    tempWorkPackages.Add(tempWorkPackage);
+                }
+            }
+
+            //put children workpackages under parents workpackages
+            
+            for (int i = 0; i < maxWorkPackageCodeLength - 5; i++) {
+
+                for (int n = 0; n < workPackages.Count; n++)
+                {
+                    if (workPackages[n].WorkPackageCode.Length == PROJECT_CODE_LENGTH + i + 2) {
+                        
+                        for (int m = 0; m < tempWorkPackages.Count; m++) {
+                            string tempCode1 = tempWorkPackages[m].WorkPackageCode;
+                            string tempCode2 = workPackages[n].WorkPackageCode.Substring(0, PROJECT_CODE_LENGTH + i + 1);
+                           
+                            if (tempCode1.Equals(tempCode2)) {
+                                tempWorkPackages.Insert(m + 1, workPackages[n]);
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            
+            workPackages = tempWorkPackages;
 
             if (workPackages == null)
             {
