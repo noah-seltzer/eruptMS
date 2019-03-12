@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets
 {
@@ -46,6 +47,7 @@ namespace COMP4911Timesheets
         // GET: Projects/Create
         public IActionResult Create()
         {
+            ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
             return View();
         }
 
@@ -54,15 +56,35 @@ namespace COMP4911Timesheets
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectId,ProjectCode,Name,Description,CostingProposal,OriginalBudget,Status")] Project project)
+        public async Task<IActionResult> Create([Bind("ProjectId,ProjectCode,Name,Description,ProjectManager")] NewProject input)
         {
             if (ModelState.IsValid)
             {
+                Project project = new Project
+                {
+                    ProjectId = input.ProjectId,
+                    ProjectCode = input.ProjectCode,
+                    Name = input.Name,
+                    Description = input.Description,
+                    Status = Project.ONGOING,
+                };
                 _context.Add(project);
+
+                ProjectEmployee manager = new ProjectEmployee
+                {
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    Role = ProjectEmployee.PROJECT_MANAGER,
+                    ProjectId = input.ProjectId,
+                    Project = project,
+                    EmployeeId = input.ProjectManager,
+                    Employee = _context.Employees.Find(input.ProjectManager),
+                };
+                _context.Add(manager);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(project);
+            return View(input);
         }
 
         // GET: Projects/Edit/5
