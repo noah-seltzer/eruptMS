@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using COMP4911Timesheets.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets
 {
+    [Authorize]
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -96,6 +98,7 @@ namespace COMP4911Timesheets
             }
 
             var project = await _context.Projects.FindAsync(id);
+            
             if (project == null)
             {
                 return NotFound();
