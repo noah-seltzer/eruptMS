@@ -75,3 +75,7 @@ body {
     border-top: 0 !important;
     border-bottom: 0 !important;
 }
+
+.col-xs-1 {
+    min-width: 100px;
+}
