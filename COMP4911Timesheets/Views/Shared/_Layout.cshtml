@@ -8,13 +8,11 @@
     <title>@ViewData["Title"] - COMP4911Timesheets</title>
 
     <environment include="Development">
+        <link rel="stylesheet" href="~/lib/chosen/chosen-min.css"/>
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
-              crossorigin="anonymous"
-              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -80,6 +78,7 @@
     </footer>
 
     <environment include="Development">
+        <script src="~/lib/chosen/chosen-jquery.js"></script>
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
     </environment>
