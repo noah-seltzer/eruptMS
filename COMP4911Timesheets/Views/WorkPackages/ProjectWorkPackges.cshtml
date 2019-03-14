@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>WorkPackage</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,6 +12,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th></th>
             <th>
                 @Html.DisplayNameFor(model => model.WorkPackageCode)
             </th>
@@ -48,43 +49,87 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Contractor)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Purpose)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Input)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Output)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Activity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
-                </td>
-            </tr>
+            @if (item.WorkPackageCode.Length == 5)
+            {
+                <tr class="collapsed" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
+                    <td><button onclick="myFunction()">Try it</button></td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Input)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Output)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (item.WorkPackageCode.Length != 5)
+            {               
+                <tr class="collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">               
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Input)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Output)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+                    </td>
+                </tr>
+            }
         }
-    </tbody>
+        </tbody>
 </table>

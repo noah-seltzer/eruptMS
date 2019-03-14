@@ -13,7 +13,9 @@ namespace COMP4911Timesheets.Controllers
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
+
         public static int PROJECT_CODE_LENGTH = 4;
+
         public WorkPackagesController(ApplicationDbContext context)
         {
             _context = context;
@@ -173,6 +175,7 @@ namespace COMP4911Timesheets.Controllers
 
             int maxWorkPackageCodeLength = 0;
             
+            //get the max length of the workpackage code
             foreach (WorkPackage tempWorkPackage in workPackages) {
                 if (tempWorkPackage.WorkPackageCode.Length > maxWorkPackageCodeLength) {
                     maxWorkPackageCodeLength = tempWorkPackage.WorkPackageCode.Length;
@@ -191,7 +194,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             //put children workpackages under parents workpackages          
-            for (int i = 0; i < maxWorkPackageCodeLength - 5; i++) {
+            for (int i = 0; i < maxWorkPackageCodeLength - PROJECT_CODE_LENGTH - 1; i++) {
 
                 for (int n = 0; n < workPackages.Count; n++)
                 {
@@ -204,14 +207,15 @@ namespace COMP4911Timesheets.Controllers
                            
                             if (tempCode1.Equals(tempCode2)) {
                                 tempWorkPackages.Insert(m + 1, workPackages[n]);
-                            }
-                            
+                            }                           
                         }
                     }
                 }
             }
             
             workPackages = tempWorkPackages;
+
+            ViewData["NestedLevel"] = maxWorkPackageCodeLength - PROJECT_CODE_LENGTH;
 
             if (workPackages == null)
             {
