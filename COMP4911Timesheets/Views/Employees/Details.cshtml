@@ -1,10 +1,10 @@
 ﻿@model COMP4911Timesheets.Models.Employee
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["PageTitle"] = "Details";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <div>
     <h4>Employee</h4>
@@ -32,7 +32,7 @@
             @Html.DisplayNameFor(model => model.Title)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => this.Model.JobTitles[this.Model.Title])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.JobTitles[this.Model.Title])
         </dd>
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FlexTime)
@@ -50,7 +50,7 @@
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Status)
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.Statuses[this.Model.Status])
         </dd>
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Approver)

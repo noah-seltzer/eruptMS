@@ -9,6 +9,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -53,15 +54,18 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
             return View(employee);
         }
 
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email");
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email");
+            var employees = _context.Employees.ToList();
+            var jobTitles = Employee.JobTitles.ToList();
+
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email");
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email");
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value");
 
             return View();
         }
@@ -75,17 +79,14 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
-                employee.Status = 1;
+                employee.Status = Employee.CURRENTLY_EMPLOYEED;
                 employee.CreatedTime = DateTime.Now;
                 employee.UserName = employee.Email;
-                employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
+                employee.SupervisorId = employee.SupervisorId;
+                employee.ApproverId = employee.ApproverId;
                 await _userManager.CreateAsync(employee, defaultPassword);
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
 
             return View(employee);
         }
@@ -104,8 +105,14 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
+            var employees = _context.Employees.ToList();
+            var jobTitles = Employee.JobTitles.ToList();
+            var statuses = Employee.Statuses.ToList();
+
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", employee.Email);
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", employee.Email);
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value", employee.Title);
+            ViewData["Status"] = new SelectList(statuses, "Key", "Value", employee.Status);
 
             return View(employee);
         }
@@ -126,8 +133,6 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
-                    employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                    employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
@@ -144,9 +149,6 @@ namespace COMP4911Timesheets.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.SupervisorId);
 
             return View(employee);
         }

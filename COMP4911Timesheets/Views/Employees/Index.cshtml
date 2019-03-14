@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Employee>
 
 @{
-    ViewData["Title"] = "Employees";
+    ViewData["PageTitle"] = "Employees";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -44,10 +44,10 @@
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
                 <td class="priority-2">
-                    @Html.DisplayFor(modelItem => item.JobTitles[item.Title])
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Title])
                 </td>
                 <td class="priority-2">
-                    @Html.DisplayFor(modelItem => item.Status)
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Status])
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
