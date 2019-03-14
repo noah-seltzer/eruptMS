@@ -10,6 +10,7 @@ using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Collections;
+using System.Security.Claims;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -85,9 +86,19 @@ namespace COMP4911Timesheets.Controllers
                 employee.SupervisorId = employee.SupervisorId;
                 employee.ApproverId = employee.ApproverId;
                 await _userManager.CreateAsync(employee, defaultPassword);
+
+                if (employee.Title == Employee.HR_MANAGER)
+                {
+                    await _userManager.AddToRoleAsync(employee, ApplicationRole.HR);
+                }
+
+                var supervisor = _context.Employees.Find(employee.SupervisorId);
+                await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+                var approver = _context.Employees.Find(employee.ApproverId);
+                await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+
                 return RedirectToAction(nameof(Index));
             }
-
             return View(employee);
         }
 
@@ -133,8 +144,21 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
+                    // NEED TO GET THE OLD SUPERVISOR, APPROVER, & TITLE, BUT COULDN'T FIND THE WAY YET. I'LL WORK ON IT LATER TODAY
+
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
+
+                    var approver = _context.Employees.Find(employee.ApproverId);
+                    await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+                    var supervisor = _context.Employees.Find(employee.SupervisorId);
+                    await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+
+                    if (employee.Title == Employee.HR_MANAGER)
+                    {
+                        await _userManager.AddToRoleAsync(employee, ApplicationRole.HR);
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -178,9 +202,25 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
+            if (_userManager.GetUserId(this.User) == id)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
+
+            var approver = _context.Employees.Find(employee.ApproverId);
+            await _userManager.RemoveFromRoleAsync(approver, ApplicationRole.TA);
+            var supervisor = _context.Employees.Find(employee.SupervisorId);
+            await _userManager.RemoveFromRoleAsync(supervisor, ApplicationRole.LM);
+
+            if (employee.Title == Employee.HR_MANAGER)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.HR);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
