@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "AD,HR")]
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;
