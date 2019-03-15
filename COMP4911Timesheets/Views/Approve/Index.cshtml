@@ -1,0 +1,83 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Employee>
+@{
+
+        ViewData["Title"] = "Approve Timesheets";
+    }
+
+    <h1>@ViewData["Title"]</h1>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EmployeeId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.Approver)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Supervisor)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </th>
+
+                <th>Waiting for Approval</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmployeeId)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Approver.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Supervisor.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id">
+                            @{var a = item.Timesheets;
+                                int c = 0;
+                                if (a != null)
+                                {
+                                    foreach (var sheets in a)
+                                    {
+                                        c++;
+                                    }
+                                }
+                            }
+                            @c
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

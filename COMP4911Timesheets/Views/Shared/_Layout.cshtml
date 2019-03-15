@@ -35,7 +35,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             //var user = await UserManager.FindByNameAsync(User.Identity.Name);
-                            if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
@@ -50,6 +50,12 @@
                                     <a class="nav-link" asp-area="" asp-controller="ProjectSumReport" asp-action="Index">Project Sum Report</a>
                                 </div>
                             </li>
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "PM"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
+                                </li>
+                            }
                         }
                     </ul>
                 </div>
