@@ -64,8 +64,8 @@ namespace COMP4911Timesheets.Controllers
             var employees = _context.Employees.ToList();
             var jobTitles = Employee.JobTitles.ToList();
 
-            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email");
-            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email");
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
             ViewData["Title"] = new SelectList(jobTitles, "Key", "Value");
 
             return View();
@@ -124,8 +124,8 @@ namespace COMP4911Timesheets.Controllers
             var jobTitles = Employee.JobTitles.ToList();
             var statuses = Employee.Statuses.ToList();
 
-            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", employee.Email);
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", employee.SupervisorId);
             ViewData["Title"] = new SelectList(jobTitles, "Key", "Value", employee.Title);
             ViewData["Status"] = new SelectList(statuses, "Key", "Value", employee.Status);
 
@@ -185,7 +185,7 @@ namespace COMP4911Timesheets.Controllers
                     employeeToBeEdited.Status = employee.Status;
                     employeeToBeEdited.ApproverId = employee.ApproverId;
                     employeeToBeEdited.SupervisorId = employee.SupervisorId;
-                    employeeToBeEdited.UserName = employee.UserName;
+                    employeeToBeEdited.UserName = employee.Email;
                     employeeToBeEdited.Email = employee.Email;
                     employeeToBeEdited.PhoneNumber = employee.PhoneNumber;
                     await _userManager.UpdateAsync(employeeToBeEdited);
