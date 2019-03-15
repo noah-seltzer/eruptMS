@@ -91,6 +91,10 @@ namespace COMP4911Timesheets.Controllers
                 {
                     await _userManager.AddToRoleAsync(employee, ApplicationRole.HR);
                 }
+                if (employee.Title == Employee.ADMIN)
+                {
+                    await _userManager.AddToRoleAsync(employee, ApplicationRole.AD);
+                }
 
                 var supervisor = _context.Employees.Find(employee.SupervisorId);
                 await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
@@ -140,23 +144,63 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            if (employee.SupervisorId == id || employee.ApproverId == id)
+            {
+                return BadRequest("Supervisor and Approver can't be themselves");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // NEED TO GET THE OLD SUPERVISOR, APPROVER, & TITLE, BUT COULDN'T FIND THE WAY YET. I'LL WORK ON IT LATER TODAY
+                    var oldEmployee = await _context.Employees.FindAsync(id);
+                    if (oldEmployee != null)
+                    {
+                        var oldApprover = await _context.Employees.FindAsync(oldEmployee.ApproverId);
+                        if (oldApprover != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldApprover, ApplicationRole.TA);
+                        }
+                        var oldSupervisor = await _context.Employees.FindAsync(oldEmployee.SupervisorId);
+                        if (oldSupervisor != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldSupervisor, ApplicationRole.LM);
+                        }
+                        if (oldEmployee.Title == Employee.HR_MANAGER)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.HR);
+                        }
+                        if (oldEmployee.Title == Employee.ADMIN)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.AD);
+                        }
+                    }
 
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
+                    var employeeToBeEdited = await _userManager.FindByIdAsync(id);
+                    employeeToBeEdited.FirstName = employee.FirstName;
+                    employeeToBeEdited.LastName = employee.LastName;
+                    employeeToBeEdited.Title = employee.Title;
+                    employeeToBeEdited.FlexTime = employee.FlexTime;
+                    employeeToBeEdited.VacationTime = employee.VacationTime;
+                    employeeToBeEdited.Status = employee.Status;
+                    employeeToBeEdited.ApproverId = employee.ApproverId;
+                    employeeToBeEdited.SupervisorId = employee.SupervisorId;
+                    employeeToBeEdited.UserName = employee.UserName;
+                    employeeToBeEdited.Email = employee.Email;
+                    employeeToBeEdited.PhoneNumber = employee.PhoneNumber;
+                    await _userManager.UpdateAsync(employeeToBeEdited);
 
                     var approver = _context.Employees.Find(employee.ApproverId);
                     await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
                     var supervisor = _context.Employees.Find(employee.SupervisorId);
                     await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
-
                     if (employee.Title == Employee.HR_MANAGER)
                     {
-                        await _userManager.AddToRoleAsync(employee, ApplicationRole.HR);
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.HR);
+                    }
+                    if (employee.Title == Employee.ADMIN)
+                    {
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.AD);
                     }
 
                 }
@@ -219,6 +263,10 @@ namespace COMP4911Timesheets.Controllers
             if (employee.Title == Employee.HR_MANAGER)
             {
                 await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.HR);
+            }
+            if (employee.Title == Employee.ADMIN)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.AD);
             }
 
             return RedirectToAction(nameof(Index));
