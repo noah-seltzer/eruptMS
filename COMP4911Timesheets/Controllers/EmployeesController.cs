@@ -9,10 +9,12 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections;
+using System.Security.Claims;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "AD,HR")]
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -53,15 +55,18 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
             return View(employee);
         }
 
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email");
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email");
+            var employees = _context.Employees.ToList();
+            var jobTitles = Employee.JobTitles.ToList();
+
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value");
 
             return View();
         }
@@ -75,18 +80,29 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
-                employee.Status = 1;
+                employee.Status = Employee.CURRENTLY_EMPLOYEED;
                 employee.CreatedTime = DateTime.Now;
                 employee.UserName = employee.Email;
-                employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
+                employee.SupervisorId = employee.SupervisorId;
+                employee.ApproverId = employee.ApproverId;
                 await _userManager.CreateAsync(employee, defaultPassword);
+
+                if (employee.Title == Employee.HR_MANAGER)
+                {
+                    await _userManager.AddToRoleAsync(employee, ApplicationRole.HR);
+                }
+                if (employee.Title == Employee.ADMIN)
+                {
+                    await _userManager.AddToRoleAsync(employee, ApplicationRole.AD);
+                }
+
+                var supervisor = _context.Employees.Find(employee.SupervisorId);
+                await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+                var approver = _context.Employees.Find(employee.ApproverId);
+                await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-
             return View(employee);
         }
 
@@ -104,8 +120,14 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
+            var employees = _context.Employees.ToList();
+            var jobTitles = Employee.JobTitles.ToList();
+            var statuses = Employee.Statuses.ToList();
+
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", employee.SupervisorId);
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value", employee.Title);
+            ViewData["Status"] = new SelectList(statuses, "Key", "Value", employee.Status);
 
             return View(employee);
         }
@@ -122,14 +144,65 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            if (employee.SupervisorId == id || employee.ApproverId == id)
+            {
+                return BadRequest("Supervisor and Approver can't be themselves");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                    employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
+                    var oldEmployee = await _context.Employees.FindAsync(id);
+                    if (oldEmployee != null)
+                    {
+                        var oldApprover = await _context.Employees.FindAsync(oldEmployee.ApproverId);
+                        if (oldApprover != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldApprover, ApplicationRole.TA);
+                        }
+                        var oldSupervisor = await _context.Employees.FindAsync(oldEmployee.SupervisorId);
+                        if (oldSupervisor != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldSupervisor, ApplicationRole.LM);
+                        }
+                        if (oldEmployee.Title == Employee.HR_MANAGER)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.HR);
+                        }
+                        if (oldEmployee.Title == Employee.ADMIN)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.AD);
+                        }
+                    }
+
+                    var employeeToBeEdited = await _userManager.FindByIdAsync(id);
+                    employeeToBeEdited.FirstName = employee.FirstName;
+                    employeeToBeEdited.LastName = employee.LastName;
+                    employeeToBeEdited.Title = employee.Title;
+                    employeeToBeEdited.FlexTime = employee.FlexTime;
+                    employeeToBeEdited.VacationTime = employee.VacationTime;
+                    employeeToBeEdited.Status = employee.Status;
+                    employeeToBeEdited.ApproverId = employee.ApproverId;
+                    employeeToBeEdited.SupervisorId = employee.SupervisorId;
+                    employeeToBeEdited.UserName = employee.Email;
+                    employeeToBeEdited.Email = employee.Email;
+                    employeeToBeEdited.PhoneNumber = employee.PhoneNumber;
+                    await _userManager.UpdateAsync(employeeToBeEdited);
+
+                    var approver = _context.Employees.Find(employee.ApproverId);
+                    await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+                    var supervisor = _context.Employees.Find(employee.SupervisorId);
+                    await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+                    if (employee.Title == Employee.HR_MANAGER)
+                    {
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.HR);
+                    }
+                    if (employee.Title == Employee.ADMIN)
+                    {
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.AD);
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -144,9 +217,6 @@ namespace COMP4911Timesheets.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.SupervisorId);
 
             return View(employee);
         }
@@ -176,9 +246,29 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
+            if (_userManager.GetUserId(this.User) == id)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
+
+            var approver = _context.Employees.Find(employee.ApproverId);
+            await _userManager.RemoveFromRoleAsync(approver, ApplicationRole.TA);
+            var supervisor = _context.Employees.Find(employee.SupervisorId);
+            await _userManager.RemoveFromRoleAsync(supervisor, ApplicationRole.LM);
+
+            if (employee.Title == Employee.HR_MANAGER)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.HR);
+            }
+            if (employee.Title == Employee.ADMIN)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.AD);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
