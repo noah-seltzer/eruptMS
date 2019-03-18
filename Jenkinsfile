@@ -3,6 +3,7 @@ pipeline {
     dockerfile {
       dir 'COMP4911Timesheets'
       filename 'build.Dockerfile'
+      label 'jenktest'
     }
 
   }
