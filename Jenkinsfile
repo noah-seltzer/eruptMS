@@ -9,5 +9,10 @@ pipeline {
         sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
+    stage('') {
+      steps {
+        echo 'this is branch env.GIT_BRANCH'
+      }
+    }
   }
 }
