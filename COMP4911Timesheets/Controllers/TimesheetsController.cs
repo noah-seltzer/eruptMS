@@ -60,14 +60,25 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets/Create
         public IActionResult Create()
         {
-
+            DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
             Timesheet model = new Timesheet()
             {
-                WeekEnding = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday),
-
+                //default this Friday
+                WeekEnding = friday
             };
-
+            List<DateTime> fridays = new List<DateTime>();
+            for (int i = 0; i < 30; i++)
+            {
+                fridays.Add(friday.AddDays(i * 7));
+            }
+            var fridayslist = fridays.Select(s => new SelectListItem
+            {
+                Value = s.Date.ToString(),
+                Text = s.Date.ToString("yyyy/MM/dd")
+            });
+            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
             return View(model);
+
         }
 
         // POST: Timesheets/Create
@@ -80,6 +91,7 @@ namespace COMP4911Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
+                //default status
                 timesheet.Status = 3;
 
                 //calculate week number
@@ -245,7 +257,7 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timesheet = await _context.Timesheets.Include(m=>m.TimesheetRows).FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(m => m.TimesheetRows).FirstOrDefaultAsync(m => m.TimesheetId == id);
             //authorization
             if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
             {
