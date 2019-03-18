@@ -22,7 +22,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Approve
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor);
+            var applicationDbContext = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor).Include(e => e.Timesheets);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -37,6 +37,7 @@ namespace COMP4911Timesheets.Controllers
             var employee = await _context.Employees
                 .Include(e => e.Approver)
                 .Include(e => e.Supervisor)
+                .Include(e => e.Timesheets)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
