@@ -11,7 +11,7 @@ pipeline {
     }
     stage('') {
       steps {
-        echo 'this is branch env.GIT_BRANCH'
+        echo 'this is branch ' + env.GIT_BRANCH
       }
     }
   }
