@@ -1,10 +1,10 @@
 ﻿@model COMP4911Timesheets.Models.Employee
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["PageTitle"] = "Edit";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <h4>Employee</h4>
 <hr />
@@ -13,11 +13,6 @@
         <form asp-action="Edit" class="form-horizontal">
             <input type="hidden" asp-for="ConcurrencyStamp" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <input asp-for="EmployeeId" class="form-control" />
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
@@ -30,8 +25,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <select asp-for="Title" class="form-control" asp-items="ViewBag.Title"></select>
             </div>
             <div class="form-group">
                 <label asp-for="FlexTime" class="control-label"></label>
@@ -45,8 +39,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <select asp-for="Status" class="form-control" asp-items="ViewBag.Status"></select>
             </div>
             <div class="form-group">
                 <label asp-for="ApproverId" class="control-label"></label>
@@ -59,11 +52,6 @@
                 <span asp-validation-for="SupervisorId" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
                 <input asp-for="Email" class="form-control" />

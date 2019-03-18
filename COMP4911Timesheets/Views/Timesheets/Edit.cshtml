@@ -1,0 +1,157 @@
+﻿@model COMP4911Timesheets.Models.Timesheet
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Timesheet</h4>
+<hr />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.FlexTime)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.FlexTime)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Status)
+    </dt>
+    <dd class="col-sm-10">
+        @{string status = "";}
+        @if (Model.Status == 0) { status = "INVALID"; }
+        @if (Model.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
+        @if (Model.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
+        @if (Model.Status == 3) { status = "SUBMITTED_APPROVED"; }
+        @if (Model.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
+        @status
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Employee)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Employee.LastName)
+    </dd>
+</dl>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="TimesheetId" />
+            <input type="hidden" asp-for="EmployeeId" />
+            <input type="hidden" asp-for="EmployeePayId" />
+            <input type="hidden" asp-for="SignatureId" />
+            <input type="hidden" asp-for="Status" />
+            <input type="hidden" asp-for="FlexTime" />
+
+            <div class="form-group">
+                <label asp-for="WeekEnding" class="control-label"></label>
+                <input asp-for="WeekEnding" class="form-control" />
+                <span asp-validation-for="WeekEnding" class="text-danger"></span>
+            </div>
+
+            @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, null)
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Project
+                        </th>
+                        <th>
+                            WorkPackage
+                        </th>
+                        <th>
+                            SatHour
+                        </th>
+                        <th>
+                            SunHour
+                        </th>
+                        <th>
+                            MonHour
+                        </th>
+                        <th>
+                            TueHour
+                        </th>
+                        <th>
+                            WedHour
+                        </th>
+                        <th>
+                            ThuHour
+                        </th>
+                        <th>
+                            FriHour
+                        </th>
+                        <th>
+                            Notes
+                        </th>
+
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.TimesheetRows != null)
+                    {
+                        foreach (var item in Model.TimesheetRows)
+                        {
+                            <tr>
+                                <td>
+                                    @item.WorkPackage.Project.Name
+                                </td>
+                                <td>
+                                    @item.WorkPackage.Name
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SatHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.SunHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MonHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TueHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.WedHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ThuHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FriHour)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Notes)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, null)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, null)
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

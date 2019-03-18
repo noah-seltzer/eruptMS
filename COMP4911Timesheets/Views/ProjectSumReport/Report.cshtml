@@ -1,8 +1,12 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.ProjectSumReport>
 
-<h1>Project Summary Reprot</h1>
-<p>PROJECT TITLE: @ViewData["ProjectName"]</P>
-<table class="table">
+@{
+    ViewData["PageTitle"] = "Project Summary Reports";
+}
+
+<h1>Project Summary Report</h1>
+<p>PROJECT TITLE: @ViewData["ProjectName"]</p>
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
@@ -31,7 +35,7 @@
     </thead>
     <tbody>
         @foreach (var item in Model)
-        {         
+        {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
@@ -58,3 +62,6 @@
         }
     </tbody>
 </table>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

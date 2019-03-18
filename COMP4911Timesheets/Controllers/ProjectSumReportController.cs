@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize]
     public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;

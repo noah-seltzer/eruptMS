@@ -1,27 +1,27 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Project>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["PageTitle"] = "Project Summary Reports";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.CostingProposal)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.OriginalBudget)
             </th>
             <th>
@@ -37,13 +37,13 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
-                <td>
+                <td class="priority-2">
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
-                <td>
+                <td class="priority-2">
                     @Html.DisplayFor(modelItem => item.CostingProposal)
                 </td>
-                <td>
+                <td class="priority-2">
                     @Html.DisplayFor(modelItem => item.OriginalBudget)
                 </td>
                 <td>

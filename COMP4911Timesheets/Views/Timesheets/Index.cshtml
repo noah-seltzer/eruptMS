@@ -1,0 +1,65 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Timesheet>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekEnding)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FlexTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @item.WeekEnding.ToString("yyyy/MM/dd")
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WeekNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FlexTime)
+            </td>
+            <td>
+                @{string status = "";}
+                @if (item.Status == 0) { status = "INVALID"; }
+                @if (item.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
+                @if (item.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
+                @if (item.Status == 3) { status = "SUBMITTED_APPROVED"; }
+                @if (item.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
+                @status
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
