@@ -1,11 +1,14 @@
 pipeline {
-  agent any
+  agent {
+    dockerfile {
+      filename 'COMP4911Timesheets/build.Dockerfile'
+    }
+
+  }
   stages {
     stage('build container') {
       steps {
         sh 'pwd'
-        sh 'docker-compose -f build.yml up --build -d'
-        sh 'docker stop eruptTEST'
       }
     }
   }
