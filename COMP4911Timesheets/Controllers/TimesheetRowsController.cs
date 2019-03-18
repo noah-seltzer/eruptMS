@@ -7,38 +7,47 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class TimesheetRowsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _userManager;
 
-        public TimesheetRowsController(ApplicationDbContext context)
+        public TimesheetRowsController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
 
         // GET: TimesheetRows/Create
         public async Task<IActionResult> Create(int id)
         {
-            //if (System.Security.Principal.WindowsIdentity.GetCurrent().) { }
+
             TimesheetRow model = new TimesheetRow()
             {
                 TimesheetId = id
             };
             var projects = await _context.Projects.ToListAsync();
             var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+
+            //authorization
+            if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
             var packages = await _context.WorkPackages.ToListAsync();
             var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem
                   {
                       Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name+" --- "+s.WorkPackage.Name
+                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
                   });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
-            //ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "Project.Name" );
             return View(model);
         }
 
@@ -57,6 +66,14 @@ namespace COMP4911Timesheets.Controllers
             }
             var projects = await _context.Projects.ToListAsync();
             var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+
+            //authorization
+            if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
+
             var packages = await _context.WorkPackages.ToListAsync();
             var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem
@@ -76,13 +93,25 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
+
             if (timesheetRow == null)
             {
                 return NotFound();
             }
+
+
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+
+            //authorization
+            if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
+
             var packages = await _context.WorkPackages.ToListAsync();
             var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem
@@ -127,7 +156,15 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+
+            //authorization
+            if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
+
             var packages = await _context.WorkPackages.ToListAsync();
             var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem

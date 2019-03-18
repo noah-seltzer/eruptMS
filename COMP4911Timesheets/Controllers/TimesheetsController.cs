@@ -25,7 +25,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay).Include(t => t.Signature);
+            var applicationDbContext = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay).Include(t => t.Signature).Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User));
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -36,17 +36,20 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
+            var projects = await _context.Projects.ToListAsync();
             var workpackages = await _context.WorkPackages.ToListAsync();
             var timesheet = await _context.Timesheets
                 .Include(t => t.Employee)
-                .Include(t => t.EmployeePay)
-                .Include(t => t.EmployeePay.PayGrade)
                 .Include(t => t.TimesheetRows)
-                .Include(t => t.Employee.WorkPackageEmployees)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
 
-            //ViewData["wpstatus"] = timesheet.Employee.;
             if (timesheet == null)
+            {
+                return NotFound();
+            }
+
+            //authorization
+            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
             {
                 return NotFound();
             }
@@ -57,10 +60,14 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets/Create
         public IActionResult Create()
         {
-            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id");
-            //ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId");
-            //ViewData["SignatureId"] = new SelectList(_context.Signatures, "SignatureId", "SignatureId");
-            return View();
+
+            Timesheet model = new Timesheet()
+            {
+                WeekEnding = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday),
+
+            };
+
+            return View(model);
         }
 
         // POST: Timesheets/Create
@@ -70,15 +77,36 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TimesheetId,WeekEnding,WeekNumber,FlexTime,Status,EmployeeId,EmployeePayId,SignatureId")] Timesheet timesheet)
         {
+
             if (ModelState.IsValid)
             {
+                timesheet.Status = 3;
+
+                //calculate week number
+                timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
+
+                timesheet.EmployeeId = _userManager.GetUserId(HttpContext.User);
+
+                //////////////////
+                ///how to select employee pay automatically?
+                //////////////////
+                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId);
+                timesheet.EmployeePay = emppay;
+                timesheet.EmployeePayId = emppay.EmployeePayId;
+
+                //////////////////
+                ///how to select Signature automatically?
+                //////////////////
+                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId);
+                timesheet.Signature = sign;
+                timesheet.SignatureId = sign.SignatureId;
+
+                timesheet.FlexTime = 40;
+
                 _context.Add(timesheet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", timesheet.EmployeeId);
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
-            ViewData["SignatureId"] = new SelectList(_context.Signatures, "SignatureId", "SignatureId", timesheet.SignatureId);
             return View(timesheet);
         }
 
@@ -90,14 +118,53 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var timesheet = await _context.Timesheets.FindAsync(id);
+            var projects = await _context.Projects.ToListAsync();
+            var workpackages = await _context.WorkPackages.ToListAsync();
+            var timesheet = await _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.TimesheetRows)
+                .FirstOrDefaultAsync(m => m.TimesheetId == id);
+
+
+
             if (timesheet == null)
             {
                 return NotFound();
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "Id", timesheet.EmployeeId);
-            ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays, "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
-            ViewData["SignatureId"] = new SelectList(_context.Signatures, "SignatureId", "SignatureId", timesheet.SignatureId);
+
+
+            //authorization
+            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
+            //calculate flex time
+            timesheet.FlexTime = 40;
+            if (timesheet.TimesheetRows != null)
+            {
+                foreach (TimesheetRow tr in timesheet.TimesheetRows)
+                {
+                    timesheet.FlexTime = timesheet.FlexTime - tr.SatHour - tr.SunHour - tr.MonHour - tr.TueHour - tr.WedHour - tr.ThuHour - tr.FriHour;
+                }
+            }
+            try
+            {
+                _context.Update(timesheet);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TimesheetExists(timesheet.TimesheetId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
             return View(timesheet);
         }
 
@@ -106,12 +173,21 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,ESignature,FlexTime,Status,EmployeePayId")] Timesheet timesheet)
+        public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,SignatureId,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
         {
             if (id != timesheet.TimesheetId)
             {
                 return NotFound();
             }
+
+            //authorization
+            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
+            //calculate week number
+            timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
 
             if (ModelState.IsValid)
             {
@@ -133,8 +209,6 @@ namespace COMP4911Timesheets.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "EmployeeId", timesheet.EmployeeId);
-            //ViewData["EmployeePayId"] = new SelectList(_context.EmployeePays.Where(e => e.EmployeeId == employeeid), "EmployeePayId", "EmployeePayId", timesheet.EmployeePayId);
             return View(timesheet);
         }
 
@@ -145,18 +219,23 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
+            var projects = await _context.Projects.ToListAsync();
             var workpackages = await _context.WorkPackages.ToListAsync();
             var timesheet = await _context.Timesheets
                 .Include(t => t.Employee)
-                .Include(t => t.EmployeePay)
-                .Include(t => t.EmployeePay.PayGrade)
                 .Include(t => t.TimesheetRows)
-                .Include(t => t.Employee.WorkPackageEmployees)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
             if (timesheet == null)
             {
                 return NotFound();
             }
+
+            //authorization
+            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
+            {
+                return NotFound();
+            }
+
 
             return View(timesheet);
         }
@@ -166,11 +245,20 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var timesheet = await _context.Timesheets.FindAsync(id);
-            var timesheetrows = timesheet.TimesheetRows;
-            foreach (TimesheetRow tr in timesheetrows)
+            var timesheet = await _context.Timesheets.Include(m=>m.TimesheetRows).FirstOrDefaultAsync(m => m.TimesheetId == id);
+            //authorization
+            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
             {
-                _context.TimesheetRows.Remove(tr);
+                return NotFound();
+            }
+
+            var timesheetrows = timesheet.TimesheetRows;
+            if (timesheetrows != null)
+            {
+                foreach (TimesheetRow tr in timesheetrows)
+                {
+                    _context.TimesheetRows.Remove(tr);
+                }
             }
             _context.Timesheets.Remove(timesheet);
             await _context.SaveChangesAsync();
@@ -182,6 +270,7 @@ namespace COMP4911Timesheets.Controllers
         {
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
             _context.TimesheetRows.Remove(timesheetRow);
+
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
         }

@@ -13,8 +13,8 @@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.WeekEnding)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.WeekEnding)
+        <dd class="col-sm-10">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.WeekNumber)
@@ -31,29 +31,106 @@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
+        <dd class="col-sm-10">
+            @{string status = "";}
+            @if (Model.Status == 0) { status = "INVALID"; }
+            @if (Model.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
+            @if (Model.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
+            @if (Model.Status == 3) { status = "SUBMITTED_APPROVED"; }
+            @if (Model.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
+            @status
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Employee)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Employee.Id)
+            @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EmployeePay)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmployeePay.EmployeePayId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Signature)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Signature.SignatureId)
-        </dd>
+
     </dl>
 </div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Project
+            </th>
+            <th>
+                WorkPackage
+            </th>
+            <th>
+                SatHour
+            </th>
+            <th>
+                SunHour
+            </th>
+            <th>
+                MonHour
+            </th>
+            <th>
+                TueHour
+            </th>
+            <th>
+                WedHour
+            </th>
+            <th>
+                ThuHour
+            </th>
+            <th>
+                FriHour
+            </th>
+            <th>
+                Notes
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.TimesheetRows != null)
+        {
+            foreach (var item in Model.TimesheetRows)
+            {
+                <tr>
+                    <td>
+                        @item.WorkPackage.Project.Name
+                    </td>
+                    <td>
+                         @item.WorkPackage.Name
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SatHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SunHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MonHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TueHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WedHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ThuHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FriHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a> |
     <a asp-action="Index">Back to List</a>

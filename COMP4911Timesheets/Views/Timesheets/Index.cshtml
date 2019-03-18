@@ -27,12 +27,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmployeePay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Signature)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -40,7 +34,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.WeekEnding)
+                @item.WeekEnding.ToString("yyyy/MM/dd")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WeekNumber)
@@ -49,16 +43,16 @@
                 @Html.DisplayFor(modelItem => item.FlexTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status)
+                @{string status = "";}
+                @if (item.Status == 0) { status = "INVALID"; }
+                @if (item.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
+                @if (item.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
+                @if (item.Status == 3) { status = "SUBMITTED_APPROVED"; }
+                @if (item.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
+                @status
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Employee.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmployeePay.EmployeePayId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Signature.SignatureId)
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a> |
