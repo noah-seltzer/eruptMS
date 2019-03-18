@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COMP4911Timesheets", "COMP4911Timesheets\COMP4911Timesheets.csproj", "{54A4AE05-E942-47D5-8C08-CACA26A580A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "COMP4911Timesheets", "COMP4911Timesheets\COMP4911Timesheets.csproj", "{54A4AE05-E942-47D5-8C08-CACA26A580A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

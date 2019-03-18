@@ -1,3 +1,15 @@
+# Table of Contents
+- [Set up EF Core with model classes](#set-up-ef-core-with-model-classes)
+- [Deploy SQL DB on Azure](#deploy-sql-db-on-azure)
+- [Troubleshooting](#troubleshooting)
+
+## Set up EF Core with model classes
+1. Make sure that correct `Connection_String` is set
+2. If there are any changes on database schema (which is likely always the case), run `dotnet ef database drop` and `dotnet ef migrations remove`
+3. Then run `dotnet ef migrations add EruptMigration -c ApplicationDbContext -o Data/Migrations`
+4. Run `dotnet ef database update`
+5. You should be able to see the tables created
+
 ## Deploy SQL DB on Azure
 1.  Go to [portal.azure.com](http://portal.azure.com)
 2.  Log in with your ID/Password
@@ -21,3 +33,8 @@
  15. Set your System Environment Variable to `LOCAL_PASSWORD`=`Test123123`. This is not important to you guys if you're using Azure, not localhost. Set anything you like.
 16. Done!!!
 17. `$ dotnet run` on windows
+
+## Troubleshooting
+| Issue | Solution |
+|--|--|
+| Any `dotnet ef` command occurs the following error `error MSB4057: The target "GetEFProjectMetadata" does not exist in the project.` | Mac<br> `dotnet ef migrations list --msbuildprojectextensionspath obj/local` <br>Windows<br> `dotnet ef migrations list --msbuildprojectextensionspath obj\local` |
