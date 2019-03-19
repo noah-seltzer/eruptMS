@@ -7,13 +7,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using System.Diagnostics;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        private static int? projectId;
+        private static int? parentWorkPKId;
         public static int PROJECT_CODE_LENGTH = 4;
 
         public WorkPackagesController(ApplicationDbContext context)
@@ -48,8 +50,8 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
-        // GET: WorkPackages/Create
-        public IActionResult Create()
+        // GET: WorkPackages/CreateWorkPackage
+        public IActionResult CreateWorkPackage()
         {
             ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId");
@@ -63,14 +65,110 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
+            int[] workpackageCode = new int[10];
+            for (int i = 0; i < 10; i++) {
+                workpackageCode[i] = -1;
+            }
+            workPackage.ProjectId = projectId;
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {
+                
+                if (tempWorkPackage.WorkPackageCode.Length == PROJECT_CODE_LENGTH + 1) {
+                    workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(PROJECT_CODE_LENGTH, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
+                }
+            }
+
+            string theWorkpackageCode = null;
+
+            for (int i = 0; i < 10; i++) {
+                if (workpackageCode[i] == -1 && i != 0) {
+                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    break;
+                }
+
+                if (workpackageCode[i] == -1 && i == 0) {
+                    theWorkpackageCode = project.ProjectCode + "0";
+                    break;
+                }
+            }
+
+            workPackage.WorkPackageCode = theWorkpackageCode;
             if (ModelState.IsValid)
             {
                 _context.Add(workPackage);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
             }
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
+            //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
+            //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
+            return View(workPackage);
+        }
+
+        // GET: WorkPackages/CreateChildWorkPackage/6
+        public IActionResult CreateChildWorkPackage(int? id)
+        {
+            parentWorkPKId = id;
+            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
+            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId");
+            return View();
+        }
+
+        // POST: WorkPackages/CreateChildWorkPackage
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateChildWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        {
+            int[] workpackageCode = new int[10];
+            for (int i = 0; i < 10; i++)
+            {
+                workpackageCode[i] = -1;
+            }
+            workPackage.ProjectId = projectId;
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
+            var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {
+
+                if (tempWorkPackage.ParentWorkPackageId == parentWorkPackage.WorkPackageId)
+                {
+                   // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
+                    workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(parentWorkPackage.WorkPackageCode.Length, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
+                }
+            }
+
+            string theWorkpackageCode = null;
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (workpackageCode[i] == -1 && i != 0)
+                {
+                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    break;
+                }
+
+                if (workpackageCode[i] == -1 && i == 0)
+                {
+                    theWorkpackageCode = parentWorkPackage.WorkPackageCode + "0";
+                    break;
+                }
+            }
+             
+            workPackage.ParentWorkPackageId = parentWorkPKId;
+            workPackage.WorkPackageCode = theWorkpackageCode;
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackage);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+            }
+            //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
+            //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
         }
 
@@ -164,6 +262,12 @@ namespace COMP4911Timesheets.Controllers
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {
+            projectId = id;
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+
+            ViewData["projectCode"] = project.ProjectCode;
+            ViewData["projectName"] = project.Name;
+
             if (id == null)
             {
                 return NotFound();
@@ -172,6 +276,8 @@ namespace COMP4911Timesheets.Controllers
 
             var workPackages = await _context.WorkPackages
              .Where(u => u.ProjectId == id).ToListAsync();
+            //order the workpackages
+            workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
             int maxWorkPackageCodeLength = 0;
             
@@ -215,7 +321,7 @@ namespace COMP4911Timesheets.Controllers
             
             workPackages = tempWorkPackages;
 
-            ViewData["NestedLevel"] = maxWorkPackageCodeLength - PROJECT_CODE_LENGTH;
+            //ViewData["NestedLevel"] = maxWorkPackageCodeLength - PROJECT_CODE_LENGTH;
 
             if (workPackages == null)
             {

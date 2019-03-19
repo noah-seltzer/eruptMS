@@ -16,9 +16,9 @@ $('[data-toggle="collapse"]').on('click', function () {
         jQuery('.collapse').collapse('hide');
     }
 
-
-    if (((subWPCodeLength - $(this).attr('id').length) > 1) && (root == $(this).attr('id').substring(0, 5))) {
-        jQuery('.collapse').collapse('hide');
+    if (((subWPCodeLength - $(this).attr('id').length) > 1)
+        && (root == $(this).attr('id').substring(0, 5))) {
+            jQuery('.collapse').collapse('hide');
     }
 
     root = $(this).attr('id').substring(0, 5);
