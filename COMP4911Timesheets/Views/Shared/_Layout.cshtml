@@ -33,8 +33,21 @@
                             //var user = await UserManager.FindByNameAsync(User.Identity.Name);
                             if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
                             {
-                                <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Employees")">
-                                    <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
+                                <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Employees,PayGrades")">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
+                                        Management <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="download">
+                                        <li>
+                                            <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">
+                                                Employees
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="nav-link" asp-area="" asp-controller="PayGrades" asp-action="Index">
+                                                Pay Grades
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                             }
                             <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
