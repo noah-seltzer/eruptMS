@@ -17,22 +17,42 @@ namespace COMP4911Timesheets.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Supervisor)
-                .WithMany(s => s.Supervisees)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Approver)
-                .WithMany(a => a.Approvees)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Supervisor)
-                .WithMany(s => s.Supervisees)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Employee>()
-                .HasOne(e => e.Approver)
-                .WithMany(a => a.Approvees)
-                .OnDelete(DeleteBehavior.Restrict);
+            // modelBuilder.Entity<Employee>()
+            //     .HasOne(e => e.Supervisor)
+            //     .WithMany(s => s.Supervisees)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            // modelBuilder.Entity<Employee>()
+            //     .HasOne(e => e.Approver)
+            //     .WithMany(a => a.Approvees)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            // modelBuilder.Entity<Employee>()
+            //     .HasOne(e => e.Supervisor)
+            //     .WithMany(s => s.Supervisees)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            // modelBuilder.Entity<Employee>()
+            //     .HasOne(e => e.Approver)
+            //     .WithMany(a => a.Approvees)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Signature>()
+                .HasOne(s => s.Employee)
+                .WithMany(e => e.Signatures)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<EmployeePay>()
+                .HasOne(ep => ep.Employee)
+                .WithMany(e => e.EmployeePays)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ProjectEmployee>()
+                .HasOne(pe => pe.Employee)
+                .WithMany(e => e.ProjectEmployees)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<WorkPackageEmployee>()
+                .HasOne(wpe => wpe.Employee)
+                .WithMany(e => e.WorkPackageEmployees)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Timesheet>()
+                .HasOne(t => t.Employee)
+                .WithMany(e => e.Timesheets)
+                .OnDelete(DeleteBehavior.SetNull);
         }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }

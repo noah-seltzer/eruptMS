@@ -29,14 +29,14 @@ namespace COMP4911Timesheets.Models
         public static readonly int SOFTWARE_TESTER = 630;
         public static readonly int UI_DESIGNER = 710;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Not Employeed"},
             {1, "Currently Employeed"},
             {2, "Maternity Leave"}
         };
 
-        public readonly Dictionary<int, string> JobTitles = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> JobTitles = new Dictionary<int, string>
         {
             {0, "Not Yet Assigned"},
             {10, "Administrator"},
