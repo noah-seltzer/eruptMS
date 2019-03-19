@@ -5,3 +5,4 @@ services:
       context: ./COMP4911Timesheets
       dockerfile: build.Dockerfile
     network_mode: "host"
+    container_name: eruptTEST
