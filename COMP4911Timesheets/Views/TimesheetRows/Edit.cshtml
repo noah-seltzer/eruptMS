@@ -1,15 +1,15 @@
 ﻿@model COMP4911Timesheets.Models.TimesheetRow
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["PageTitle"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <h4>TimesheetRow</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-4 well bs-component">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="TimesheetId" />
@@ -60,7 +60,7 @@
                 <span asp-validation-for="WorkPackageId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary btn-raised" />
             </div>
         </form>
     </div>
