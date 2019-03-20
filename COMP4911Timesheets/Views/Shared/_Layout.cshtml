@@ -52,9 +52,6 @@
                                     </ul>
                                 </li>
                             }
-                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheets,TimesheetRows")">
-                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
-                            </li>
                             <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
                                     Project <span class="caret"></span></a>
@@ -71,6 +68,9 @@
                                     </li>
 
                                 </ul>
+                            </li>
+                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheets,TimesheetRows")">
+                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
                             </li>
                         }
                     </ul>
@@ -95,10 +95,12 @@
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="~/js/select2placeholder.js"></script>
         <script>
             $(function () {
                 $(".searchDropDown").select2({
-                    width: "100%"
+                    width: "100%",
+                    searchInputPlaceholder: 'Search...'
                 });
             });
         </script>
@@ -117,6 +119,7 @@
                 integrity="sha256-E/V4cWE4qvAeO5MOhjtGtqDzPndRO1LBk8lJ/PR7CA4=">
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="~/js/select2placeholder.js"></script>
         <script>
             $(function () {
                 $(".searchDropDown").select2({
