@@ -13,6 +13,7 @@ namespace COMP4911Timesheets.Controllers
     public class BudgetsController : Controller
     {
         private static int? workpackageId;
+        private static int? parentWorkpackageId;
         private readonly ApplicationDbContext _context;
 
         public BudgetsController(ApplicationDbContext context)
@@ -53,6 +54,10 @@ namespace COMP4911Timesheets.Controllers
             workpackageId = id;
             var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
             if (workPackages == null) {
+                var tempWorkpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+                if (tempWorkpackage.ParentWorkPackageId != null) {
+                    parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
+                }
                 ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId");
                 ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
                 return View();
@@ -72,6 +77,13 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Create([Bind("BudgetId,Hour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
         {
             budget.WorkPackageId = workpackageId;
+
+            var rmBudgets = await _context.Budgets.Where(a => a.WorkPackageId == parentWorkpackageId).ToListAsync();
+            foreach (Budget rmBudget in rmBudgets) { 
+                _context.Budgets.Remove(rmBudget);
+                await _context.SaveChangesAsync();
+            }
+            
 
             if (ModelState.IsValid)
             {
