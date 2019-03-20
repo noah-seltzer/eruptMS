@@ -64,7 +64,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             TempData["info"] = "Budget plan only can be added into leaf workpackages";
-            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId); ;
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
 
         }
@@ -83,13 +83,14 @@ namespace COMP4911Timesheets.Controllers
                 _context.Budgets.Remove(rmBudget);
                 await _context.SaveChangesAsync();
             }
-            
+
+            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId); ;
 
             if (ModelState.IsValid)
             {
                 _context.Add(budget);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = workpackage.ProjectId });
             }
             ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId", budget.PayGradeId);
             ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", budget.WorkPackageId);
