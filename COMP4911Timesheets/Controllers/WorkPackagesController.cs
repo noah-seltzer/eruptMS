@@ -42,6 +42,11 @@ namespace COMP4911Timesheets.Controllers
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
+
+            var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).ToListAsync();
+
+            workPackage.Budgets = budgets;
+
             if (workPackage == null)
             {
                 return NotFound();
