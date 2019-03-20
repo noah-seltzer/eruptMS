@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Details";
+    ViewData["projectId"] = Model.ProjectId;
+
 }
 
 <h1>Details</h1>
@@ -90,22 +92,22 @@
 
 @foreach (var item in Model.Budgets)
 {
-<div class="row">
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Hour)
+    <div class="row">
+        <div class="col-xs-1">
+            @Html.DisplayFor(model => item.Hour)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayFor(model => item.Status)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayFor(model => item.Type)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayFor(model => item.PayGradeId)
+        </div>
     </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Status)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Type)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.PayGradeId)
-    </div>
-</div>
-    }
+}
 <div>
     <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
 </div>
