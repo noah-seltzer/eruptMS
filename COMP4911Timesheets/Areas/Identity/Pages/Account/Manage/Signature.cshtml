@@ -1,0 +1,40 @@
+﻿@page
+@model SignatureModel
+@{
+    ViewData["PageTitle"] = "Signature";
+    ViewData["ActivePage"] = ManageNavPages.Signature;
+}
+
+<h4>@ViewData["PageTitle"]</h4>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6 col-lg-6 well bs-component">
+        <form id="change-password-form" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            @{
+                if (ViewData["signature"] != null) {
+                <div class="form-group">
+                    <label asp-for="Input.OldPassPhrase"></label>
+                    <input asp-for="Input.OldPassPhrase" class="form-control" />
+                    <span asp-validation-for="Input.OldPassPhrase" class="text-danger"></span>
+                </div>
+                }
+            }
+            <div class="form-group">
+                <label asp-for="Input.NewPassPhrase"></label>
+                <input asp-for="Input.NewPassPhrase" class="form-control" />
+                <span asp-validation-for="Input.NewPassPhrase" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassPhrase"></label>
+                <input asp-for="Input.ConfirmPassPhrase" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassPhrase" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-raised">Update pass phrase</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
