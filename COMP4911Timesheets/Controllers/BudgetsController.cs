@@ -52,9 +52,13 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Create(int? id)
         {
             workpackageId = id;
+
             var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
             if (workPackages == null) {
                 var tempWorkpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+
+                ViewData["projectId"] = tempWorkpackage.ProjectId;
+
                 if (tempWorkpackage.ParentWorkPackageId != null) {
                     parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
                 }
