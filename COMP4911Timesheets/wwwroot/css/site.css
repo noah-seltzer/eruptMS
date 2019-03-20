@@ -75,3 +75,7 @@ body {
     border-top: 0 !important;
     border-bottom: 0 !important;
 }
+
+.select2-results__option {
+    color: #444444 !important;
+}
