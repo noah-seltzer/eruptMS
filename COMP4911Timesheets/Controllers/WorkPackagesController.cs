@@ -59,8 +59,6 @@ namespace COMP4911Timesheets.Controllers
         public IActionResult CreateWorkPackage()
         {
             TempData["projectId"] = projectId;
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId");
             return View();
         }
 
@@ -118,8 +116,6 @@ namespace COMP4911Timesheets.Controllers
         {
             parentWorkPKId = id;
             TempData["projectId"] = projectId;
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId");
             return View();
         }
 
