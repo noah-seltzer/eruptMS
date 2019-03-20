@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Project>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["PageTitle"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
@@ -21,13 +21,13 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.CostingProposal)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.OriginalBudget)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Status)
             </th>
             <th></th>
@@ -45,20 +45,18 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
+            <td class="priority-2">
                 @Html.DisplayFor(modelItem => item.CostingProposal)
             </td>
-            <td>
+            <td class="priority-2">
                 @Html.DisplayFor(modelItem => item.OriginalBudget)
             </td>
-            <td>
+            <td class="priority-2">
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">WorkPackage</a> |
-                <a asp-action="Edit" asp-route-id="@item.ProjectId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProjectId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProjectId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage [PM ONLY]</a> <br />
+                <a asp-action="Details" asp-route-id="@item.ProjectId">View [Workers]</a> 
             </td>
         </tr>
 }

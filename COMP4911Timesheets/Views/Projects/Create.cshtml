@@ -1,15 +1,15 @@
-﻿@model COMP4911Timesheets.Models.Project
+@model COMP4911Timesheets.ViewModels.NewProject
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["PageTitle"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>@ViewData["Title"]</h1>
 
 <h4>Project</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 col-lg-6 well bs-component">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -28,22 +28,12 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CostingProposal" class="control-label"></label>
-                <input asp-for="CostingProposal" class="form-control" />
-                <span asp-validation-for="CostingProposal" class="text-danger"></span>
+                <label asp-for="ProjectManager" class="control-label"></label>
+                <select asp-for="ProjectManager" class="form-control" asp-items="ViewBag.Employees"></select>
+                <span asp-validation-for="ProjectManager" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="OriginalBudget" class="control-label"></label>
-                <input asp-for="OriginalBudget" class="form-control" />
-                <span asp-validation-for="OriginalBudget" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
             </div>
         </form>
     </div>

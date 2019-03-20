@@ -1,49 +1,49 @@
 ﻿@model COMP4911Timesheets.Models.Project
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["PageTitle"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 
 <div>
     <h4>Project</h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
+    <dl class="row col-lg-6 well bs-component">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ProjectCode)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.ProjectCode)
         </dd>
-        <dt class="col-sm-2">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class="col-sm-2">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class="col-sm-2">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CostingProposal)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CostingProposal)
         </dd>
-        <dt class="col-sm-2">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.OriginalBudget)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.OriginalBudget)
         </dd>
-        <dt class="col-sm-2">
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
-        <dd class="col-sm-10">
+        <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Status)
         </dd>
     </dl>
@@ -52,76 +52,3 @@
     <a asp-action="Edit" asp-route-id="@Model.ProjectId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-
-            </th>
-            <th>
-
-            </th>
-            <th>
-
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.WorkPackages)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Contractor)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Purpose)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Input)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Output)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Activity)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
