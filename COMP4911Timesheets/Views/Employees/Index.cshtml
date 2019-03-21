@@ -1,4 +1,4 @@
-﻿@model IEnumerable<COMP4911Timesheets.Models.Employee>
+﻿@model IEnumerable<COMP4911Timesheets.ViewModels.EmployeeManagement>
 
 @{
     ViewData["PageTitle"] = "Employees";
@@ -13,19 +13,22 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.EmployeeId)
+                @Html.DisplayNameFor(model => model.Employee.EmployeeId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.Employee.FirstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.Employee.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
             </th>
             <th class="priority-2">
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.Employee.Title)
             </th>
             <th class="priority-2">
-                @Html.DisplayNameFor(model => model.Status)
+                @Html.DisplayNameFor(model => model.Employee.Status)
             </th>
             <th></th>
         </tr>
@@ -35,24 +38,27 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.EmployeeId)
+                    @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
+                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
                 </td>
                 <td class="priority-2">
-                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Title])
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Employee.Title])
                 </td>
                 <td class="priority-2">
-                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Status])
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Employee.Status])
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Employee.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Employee.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Employee.Id">Delete</a>
                 </td>
             </tr>
         }

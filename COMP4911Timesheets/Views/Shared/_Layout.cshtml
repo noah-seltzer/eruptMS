@@ -11,10 +11,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
-              crossorigin="anonymous"
-              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -36,15 +33,16 @@
                             //var user = await UserManager.FindByNameAsync(User.Identity.Name);
                             if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
                             {
-                                <li class="nav-item">
+                                <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Employees")">
                                     <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
                                 </li>
                             }
-                            <li class="nav-item">
 
+                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
                                 <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
-                           </li>
-                            <li class="nav-item dropdown">
+                            </li>
+                            <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
+
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
                                     Project <span class="caret"></span></a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="download">
@@ -55,7 +53,7 @@
                                     </li>
                                     <li>
                                         <a class="nav-link" asp-area="" asp-controller="ProjectSumReport" asp-action="Index">
-                                            Project Sum Report
+                                            Project Summary Reports
                                         </a>
                                     </li>
 
@@ -87,6 +85,7 @@
     </footer>
 
     <environment include="Development">
+        <script src="~/lib/chosen/chosen-jquery.js"></script>
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
     </environment>

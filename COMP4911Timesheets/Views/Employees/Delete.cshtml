@@ -1,4 +1,4 @@
-﻿@model COMP4911Timesheets.Models.Employee
+﻿@model COMP4911Timesheets.ViewModels.EmployeeManagement
 
 @{
     ViewData["PageTitle"] = "Delete";
@@ -12,75 +12,87 @@
     <hr />
     <dl class="row well bs-component">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EmployeeId)
+            @Html.DisplayNameFor(model => model.Employee.EmployeeId)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EmployeeId)
+            @Html.DisplayFor(model => model.Employee.EmployeeId)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.DisplayNameFor(model => model.Employee.FirstName)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
+            @Html.DisplayFor(model => model.Employee.FirstName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+            @Html.DisplayNameFor(model => model.Employee.LastName)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
+            @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.Employee.Title)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.JobTitles[this.Model.Title])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.JobTitles[this.Model.Employee.Title])
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FlexTime)
+            @Html.DisplayNameFor(model => model.Employee.FlexTime)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FlexTime)
+            @Html.DisplayFor(model => model.Employee.FlexTime)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.VacationTime)
+            @Html.DisplayNameFor(model => model.Employee.VacationTime)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.VacationTime)
+            @Html.DisplayFor(model => model.Employee.VacationTime)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
+            @Html.DisplayNameFor(model => model.Employee.Status)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.Statuses[this.Model.Status])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.Statuses[this.Model.Employee.Status])
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Approver)
+            @Html.DisplayNameFor(model => model.Employee.Approver)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Approver.Email)
+            @Html.DisplayFor(model => model.Employee.Approver.Email)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Supervisor)
+            @Html.DisplayNameFor(model => model.Employee.Supervisor)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Supervisor.Email)
+            @Html.DisplayFor(model => model.Employee.Supervisor.Email)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.Employee.Email)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
+            @Html.DisplayFor(model => model.Employee.Email)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
+            @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
+            @Html.DisplayFor(model => model.EmployeePay.PayGrade.PayLevel)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.Cost)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EmployeePay.PayGrade.Cost)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.PhoneNumber)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Employee.Id" />
         <input type="submit" value="Delete" class="btn btn-danger btn-raised" /> |
         <a asp-action="Index">Back to List</a>
     </form>

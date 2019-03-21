@@ -77,9 +77,6 @@
             <th>
                 Status
             </th>
-            <th>
-                Employee
-            </th>
             
             <th></th>
         </tr>
@@ -98,16 +95,20 @@
                 @Html.DisplayFor(modelItem => item.FlexTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status)
+                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
+            </td>
+            
+            <td>
+                <form asp-action="Approve">
+                    <input type="hidden" asp-for="@item.TimesheetId" />
+                    <input type="submit" value="Approve" class="btn btn-success btn-raised" />
+                </form>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Employee.Id)
-            </td>
-            <td>
-                <a asp-action="" asp-route-id="@item.TimesheetId">Approve</a>
-            </td>
-            <td>
-                <a asp-action="" asp-route-id="@item.TimesheetId">Reject</a>
+                <form asp-action="Reject">
+                    <input type="hidden" asp-for="@item.TimesheetId" />
+                    <input type="submit" value="Reject" class="btn btn-danger btn-raised" />
+                </form>
             </td>
         </tr>
         }
