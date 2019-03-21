@@ -55,8 +55,9 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
+                <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">WorkPackage</a><br/>
                 <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage [PM ONLY]</a> <br />
-                <a asp-action="Details" asp-route-id="@item.ProjectId">View [Workers]</a> 
+                <a asp-action="Details" asp-route-id="@item.ProjectId">View [Workers]</a>
             </td>
         </tr>
 }

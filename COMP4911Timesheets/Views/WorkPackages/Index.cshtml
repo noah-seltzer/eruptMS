@@ -1,0 +1,89 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackageCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contractor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Purpose)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Input)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Output)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ParentWorkPackage)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkPackageCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Contractor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Purpose)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Input)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Output)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Activity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
