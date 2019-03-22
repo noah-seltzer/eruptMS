@@ -46,12 +46,12 @@
             <ul>
                 @foreach (var e in Model.ProjectEmployees)
                 {
-                    <li>e.Email</li>
+                    <li>@e.EmployeeId @e.Role</li>
                 }
                 </ul>
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />
-                </div>foreach
+                </div>
 </form>
     </div>
 </div>

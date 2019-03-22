@@ -97,7 +97,7 @@ namespace COMP4911Timesheets
                 return NotFound();
             }
 
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _context.Projects.Include(e => e.ProjectEmployees).FirstAsync(p => p.ProjectId == id);
             
             if (project == null)
             {
