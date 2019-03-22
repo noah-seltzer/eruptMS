@@ -4,12 +4,12 @@
     ViewData["PageTitle"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <h4>Project</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 col-lg-6 well bs-component">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProjectId" />
