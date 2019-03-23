@@ -40,6 +40,7 @@ namespace COMP4911Timesheets
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+            Utility.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
 
             //services.AddDefaultIdentity<IdentityUser>()
             //    .AddDefaultUI(UIFramework.Bootstrap4)
