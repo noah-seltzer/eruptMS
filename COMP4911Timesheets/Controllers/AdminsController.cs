@@ -15,7 +15,7 @@ using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize(Roles = "AD,HR")]
+    [Authorize(Roles = "AD")]
     public class AdminsController : Controller
     {
         private readonly ApplicationDbContext _context;
