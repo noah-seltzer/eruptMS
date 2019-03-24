@@ -63,7 +63,7 @@ namespace COMP4911Timesheets.Controllers
 
                 _context.Add(timesheetRow);
 
-                //Timesheet need to be improved after change
+                //Timesheet status need to be not_approved after any change
                 var ts = _context.Timesheets.FirstOrDefault(t=>t.TimesheetId == timesheetRow.TimesheetId);
                 ts.Status = 2;
 
@@ -147,7 +147,7 @@ namespace COMP4911Timesheets.Controllers
                 {
                     _context.Update(timesheetRow);
 
-                    //Timesheet need to be improved after change
+                    //Timesheet status need to be not_approved after any change
                     var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
                     ts.Status = 2;
 

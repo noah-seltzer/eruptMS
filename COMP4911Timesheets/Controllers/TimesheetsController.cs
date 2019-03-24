@@ -280,7 +280,7 @@ namespace COMP4911Timesheets.Controllers
         {
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
 
-            //Timesheet need to be improved after change
+            //Timesheet status need to be not_approved after any change
             var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
             ts.Status = 2;
 
