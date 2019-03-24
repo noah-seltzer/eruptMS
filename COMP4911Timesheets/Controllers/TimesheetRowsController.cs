@@ -60,7 +60,13 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 _context.Add(timesheetRow);
+
+                //Timesheet need to be improved after change
+                var ts = _context.Timesheets.FirstOrDefault(t=>t.TimesheetId == timesheetRow.TimesheetId);
+                ts.Status = 2;
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
@@ -140,6 +146,11 @@ namespace COMP4911Timesheets.Controllers
                 try
                 {
                     _context.Update(timesheetRow);
+
+                    //Timesheet need to be improved after change
+                    var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
+                    ts.Status = 2;
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -153,6 +164,8 @@ namespace COMP4911Timesheets.Controllers
                         throw;
                     }
                 }
+
+
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
             var projects = await _context.Projects.ToListAsync();

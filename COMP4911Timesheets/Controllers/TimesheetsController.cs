@@ -91,25 +91,23 @@ namespace COMP4911Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
-                //default status
-                timesheet.Status = 3;
+                //default status is submitted but not approved
+                timesheet.Status = 2;
 
                 //calculate week number
                 timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
 
+                //get user's employee id
                 timesheet.EmployeeId = _userManager.GetUserId(HttpContext.User);
 
-                //////////////////
-                ///how to select employee pay automatically?
-                //////////////////
-                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId);
+
+                //select the valid employee pay
+                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == 1);
                 timesheet.EmployeePay = emppay;
                 timesheet.EmployeePayId = emppay.EmployeePayId;
 
-                //////////////////
-                ///how to select Signature automatically?
-                //////////////////
-                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId);
+                //select valid
+                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == 1);
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
@@ -281,8 +279,12 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> DeleteRow(int id)
         {
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
-            _context.TimesheetRows.Remove(timesheetRow);
 
+            //Timesheet need to be improved after change
+            var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
+            ts.Status = 2;
+
+            _context.TimesheetRows.Remove(timesheetRow);
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
         }
