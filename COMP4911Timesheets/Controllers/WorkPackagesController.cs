@@ -33,6 +33,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();

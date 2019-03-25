@@ -71,7 +71,7 @@
             <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
             <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
         </div>
-    }
+    } 
     @if (item.WorkPackageCode.Length != 5)
     {
         <div class="row collapse hoverBg w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">

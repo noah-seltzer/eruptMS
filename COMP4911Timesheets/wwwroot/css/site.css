@@ -102,12 +102,6 @@ body {
     height: calc(2.15625rem + 2px);
 }
 
-<<<<<<< HEAD
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 1.5 !important;
-    }
-=======
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 1.5 !important;
 }
->>>>>>> 37be7058dc9118bada68212f26d8079c70d33c83
