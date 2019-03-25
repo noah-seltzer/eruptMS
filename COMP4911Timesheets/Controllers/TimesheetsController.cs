@@ -91,8 +91,8 @@ namespace COMP4911Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
-                //default status is submitted but not approved
-                timesheet.Status = 2;
+                //default status is not submitted and not approved
+                timesheet.Status = 1;
 
                 //calculate week number
                 timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
@@ -196,13 +196,11 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            //calculate week number
-            timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    timesheet.Status = 2;
                     _context.Update(timesheet);
                     await _context.SaveChangesAsync();
                 }
@@ -280,15 +278,28 @@ namespace COMP4911Timesheets.Controllers
         {
             var timesheetRow = await _context.TimesheetRows.FindAsync(id);
 
-            //Timesheet status need to be not_approved after any change
-            var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
-            ts.Status = 2;
-
             _context.TimesheetRows.Remove(timesheetRow);
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
         }
 
+        // POST: Timesheets/Submit/5(timesheetid)
+        public async Task<IActionResult> Submit(int id)
+        {
+            var timesheet = await _context.Timesheets.FindAsync(id);
+            timesheet.Status = 2;
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        // POST: Timesheets/Retract/5(timesheetid)
+        public async Task<IActionResult> Retract(int id)
+        {
+            var timesheet = await _context.Timesheets.FindAsync(id);
+            timesheet.Status = 1;
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
 
         private bool TimesheetExists(int id)
         {

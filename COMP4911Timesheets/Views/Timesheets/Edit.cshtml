@@ -10,6 +10,12 @@
 <hr />
 <dl class="row">
     <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.WeekEnding)
+    </dt>
+    <dd class="col-sm-10">
+        @Model.WeekEnding.ToString("yyyy/MM/dd")
+    </dd>
+    <dt class="col-sm-2">
         @Html.DisplayNameFor(model => model.FlexTime)
     </dt>
     <dd class="col-sm-10">
@@ -44,14 +50,11 @@
             <input type="hidden" asp-for="SignatureId" />
             <input type="hidden" asp-for="Status" />
             <input type="hidden" asp-for="FlexTime" />
+            @if (Model.Status == 1 || Model.Status == 4)
+            {
+                @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            }
 
-            <div class="form-group">
-                <label asp-for="WeekEnding" class="control-label"></label>
-                <input asp-for="WeekEnding" class="form-control" />
-                <span asp-validation-for="WeekEnding" class="text-danger"></span>
-            </div>
-
-            @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, null)
             <table class="table">
                 <thead>
                     <tr>
@@ -127,10 +130,16 @@
                                     @Html.DisplayFor(modelItem => item.Notes)
                                 </td>
                                 <td>
-                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, null)
+                                    @if (Model.Status == 1 || Model.Status == 4)
+                                    {
+                                        @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                    }
                                 </td>
                                 <td>
-                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, null)
+                                    @if (Model.Status == 1 || Model.Status == 4)
+                                    {
+                                        @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                    }
                                 </td>
                             </tr>
                         }
@@ -138,14 +147,19 @@
                 </tbody>
             </table>
 
+            @if (Model.Status == 1 || Model.Status == 4)
+            {
+                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            }
+            @if (Model.Status == 2)
+            {
+                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            }
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
         </form>
     </div>
 </div>
-
+<br />
 
 
 <div>

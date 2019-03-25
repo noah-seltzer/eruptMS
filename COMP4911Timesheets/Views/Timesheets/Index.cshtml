@@ -28,10 +28,13 @@
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
             <th></th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
         <tr>
             <td>
                 @item.WeekEnding.ToString("yyyy/MM/dd")
@@ -55,11 +58,21 @@
                 @Html.DisplayFor(modelItem => item.Employee.LastName)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
+            </td>
+            <td>
+                @if (item.Status == 1 || item.Status == 4 || item.Status == 2)
+                {
+                    <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a>
+                }
+            </td>
+            <td>
+                @if (item.Status == 1 || item.Status == 4)
+                {
+                    <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
+                }
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>

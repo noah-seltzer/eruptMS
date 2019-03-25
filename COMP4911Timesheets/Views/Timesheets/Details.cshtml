@@ -10,25 +10,25 @@
     <h4>Timesheet</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.WeekEnding)
         </dt>
         <dd class="col-sm-10">
             @Model.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.WeekNumber)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.WeekNumber)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FlexTime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.FlexTime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-10">
@@ -40,10 +40,10 @@
             @if (Model.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
             @status
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Employee)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
 
@@ -97,7 +97,7 @@
                         @item.WorkPackage.Project.Name
                     </td>
                     <td>
-                         @item.WorkPackage.Name
+                        @item.WorkPackage.Name
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SatHour)
@@ -132,6 +132,10 @@
 
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a> |
+    @if (Model.Status == 1 || Model.Status == 2 || Model.Status == 4)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
+    }
+    <br />
     <a asp-action="Index">Back to List</a>
 </div>

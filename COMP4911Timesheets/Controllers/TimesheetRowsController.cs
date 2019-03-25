@@ -63,10 +63,6 @@ namespace COMP4911Timesheets.Controllers
 
                 _context.Add(timesheetRow);
 
-                //Timesheet status need to be not_approved after any change
-                var ts = _context.Timesheets.FirstOrDefault(t=>t.TimesheetId == timesheetRow.TimesheetId);
-                ts.Status = 2;
-
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
@@ -146,10 +142,6 @@ namespace COMP4911Timesheets.Controllers
                 try
                 {
                     _context.Update(timesheetRow);
-
-                    //Timesheet status need to be not_approved after any change
-                    var ts = _context.Timesheets.FirstOrDefault(t => t.TimesheetId == timesheetRow.TimesheetId);
-                    ts.Status = 2;
 
                     await _context.SaveChangesAsync();
                 }
