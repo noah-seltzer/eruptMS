@@ -10,9 +10,9 @@ pipeline {
         sh 'echo sudo docker rm $containerName'
         sh 'ls'
         sh 'pwd'
-        sh 'echo sudo sed -i "s/eruptTest/$containerName/g" $WORKSPACE/build.yml'
+        sh 'sudo sed -i "s/eruptTest/$containerName/g" $WORKSPACE/build.yml'
         sh 'sudo docker-compose -f build.yml up --build -d'
-        readFile(file: 'build.yml', encoding: 'utf-8')
+        sh 'cat build.yml'
       }
     }
     stage('build containername') {
