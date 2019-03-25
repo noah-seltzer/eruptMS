@@ -1,6 +1,9 @@
 pipeline {
   agent any
   stages {
+    environment { 
+        containerName= sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
+    }
     stage('build container') {
       steps {
         sh 'sudo docker stop eruptTEST'
@@ -13,7 +16,6 @@ pipeline {
         sh 'echo Container name is $containerName'
         sh 'echo branch name is ${GIT_BRANCH}'
         sh 'echo erupt$GIT_BRANCH'
-        sh 'containerName=erupt$GIT_BRANCH'
         sh 'echo $containerName'
       }
     }
