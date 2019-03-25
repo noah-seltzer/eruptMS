@@ -12,7 +12,7 @@ pipeline {
       steps {
         echo 'this is branch '+env.GIT_BRANCH
         echo '${\'Container name is\' + $containerName}'
-        sh 'containerName = \'erupt\' + env.GIT_BRANCH'
+        sh 'containerName=\'erupt\' + env.GIT_BRANCH'
         echo '${\'Container name is\' + $containerName}'
       }
     }
