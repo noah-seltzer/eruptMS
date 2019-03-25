@@ -12,7 +12,7 @@ pipeline {
       steps {
         sh 'echo Container name is $containerName'
         sh 'echo branch name is ${GIT_BRANCH}'
-        sh 'containerName=\'erupt$GIT_BRANCH\''
+        sh 'export containerName=\'erupt$GIT_BRANCH\''
         sh 'echo $containerName'
       }
     }
