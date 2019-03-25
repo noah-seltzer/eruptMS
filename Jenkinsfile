@@ -8,6 +8,7 @@ pipeline {
       steps {
         sh 'echo sudo docker stop $containerName'
         sh 'echo sudo docker rm $containerName'
+        sh 'ls'
         sh 'sh \'sed -i \'s/eruptTest/$containerName/g\' ./build.yml\''
         sh 'sudo docker-compose -f build.yml up --build -d'
         readFile(file: 'build.yml', encoding: 'utf-8')
