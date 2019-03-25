@@ -25,7 +25,12 @@ namespace COMP4911Timesheets.Controllers
         // GET: Timesheets
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Timesheets.Include(t => t.Employee).Include(t => t.EmployeePay).Include(t => t.Signature).Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User));
+            var applicationDbContext = _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.EmployeePay)
+                .Include(t => t.Signature)
+                .Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User))
+                .OrderByDescending(t => t.WeekNumber);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -137,6 +142,23 @@ namespace COMP4911Timesheets.Controllers
                 .Include(t => t.TimesheetRows)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
 
+            DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
+            Timesheet model = new Timesheet()
+            {
+                //default this Friday
+                WeekEnding = friday
+            };
+            List<DateTime> fridays = new List<DateTime>();
+            for (int i = 0; i < 30; i++)
+            {
+                fridays.Add(friday.AddDays(i * 7));
+            }
+            var fridayslist = fridays.Select(s => new SelectListItem
+            {
+                Value = s.Date.ToString(),
+                Text = s.Date.ToString("yyyy/MM/dd")
+            });
+            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
 
 
             if (timesheet == null)
