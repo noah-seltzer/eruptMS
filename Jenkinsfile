@@ -11,7 +11,7 @@ pipeline {
     stage('build containername') {
       steps {
         sh 'echo Container name is $containerName'
-        sh 'echo branch name is ${env.GIT_BRANCH}'
+        sh 'echo branch name is ${GIT_BRANCH}'
         sh 'containerName=\'erupt$env.GIT_BRANCH\''
         sh 'echo $containerName'
       }
