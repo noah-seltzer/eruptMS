@@ -181,44 +181,44 @@ namespace COMP4911Timesheets.Controllers
         // POST: Timesheets/Edit/5(timesheetid)
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,SignatureId,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
-        {
-            if (id != timesheet.TimesheetId)
-            {
-                return NotFound();
-            }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,SignatureId,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
+        //{
+        //    if (id != timesheet.TimesheetId)
+        //    {
+        //        return NotFound();
+        //    }
 
-            //authorization
-            if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
-            {
-                return NotFound();
-            }
+        //    //authorization
+        //    if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
+        //    {
+        //        return NotFound();
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    timesheet.Status = 2;
-                    _context.Update(timesheet);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TimesheetExists(timesheet.TimesheetId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(timesheet);
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            
+        //            _context.Update(timesheet);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!TimesheetExists(timesheet.TimesheetId))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(timesheet);
+        //}
 
         // GET: Timesheets/Delete/5(timesheetid)
         public async Task<IActionResult> Delete(int? id)
