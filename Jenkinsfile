@@ -8,12 +8,9 @@ pipeline {
         sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
-    stage('name container') {
+    stage('build containername') {
       steps {
-        echo 'this is branch '+env.GIT_BRANCH
-        echo '${\'Container name is \'+env.containerName}'
-        sh 'containerName=\'erupt${env.GIT_BRANCH}\''
-        echo 'Container name is $containerName'
+        sh 'echo $containerName'
       }
     }
   }
