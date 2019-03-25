@@ -89,6 +89,13 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId); ;
+            //check if paygrade id already exist
+            var tempBudgets = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
+
+            if (tempBudgets != null) {
+                TempData["budgetInfo"] = "You can not add same pay grade for same workpackage";
+                return View();
+            }
 
             if (ModelState.IsValid)
             {
@@ -96,9 +103,11 @@ namespace COMP4911Timesheets.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = workpackage.ProjectId });
             }
+
+            TempData["budgetInfo"] = "Add budget plan failed please try again";
             ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId", budget.PayGradeId);
             ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", budget.WorkPackageId);
-            return View(budget);
+            return View();
         }
 
         // GET: Budgets/Edit/5

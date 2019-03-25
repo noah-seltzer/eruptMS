@@ -45,6 +45,10 @@ namespace COMP4911Timesheets.Controllers
 
             var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).ToListAsync();
 
+            for (int i = 0; i < budgets.Count; i++) {
+                budgets[i].PayGrade = await _context.PayGrades.FirstOrDefaultAsync(m => m.PayGradeId == budgets[i].PayGradeId);
+            }
+
             workPackage.Budgets = budgets;
 
             if (workPackage == null)
@@ -174,6 +178,22 @@ namespace COMP4911Timesheets.Controllers
             //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
         }
+
+
+        // GET: WorkPackages/CreateWorkPackage/6
+        public async Task<IActionResult> CreateWorkPackageReport(int? id)
+        {
+            parentWorkPKId = id;
+            var theWorkPackage = await _context.WorkPackages.FindAsync(id);
+            WorkPackageReport workPackageReport = new WorkPackageReport();
+            workPackageReport.WorkPackage = theWorkPackage;
+
+            TempData["projectId"] = projectId;
+            return View(workPackageReport);
+        }
+
+
+
 
         // GET: WorkPackages/Edit/5
         public async Task<IActionResult> Edit(int? id)
