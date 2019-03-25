@@ -3,8 +3,8 @@ pipeline {
   stages {
     stage('build container') {
       steps {
-        sh 'echo sudo docker stop eruptTEST'
-        sh 'echo sudo docker rm eruptTEST'
+        sh 'sudo docker stop eruptTEST'
+        sh 'sudo docker rm eruptTEST'
         sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
@@ -12,7 +12,7 @@ pipeline {
       steps {
         echo 'this is branch '+env.GIT_BRANCH
         echo '${\'Container name is\' + $containerName}'
-        sh '$containerName = \'erupt\' + env.GIT_BRANCH'
+        sh 'containerName = \'erupt\' + env.GIT_BRANCH'
         echo '${\'Container name is\' + $containerName}'
       }
     }
