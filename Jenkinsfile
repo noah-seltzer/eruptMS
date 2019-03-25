@@ -18,7 +18,4 @@ pipeline {
       }
     }
   }
-  environment {
-    containerName = 'erupt'
-  }
 }
