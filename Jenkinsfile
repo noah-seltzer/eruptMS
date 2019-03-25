@@ -3,16 +3,18 @@ pipeline {
   stages {
 
     stage('build container') {
+      environment { 
+        containerName= sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
+      }      
       steps {
-        sh 'sudo docker stop eruptTEST'
-        sh 'sudo docker rm eruptTEST'
+        sh 'sed -i 's/eruptTEST/$containerName/g' build.yml'
+        sh 'echo sudo docker stop $containerName'
+        sh 'echo sudo docker rm $containerName'
         sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
     stage('build containername') {
-    environment { 
-        containerName= sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
-    }
+
       steps {
         sh 'echo Container name is $containerName'
         sh 'echo branch name is ${GIT_BRANCH}'
