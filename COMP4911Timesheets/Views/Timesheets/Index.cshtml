@@ -46,13 +46,7 @@
                 @Html.DisplayFor(modelItem => item.FlexTime)
             </td>
             <td>
-                @{string status = "";}
-                @if (item.Status == 0) { status = "INVALID"; }
-                @if (item.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
-                @if (item.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
-                @if (item.Status == 3) { status = "SUBMITTED_APPROVED"; }
-                @if (item.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
-                @status
+                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Employee.LastName)
@@ -61,13 +55,14 @@
                 <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
             </td>
             <td>
-                @if (item.Status == 1 || item.Status == 4 || item.Status == 2)
+
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
                     <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a>
                 }
             </td>
             <td>
-                @if (item.Status == 1 || item.Status == 4)
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
                     <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
                 }

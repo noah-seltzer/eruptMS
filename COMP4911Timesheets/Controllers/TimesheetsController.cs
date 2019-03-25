@@ -58,25 +58,53 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Timesheets/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            //get timesheets
+            var timesheets = await _context.Timesheets.Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User)).ToListAsync();
+            //get this Friday
             DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
             Timesheet model = new Timesheet()
             {
                 //default this Friday
                 WeekEnding = friday
             };
+            //Friday list
             List<DateTime> fridays = new List<DateTime>();
-            for (int i = 0; i < 30; i++)
+
+            //Add Fridays in 2 months
+            for (int i = 0; i < 9; i++)
             {
-                fridays.Add(friday.AddDays(i * 7));
+                var newfriday = friday.AddDays(i * 7);
+                //Check if timesheet for this week exist
+                bool exist = false;
+                foreach (Timesheet t in timesheets)
+                {
+                    if (t.WeekEnding == newfriday) { exist = true; }
+                }
+                if (!exist) { fridays.Add(newfriday); }
             }
+
+            //Add Fridays in previous month
+            for (int i = 4; i > 0; i--)
+            {
+                var oldfriday = friday.AddDays(- i * 7);
+                //Check if timesheet for this week exist
+                bool exist = false;
+                foreach (Timesheet t in timesheets)
+                {
+                    if (t.WeekEnding == oldfriday) { exist = true; }
+                }
+                if (!exist) { fridays.Add(oldfriday); }
+            }
+
+            //Create selectlist using Friday list
             var fridayslist = fridays.Select(s => new SelectListItem
             {
                 Value = s.Date.ToString(),
                 Text = s.Date.ToString("yyyy/MM/dd")
             });
-            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
+            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text", friday);
             return View(model);
 
         }
@@ -92,7 +120,7 @@ namespace COMP4911Timesheets.Controllers
             if (ModelState.IsValid)
             {
                 //default status is not submitted and not approved
-                timesheet.Status = 1;
+                timesheet.Status = Timesheet.NOT_SUBMITTED_NOT_APPROVED;
 
                 //calculate week number
                 timesheet.WeekNumber = Utility.GetWeekNumberByDate(timesheet.WeekEnding);
@@ -102,12 +130,12 @@ namespace COMP4911Timesheets.Controllers
 
 
                 //select the valid employee pay
-                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == 1);
+                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
                 timesheet.EmployeePay = emppay;
                 timesheet.EmployeePayId = emppay.EmployeePayId;
 
                 //select valid
-                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == 1);
+                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
@@ -287,7 +315,7 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Submit(int id)
         {
             var timesheet = await _context.Timesheets.FindAsync(id);
-            timesheet.Status = 2;
+            timesheet.Status = Timesheet.SUBMITTED_NOT_APPROVED;
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
         }
@@ -296,7 +324,7 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Retract(int id)
         {
             var timesheet = await _context.Timesheets.FindAsync(id);
-            timesheet.Status = 1;
+            timesheet.Status = Timesheet.NOT_SUBMITTED_NOT_APPROVED;
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
         }

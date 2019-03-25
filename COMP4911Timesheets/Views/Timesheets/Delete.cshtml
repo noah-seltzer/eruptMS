@@ -33,13 +33,7 @@
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-10">
-            @{string status = "";}
-            @if (Model.Status == 0) { status = "INVALID"; }
-            @if (Model.Status == 1) { status = "NOT_SUBMITTED_NOT_APPROVED"; }
-            @if (Model.Status == 2) { status = "SUBMITTED_NOT_APPROVED"; }
-            @if (Model.Status == 3) { status = "SUBMITTED_APPROVED"; }
-            @if (Model.Status == 4) { status = "REJECTED_NEED_RESUBMISSION"; }
-            @status
+            @Html.DisplayFor(model => model.Statuses[Model.Status])
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Employee)
