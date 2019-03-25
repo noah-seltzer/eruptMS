@@ -76,6 +76,21 @@ body {
     border-bottom: 0 !important;
 }
 
+
+/* Custom workpacke col width
+-------------------------------------------------- */
+
+.col-xs-1 {
+    min-width: 120px;
+}
+/* Custom workpacke row hover style
+-------------------------------------------------- */
+
+.hoverBg:hover {
+    background-color: #555459;
+    transition: all .6s ease-in-out;
+}
+
 .select2-results__option {
     color: #444444 !important;
 }
