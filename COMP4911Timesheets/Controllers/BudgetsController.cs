@@ -63,7 +63,7 @@ namespace COMP4911Timesheets.Controllers
                     parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
                 }
                 ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId");
-                ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
+
                 return View();
             }
 
