@@ -9,9 +9,11 @@
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -33,14 +35,29 @@
                             //var user = await UserManager.FindByNameAsync(User.Identity.Name);
                             if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
                             {
-                                <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Employees")">
-                                    <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a>
+                                <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Employees,PayGrades")">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
+                                        Management <span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="download">
+                                        <li>
+                                            <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">
+                                                Employees
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="nav-link" asp-area="" asp-controller="PayGrades" asp-action="Index">
+                                                Pay Grades
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </li>
                             }
+
 
                             <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
                                 <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
                             </li>
+
                             <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
 
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
@@ -65,6 +82,11 @@
                                     <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
                                 </li>
                             }
+
+                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheets,TimesheetRows")">
+                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
+                            </li>
+
                         }
                     </ul>
                 </div>
@@ -85,9 +107,18 @@
     </footer>
 
     <environment include="Development">
-        <script src="~/lib/chosen/chosen-jquery.js"></script>
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="~/js/select2placeholder.js"></script>
+        <script>
+            $(function () {
+                $(".searchDropDown").select2({
+                    width: "100%",
+                    searchInputPlaceholder: 'Search...'
+                });
+            });
+        </script>
     </environment>
     <environment exclude="Development">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
@@ -101,6 +132,15 @@
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
                 crossorigin="anonymous"
                 integrity="sha256-E/V4cWE4qvAeO5MOhjtGtqDzPndRO1LBk8lJ/PR7CA4=">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="~/js/select2placeholder.js"></script>
+        <script>
+            $(function () {
+                $(".searchDropDown").select2({
+                    width: "100%"
+                });
+            });
         </script>
     </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>

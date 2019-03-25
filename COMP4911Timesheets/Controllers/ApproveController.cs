@@ -161,7 +161,50 @@ namespace COMP4911Timesheets.Controllers
 
         private bool EmployeeExists(string id)
         {
+            
             return _context.Employees.Any(e => e.Id == id);
+        }
+
+        private bool TimesheetExists(int id)
+        {
+            
+            return _context.Timesheets.Any(m => m.TimesheetId == id);
+        }
+
+        // GET: Approve/Delete/5
+        /**
+        public async Task<IActionResult> Approve(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int x = Int32.Parse(id);
+
+            var timesheet = await _context.Timesheets
+                .Include(e => e.TimesheetRows)
+                .FirstOrDefaultAsync(m => m.TimesheetId == x);
+            if (timesheet == null)
+            {
+                return NotFound();
+            }
+
+            return View(timesheet);
+        }
+        */
+        // POST: Approve/Delete/5
+
+        
+        public async Task<IActionResult> Approval(string id)
+        {
+            int x = 0;
+            Int32.TryParse(id, out x);
+            var timesheet = await _context.Timesheets.FindAsync(x);
+            timesheet.Status = 3;
+            _context.SaveChanges();
+            
+            return RedirectToAction(nameof(Details));
         }
     }
 }

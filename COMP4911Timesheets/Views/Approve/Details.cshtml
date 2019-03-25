@@ -66,6 +66,9 @@
     <thead>
         <tr>
             <th>
+                TimesheetID
+            </th>
+            <th>
                 WeekEnding
             </th>
             <th>
@@ -77,7 +80,7 @@
             <th>
                 Status
             </th>
-            
+
             <th></th>
         </tr>
     </thead>
@@ -85,6 +88,9 @@
         @foreach (var item in Model.Timesheets)
         {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimesheetId)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WeekEnding)
             </td>
@@ -97,12 +103,10 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Statuses[item.Status])
             </td>
-            
+
             <td>
-                <form asp-action="Approve">
-                    <input type="hidden" asp-for="@item.TimesheetId" />
-                    <input type="submit" value="Approve" class="btn btn-success btn-raised" />
-                </form>
+                
+                <a asp-action="Approval" asp-route-id="@item.TimesheetId" class="btn btn-success btn-raised">Approve</a>
             </td>
             <td>
                 <form asp-action="Reject">
