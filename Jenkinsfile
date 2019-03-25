@@ -7,7 +7,6 @@ pipeline {
         containerName= sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
       }      
       steps {
-        sh 'sed -i 's/eruptTEST/$containerName/g' build.yml'
         sh 'echo sudo docker stop $containerName'
         sh 'echo sudo docker rm $containerName'
         sh 'sudo docker-compose -f build.yml up --build -d'
