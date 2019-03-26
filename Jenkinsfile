@@ -4,7 +4,6 @@ pipeline {
     stage('build container') {
       steps {
         sh 'ls'
-        sh 'cat $propertiesPath$GIT_BRANCH'
         sh 'echo sudo docker stop $containerName'
         sh 'echo sudo docker rm $containerName'
         sh 'echo port num is $port'
