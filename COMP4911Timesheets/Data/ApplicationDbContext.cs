@@ -45,6 +45,10 @@ namespace COMP4911Timesheets.Data
                 .HasOne(pe => pe.Employee)
                 .WithMany(e => e.ProjectEmployees)
                 .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ProjectEmployee>()
+                .HasOne(pe => pe.Project)
+                .WithMany(p => p.ProjectEmployees)
+                .OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<WorkPackageEmployee>()
                 .HasOne(wpe => wpe.Employee)
                 .WithMany(e => e.WorkPackageEmployees)
@@ -53,6 +57,14 @@ namespace COMP4911Timesheets.Data
                 .HasOne(t => t.Employee)
                 .WithMany(e => e.Timesheets)
                 .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ProjectRequest>()
+                .HasOne(pr => pr.Project)
+                .WithMany(p => p.ProjectRequests)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ProjectRequest>()
+                .HasOne(pr => pr.PayGrade)
+                .WithMany(pg => pg.ProjectRequests)
+                .OnDelete(DeleteBehavior.SetNull);
         }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -60,6 +72,7 @@ namespace COMP4911Timesheets.Data
         public DbSet<EmployeePay> EmployeePays { get; set; }
         public DbSet<Signature> Signatures { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectRequest> ProjectRequests { get; set; }
         public DbSet<ProjectReport> ProjectReports { get; set; }
         public DbSet<ProjectEmployee> ProjectEmployees { get; set; }
         public DbSet<WorkPackage> WorkPackages { get; set; }
