@@ -1,28 +1,22 @@
 pipeline {
   agent any
   stages {
-    stage('build container') {
+    stage('set properties') {
       steps {
-        sh 'ls'
-        sh 'echo sudo docker stop $containerName'
-        sh 'echo sudo docker rm $containerName'
-        sh 'echo port num is $port'
-        sh 'pwd'
         sh 'sudo sed -i "s/eruptTEST/$containerName/g" $WORKSPACE/build.yml'
         sh 'cat build.yml'
-        sh 'sudo docker-compose -f build.yml up --build -d'
+        sh 'sudo sed -i "s/:5000/:$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
+        sh 'cat $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
       }
     }
-    stage('build containername') {
+    stage('build container') {
       steps {
-        sh 'echo Container name is $containerName'
-        sh 'echo branch name is ${GIT_BRANCH}'
-        sh 'echo erupt$GIT_BRANCH'
-        sh 'echo $containerName'
+        sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
   }
   environment {
+    eruptPassword = 'Password!123'
     containerName = sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
     port = sh (returnStdout: true, script: 'cat ./COMP4911Timesheets/Properties/$GIT_BRANCH').trim()
   }
