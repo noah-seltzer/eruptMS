@@ -81,7 +81,7 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Create([Bind("BudgetId,Hour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
         {
             budget.WorkPackageId = workpackageId;
-
+            budget.Status = 1;
             var rmBudgets = await _context.Budgets.Where(a => a.WorkPackageId == parentWorkpackageId).ToListAsync();
             foreach (Budget rmBudget in rmBudgets) { 
                 _context.Budgets.Remove(rmBudget);
