@@ -26,5 +26,6 @@ pipeline {
   environment {
     propertiesPath = './COMP4911Timesheets/Properties/'
     containerName = sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
+    port = sh (returnStdout: true, script: 'cat $propertiesPath$GIT_BRANCH').trim()
   }
 }
