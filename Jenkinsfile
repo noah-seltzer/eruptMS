@@ -3,11 +3,12 @@ pipeline {
     environment {
         propertiesPath = './COMP4911Timesheets/Properties/'
         containerName = sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
-        port = sh (returnStdout: true, script: 'cat $propertiesPath$GIT_BRANCH').trim()
+        /*port = sh (returnStdout: true, script: 'cat $propertiesPath$GIT_BRANCH').trim()*/
     }
   stages {
     stage('build container') {
       steps {
+        sh 'echo $propertiesPath$GIT_BRANCH'
         sh 'echo sudo docker stop $containerName'
         sh 'echo sudo docker rm $containerName'
         sh 'echo port num is $port'
