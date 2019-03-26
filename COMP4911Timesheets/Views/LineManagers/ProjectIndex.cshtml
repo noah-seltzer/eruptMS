@@ -1,0 +1,44 @@
+@model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
+
+@{
+    ViewData["PageTitle"] = "Management";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<p>
+    <a asp-action="Index">Employees</a>
+</p>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    <a asp-action="AddEmployees" asp-route-id="@item.Project.ProjectId">Add Employees</a> |
+                    <a asp-action="RemoveEmployees" asp-route-id="@item.Project.ProjectId">Remove Employees</a> |
+                    <a asp-action="DetailsEmployees" asp-route-id="@item.Project.ProjectId">Employees Details</a>
+                    <a asp-action="ViewWPReports" asp-route-id="@item.Project.ProjectId">View WP Reports</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
