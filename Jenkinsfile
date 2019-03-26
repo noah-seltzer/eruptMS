@@ -2,15 +2,15 @@ pipeline {
   agent any
     environment {
         containerName = sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
-        port = sh (returnStdout: true, script: 'if [ "$containerName" = "TEST" ]; then
-        echo 80
-elif [ "$containerName" = "STAGE" ]; then
-        echo 5000
-elif [ "$containerName" = "jenkins-build" ]; then
-        echo 5001
-elif [ "$containerName" = "UAT" ]; then
-        echo 5002
-fi').trim()
+      port = """${sh (returnStdout: true, script: 'if [ "$containerName" = "TEST" ]; then
+          echo 80
+        elif [ "$containerName" = "STAGE" ]; then
+          echo 5000
+        elif [ "$containerName" = "jenkins-build" ]; then
+          echo 5001
+        elif [ "$containerName" = "UAT" ]; then
+          echo 5002
+        fi')}"""
     }
   stages {
     stage('build container') {
