@@ -126,7 +126,9 @@
 
 
 <div>
-    @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+    @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+        Model.Statuses[Model.Status] == "Submitted & Not Approved" ||
+        Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
     {
         <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
     }

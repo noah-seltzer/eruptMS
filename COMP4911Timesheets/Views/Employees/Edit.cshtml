@@ -15,12 +15,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Employee.FirstName" class="control-label"></label>
-                <input asp-for="Employee.FirstName" class="form-control" />
+                <input asp-for="Employee.FirstName" class="form-control" required/>
                 <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Employee.LastName" class="control-label"></label>
-                <input asp-for="Employee.LastName" class="form-control" />
+                <input asp-for="Employee.LastName" class="form-control" required/>
                 <span asp-validation-for="Employee.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -60,13 +60,8 @@
             <input type="hidden" asp-for="EmployeePay.EmployeePayId" />
             <div class="form-group">
                 <label asp-for="Employee.Email" class="control-label"></label>
-                <input asp-for="Employee.Email" class="form-control" />
+                <input asp-for="Employee.Email" class="form-control" required/>
                 <span asp-validation-for="Employee.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Employee.PhoneNumber" class="control-label"></label>
-                <input asp-for="Employee.PhoneNumber" class="form-control" />
-                <span asp-validation-for="Employee.PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-raised" />

@@ -42,7 +42,7 @@
 
         <div class="form-group col-sm-4">
             <label asp-for="WeekEnding" class="control-label"></label>
-            <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays"></select>
+            <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays" disabled></select>
             <span asp-validation-for="WeekEnding" class="text-danger"></span>
         </div>
 
@@ -125,14 +125,19 @@
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                    Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
-                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
-                                }                            </td>
+                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
+                                        new { @class = "btn btn-primary", @role = "button" })
+                                }
+                            </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                    Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
-                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
+                                        new { @class = "btn btn-primary", @role = "button" })
                                 }
                             </td>
                         </tr>
@@ -141,17 +146,19 @@
             </tbody>
         </table>
 
-            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
             {
-                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId },
+                    new { @class = "btn btn-primary", @role = "button" })
             }
             @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
             {
-                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId },
+                    new { @class = "btn btn-primary", @role = "button" })
             }
         </form>
     </div>
-</div>
 <br />
 
 
