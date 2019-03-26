@@ -184,20 +184,44 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/CreateWorkPackage/6
         public async Task<IActionResult> CreateWorkPackageReport(int? id)
         {
-            parentWorkPKId = id;
-            var theWorkPackage = await _context.WorkPackages.FindAsync(id);
-            WorkPackageReport workPackageReport = new WorkPackageReport();
-            workPackageReport.WorkPackage = theWorkPackage;
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
+            if (workPackages == null)
+            {
+                var theWorkPackage = await _context.WorkPackages.FindAsync(id);
+                WorkPackageReport workPackageReport = new WorkPackageReport
+                {
+                    WorkPackage = theWorkPackage,
+                    WeekNumber = Utility.GetWeekNumberByDate(DateTime.Today)
+                };
+                return View(workPackageReport);
+            }
 
-            TempData["projectId"] = projectId;
-            return View(workPackageReport);
+            TempData["info"] = "Workpackage report only can be created on leaf workpackages";
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+            return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
+     
+        }
+
+        // POST: WorkPackageReports/CreateWorkPackageReport
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateWorkPackageReport([Bind("WorkPackageReportId,WeekNumber,Status,Comments,StartingPercentage,CompletedPercentage,CostStarted,CostFinished,WorkAccomplished,WorkAccomplishedNP,Problem,ProblemAnticipated,WorkPackageId")] WorkPackageReport workPackageReport)
+        {
+            workPackageReport.Status = 1;
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackageReport);
+                await _context.SaveChangesAsync();
+                //return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
         }
 
 
-
-
-        // GET: WorkPackages/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+            // GET: WorkPackages/Edit/5
+            public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
