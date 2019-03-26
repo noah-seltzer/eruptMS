@@ -16,12 +16,12 @@
 
             <div class="form-group">
                 <label asp-for="project.ProjectCode" class="control-label"></label>
-                <input asp-for="project.ProjectCode" class="form-control" />
+                <input asp-for="project.ProjectCode" class="form-control" disabled/>
                 <span asp-validation-for="project.ProjectCode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.Name" class="control-label"></label>
-                <input asp-for="project.Name" class="form-control" />
+                <input asp-for="project.Name" class="form-control" required/>
                 <span asp-validation-for="project.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -31,12 +31,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="project.CostingProposal" class="control-label"></label>
-                <input asp-for="project.CostingProposal" class="form-control" />
+                <input asp-for="project.CostingProposal" class="form-control" required/>
                 <span asp-validation-for="project.CostingProposal" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.OriginalBudget" class="control-label"></label>
-                <input asp-for="project.OriginalBudget" class="form-control" />
+                <input asp-for="project.OriginalBudget" class="form-control" required/>
                 <span asp-validation-for="project.OriginalBudget" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -74,7 +74,9 @@
         <ul>
             @foreach (var w in Model.project.WorkPackages)
             {
-                <li>@w.WorkPackageId @w.WorkPackageCode @w.Name</li>
+                <li>
+                    @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
+                </li>
             }
         </ul>
     </div>
@@ -86,9 +88,31 @@
         <ul>
             @foreach (var e in Model.project.ProjectEmployees)
             {
-                <li>
-                    @ProjectEmployee.Roles[e.Role] @e.Employee.Email
-                </li>
+            <li>
+                <div class="modal fade" id="roleModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Change Role</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <button type="button" class="btn btn-primary">Make Manager</button>
+                                <button type="button" class="btn btn-primary">Make Assistant</button>
+                                <br />
+                                <label class="form-check-label">Currently Working</label>
+                                <input type="checkbox" class="form-check-inline"/>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-raised btn-primary" type="button" data-toggle="modal" data-target="#roleModal">Modify</button>
+                @ProjectEmployee.Roles[e.Role] @e.Employee.Email
+            </li>
             }
         </ul>
     </div>
