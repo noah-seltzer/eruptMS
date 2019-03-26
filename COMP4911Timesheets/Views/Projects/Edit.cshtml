@@ -1,59 +1,98 @@
-﻿@model COMP4911Timesheets.Models.Project
+﻿@model COMP4911Timesheets.ViewModels.ManageProject
 
 @{
-    ViewData["PageTitle"] = "Edit";
+    ViewData["PageTitle"] = @Model.project.Name;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
 
-<h4>Project</h4>
-<hr />
 <div class="row">
-    <div class="col-md-8 col-lg-6 well bs-component">
+    <div class="col-md-6 col-lg-4 well bs-component">
+        <h4>Project Summary</h4>
+        <hr />
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProjectId" />
+            <input type="hidden" asp-for="project.ProjectId" />
+
             <div class="form-group">
-                <label asp-for="ProjectCode" class="control-label"></label>
-                <input asp-for="ProjectCode" class="form-control" />
-                <span asp-validation-for="ProjectCode" class="text-danger"></span>
+                <label asp-for="project.ProjectCode" class="control-label"></label>
+                <input asp-for="project.ProjectCode" class="form-control" />
+                <span asp-validation-for="project.ProjectCode" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="project.Name" class="control-label"></label>
+                <input asp-for="project.Name" class="form-control" />
+                <span asp-validation-for="project.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="project.Description" class="control-label"></label>
+                <input asp-for="project.Description" class="form-control" />
+                <span asp-validation-for="project.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CostingProposal" class="control-label"></label>
-                <input asp-for="CostingProposal" class="form-control" />
-                <span asp-validation-for="CostingProposal" class="text-danger"></span>
+                <label asp-for="project.CostingProposal" class="control-label"></label>
+                <input asp-for="project.CostingProposal" class="form-control" />
+                <span asp-validation-for="project.CostingProposal" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="OriginalBudget" class="control-label"></label>
-                <input asp-for="OriginalBudget" class="form-control" />
-                <span asp-validation-for="OriginalBudget" class="text-danger"></span>
+                <label asp-for="project.OriginalBudget" class="control-label"></label>
+                <input asp-for="project.OriginalBudget" class="form-control" />
+                <span asp-validation-for="project.OriginalBudget" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="project.Status" class="control-label"></label>
+                <select asp-for="project.Status" class="form-control searchDropDown" asp-items="ViewBag.Status"></select>
             </div>
-            <ul>
-                @foreach (var e in Model.ProjectEmployees)
-                {
-                    <li>@e.EmployeeId @e.Role</li>
-                }
-                </ul>
-                <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-primary" />
-                </div>
-</form>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
     </div>
+
+    <div class="col-md-8 col-lg-4 well bs-component">
+        <h4>Request Employees</h4>
+        <hr />
+        <form asp-action="Edit">
+
+            @foreach (var r in Model.requests)
+            {
+                <div class="form-group">
+                    <label class="control-label">@r.Item1</label>
+                    <input class="form-control" type="number" value="@r.Item2" />
+                </div>
+            }
+
+            <div class="form-group">
+                <input type="submit" value="Request" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-8 col-lg-4 well bs-component">
+        <h4>Work Packages</h4>
+        <hr />
+        <ul>
+            @foreach (var w in Model.project.WorkPackages)
+            {
+                <li>@w.WorkPackageId @w.WorkPackageCode @w.Name</li>
+            }
+        </ul>
+    </div>
+
+
+    <div class="col-md-8 col-lg-8 well bs-component">
+        <h4>Employees</h4>
+        <hr />
+        <ul>
+            @foreach (var e in Model.project.ProjectEmployees)
+            {
+                <li>
+                    @ProjectEmployee.Roles[e.Role] @e.Employee.Email
+                </li>
+            }
+        </ul>
+    </div>
+
 </div>
 
 <div>

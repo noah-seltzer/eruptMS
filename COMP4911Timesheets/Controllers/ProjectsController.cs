@@ -83,6 +83,15 @@ namespace COMP4911Timesheets
                 };
                 _context.Add(manager);
 
+                WorkPackage mgmt = new WorkPackage
+                {
+                    ProjectId = input.ProjectId,
+                    ParentWorkPackageId = null,
+                    Name = "Management",
+                    Description = ""
+                };
+                _context.Add(mgmt);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -97,13 +106,31 @@ namespace COMP4911Timesheets
                 return NotFound();
             }
 
-            var project = await _context.Projects.Include(e => e.ProjectEmployees).FirstAsync(p => p.ProjectId == id);
-            
+            var emps = _context.ProjectEmployees.Include(e => e.Employee).Where(e => e.ProjectId == id).ToList();
+
+            var project = _context.Projects
+                .Include(w => w.WorkPackages)
+                .First(f => f.ProjectId == id);
+
             if (project == null)
             {
                 return NotFound();
             }
-            return View(project);
+
+            project.ProjectEmployees = emps;
+
+            var g = _context.PayGrades.ToList();
+
+            ManageProject model = new ManageProject();
+            model.project = project;
+            model.requests = new List<Tuple<string, int>>();
+
+            foreach (var grade in g)
+                model.requests.Add(Tuple.Create(grade.PayLevel, 0));
+
+            ViewData["Status"] = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
+
+            return View(model);
         }
 
         // POST: Projects/Edit/5
@@ -111,9 +138,9 @@ namespace COMP4911Timesheets
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProjectId,ProjectCode,Name,Description,CostingProposal,OriginalBudget,Status")] Project project)
+        public async Task<IActionResult> Edit(int id, ManageProject model)
         {
-            if (id != project.ProjectId)
+            if (id != model.project.ProjectId)
             {
                 return NotFound();
             }
@@ -122,12 +149,12 @@ namespace COMP4911Timesheets
             {
                 try
                 {
-                    _context.Update(project);
+                    _context.Update(model.project);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProjectExists(project.ProjectId))
+                    if (!ProjectExists(model.project.ProjectId))
                     {
                         return NotFound();
                     }
@@ -138,7 +165,7 @@ namespace COMP4911Timesheets
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(project);
+            return View(model.project);
         }
 
         // GET: Projects/Delete/5
