@@ -60,7 +60,9 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 _context.Add(timesheetRow);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
@@ -140,6 +142,7 @@ namespace COMP4911Timesheets.Controllers
                 try
                 {
                     _context.Update(timesheetRow);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -153,6 +156,8 @@ namespace COMP4911Timesheets.Controllers
                         throw;
                     }
                 }
+
+
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
             var projects = await _context.Projects.ToListAsync();
