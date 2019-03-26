@@ -7,7 +7,7 @@ namespace COMP4911Timesheets.Models
 {
     public class ProjectSumReport
     {
-        public int WorkPackageCode { get; set; }
+        public string WorkPackageCode { get; set; }
         public string WorkPackageName { get; set; }
 
         public double ACost { get; set; }

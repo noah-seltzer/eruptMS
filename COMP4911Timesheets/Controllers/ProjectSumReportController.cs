@@ -76,7 +76,7 @@ namespace COMP4911Timesheets.Controllers
 
                 var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId);
 
-                tempReport.WorkPackageCode = tempWorkPackage.WorkPackageId;
+                tempReport.WorkPackageCode = tempWorkPackage.WorkPackageCode;
                 tempReport.WorkPackageName = tempWorkPackage.Name;
                 tempReport.ACost = aCost;
                 tempReport.ECost = eCost;
@@ -84,7 +84,9 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.EHour = eHour;
                 double tempVar = (int)(aHour / eHour * 10000);
                 tempReport.Variance = tempVar / 100;
-                tempReport.Comment = workPackageReport.Comments;
+                if(workPackageReport != null) { 
+                    tempReport.Comment = workPackageReport.Comments;
+                }
                 projectSumReports.Add(tempReport);
             }
 

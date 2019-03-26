@@ -1,24 +1,24 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Timesheet>
 
 @{
-    ViewData["pagetitle"] = "Index";
+    ViewData["PageTitle"] = "Timesheets";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.WeekEnding)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.WeekNumber)
             </th>
-            <th>
+            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.FlexTime)
             </th>
             <th>
@@ -39,10 +39,10 @@
             <td>
                 @item.WeekEnding.ToString("yyyy/MM/dd")
             </td>
-            <td>
+            <td class="priority-2">
                 @Html.DisplayFor(modelItem => item.WeekNumber)
             </td>
-            <td>
+            <td class="priority-2">
                 @Html.DisplayFor(modelItem => item.FlexTime)
             </td>
             <td>

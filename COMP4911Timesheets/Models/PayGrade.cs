@@ -18,7 +18,7 @@ namespace COMP4911Timesheets.Models
         public static readonly string JS = "JS";
         public static readonly string DS = "DS";
 
-        public readonly Dictionary<string, string> PayLevels = new Dictionary<string, string>
+        public static readonly Dictionary<string, string> PayLevels = new Dictionary<string, string>
         {
             {"P1", "P1"},
             {"P2", "P2"},

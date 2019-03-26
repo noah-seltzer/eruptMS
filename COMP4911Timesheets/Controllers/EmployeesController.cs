@@ -9,10 +9,13 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections;
+using System.Security.Claims;
+using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "AD,HR")]
     public class EmployeesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -30,11 +33,23 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Employees
+            var employees = await _context.Employees
                 .Include(e => e.Approver)
                 .Include(e => e.Supervisor)
-                .OrderBy(s => s.EmployeeId);
-            return View(await applicationDbContext.ToListAsync());
+                .OrderBy(s => s.EmployeeId).ToListAsync();
+            var employeeManagements = new List<EmployeeManagement>();
+            foreach (var employee in employees)
+            {
+                employeeManagements.Add
+                (
+                    new EmployeeManagement
+                    {
+                        Employee = employee,
+                        EmployeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == employee.Id).Where(ep => ep.Status == EmployeePay.VALID).Include(ep => ep.PayGrade).FirstOrDefaultAsync()
+                    }
+                );
+            }
+            return View(employeeManagements);
         }
 
         // GET: Employees/Details/5
@@ -53,15 +68,25 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
-            return View(employee);
+            var employeeManagement = new EmployeeManagement
+            {
+                Employee = employee,
+                EmployeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == id).Where(ep => ep.Status == EmployeePay.VALID).Include(ep => ep.PayGrade).FirstOrDefaultAsync()
+            };
+            return View(employeeManagement);
         }
 
         // GET: Employees/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email");
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email");
+            var employees = await _context.Employees.ToListAsync();
+            var jobTitles = Employee.JobTitles.ToList();
+            var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", _userManager.GetUserId(this.User));
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value");
+            ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
 
             return View();
         }
@@ -71,23 +96,38 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,FirstName,LastName,Title,CreatedTime,FlexTime,VacationTime,Status,ApproverId,SupervisorId,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] Employee employee)
+        public async Task<IActionResult> Create(EmployeeManagement employeeManagement)
         {
             if (ModelState.IsValid)
             {
-                employee.Status = 1;
-                employee.CreatedTime = DateTime.Now;
-                employee.UserName = employee.Email;
-                employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
-                await _userManager.CreateAsync(employee, defaultPassword);
+                employeeManagement.Employee.Status = Employee.CURRENTLY_EMPLOYEED;
+                employeeManagement.Employee.CreatedTime = DateTime.Now;
+                employeeManagement.Employee.UserName = employeeManagement.Employee.Email;
+                await _userManager.CreateAsync(employeeManagement.Employee, defaultPassword);
+
+                employeeManagement.EmployeePay.EmployeeId = employeeManagement.Employee.Id;
+                employeeManagement.EmployeePay.AssignedDate = DateTime.Now;
+                employeeManagement.EmployeePay.Status = EmployeePay.VALID;
+                await _context.AddAsync(employeeManagement.EmployeePay);
+                await _context.SaveChangesAsync();
+
+                if (employeeManagement.Employee.Title == Employee.HR_MANAGER)
+                {
+                    await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.HR);
+                }
+                if (employeeManagement.Employee.Title == Employee.ADMIN)
+                {
+                    await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.AD);
+                }
+
+                var supervisor = _context.Employees.Find(employeeManagement.Employee.SupervisorId);
+                await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+                var approver = _context.Employees.Find(employeeManagement.Employee.ApproverId);
+                await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-
-            return View(employee);
+            return View(employeeManagement);
         }
 
         // GET: Employees/Edit/5
@@ -104,10 +144,25 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.Email);
+            var employees = await _context.Employees.ToListAsync();
+            var jobTitles = Employee.JobTitles.ToList();
+            var statuses = Employee.Statuses.ToList();
+            var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+            var employeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == id).Where(ep => ep.Status == EmployeePay.VALID).FirstOrDefaultAsync();
 
-            return View(employee);
+            ViewData["ApproverId"] = new SelectList(employees, "Id", "Email", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(employees, "Id", "Email", employee.SupervisorId);
+            ViewData["Title"] = new SelectList(jobTitles, "Key", "Value", employee.Title);
+            ViewData["Status"] = new SelectList(statuses, "Key", "Value", employee.Status);
+            ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel", employeePay.PayGradeId);
+
+            var employeeManagement = new EmployeeManagement
+            {
+                Employee = employee,
+                EmployeePay = employeePay
+            };
+
+            return View(employeeManagement);
         }
 
         // POST: Employees/Edit/5
@@ -115,25 +170,91 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("EmployeeId,FirstName,LastName,Title,CreatedTime,FlexTime,VacationTime,Status,ApproverId,SupervisorId,Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] Employee employee)
+        public async Task<IActionResult> Edit(string id, EmployeeManagement employeeManagement)
         {
-            if (id != employee.Id)
+            if (id != employeeManagement.Employee.Id)
             {
                 return NotFound();
+            }
+
+            if (employeeManagement.Employee.SupervisorId == id || employeeManagement.Employee.ApproverId == id)
+            {
+                return BadRequest("Supervisor and Approver can't be themselves");
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    employee.SupervisorId = _context.Employees.Where(e => e.UserName == employee.SupervisorId).First().Id;
-                    employee.ApproverId = _context.Employees.Where(e => e.UserName == employee.ApproverId).First().Id;
-                    _context.Update(employee);
+                    var oldEmployee = await _context.Employees.FindAsync(id);
+                    if (oldEmployee != null)
+                    {
+                        var oldApprover = await _context.Employees.FindAsync(oldEmployee.ApproverId);
+                        if (oldApprover != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldApprover, ApplicationRole.TA);
+                        }
+                        var oldSupervisor = await _context.Employees.FindAsync(oldEmployee.SupervisorId);
+                        if (oldSupervisor != null)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldSupervisor, ApplicationRole.LM);
+                        }
+                        if (oldEmployee.Title == Employee.HR_MANAGER)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.HR);
+                        }
+                        if (oldEmployee.Title == Employee.ADMIN)
+                        {
+                            await _userManager.RemoveFromRoleAsync(oldEmployee, ApplicationRole.AD);
+                        }
+                    }
+
+                    var employeeToBeEdited = await _userManager.FindByIdAsync(id);
+                    employeeToBeEdited.FirstName = employeeManagement.Employee.FirstName;
+                    employeeToBeEdited.LastName = employeeManagement.Employee.LastName;
+                    employeeToBeEdited.Title = employeeManagement.Employee.Title;
+                    employeeToBeEdited.FlexTime = employeeManagement.Employee.FlexTime;
+                    employeeToBeEdited.VacationTime = employeeManagement.Employee.VacationTime;
+                    employeeToBeEdited.Status = employeeManagement.Employee.Status;
+                    employeeToBeEdited.ApproverId = employeeManagement.Employee.ApproverId;
+                    employeeToBeEdited.SupervisorId = employeeManagement.Employee.SupervisorId;
+                    employeeToBeEdited.UserName = employeeManagement.Employee.Email;
+                    employeeToBeEdited.Email = employeeManagement.Employee.Email;
+                    employeeToBeEdited.PhoneNumber = employeeManagement.Employee.PhoneNumber;
+                    await _userManager.UpdateAsync(employeeToBeEdited);
+
+                    var employeePayToBeDisabled = _context.EmployeePays.Find(employeeManagement.EmployeePay.EmployeePayId);
+                    employeePayToBeDisabled.Status = EmployeePay.INVALID;
+                    _context.Update(employeePayToBeDisabled);
                     await _context.SaveChangesAsync();
+
+                    var newEmployeePay = new EmployeePay
+                    {
+                        AssignedDate = DateTime.Now,
+                        Status = EmployeePay.VALID,
+                        EmployeeId = employeeToBeEdited.Id,
+                        PayGradeId = employeeManagement.EmployeePay.PayGradeId
+                    };
+                    _context.Add(newEmployeePay);
+                    await _context.SaveChangesAsync();
+
+                    var approver = _context.Employees.Find(employeeManagement.Employee.ApproverId);
+                    await _userManager.AddToRoleAsync(approver, ApplicationRole.TA);
+                    var supervisor = _context.Employees.Find(employeeManagement.Employee.SupervisorId);
+                    await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
+                    if (employeeManagement.Employee.Title == Employee.HR_MANAGER)
+                    {
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.HR);
+                    }
+                    if (employeeManagement.Employee.Title == Employee.ADMIN)
+                    {
+                        await _userManager.AddToRoleAsync(employeeToBeEdited, ApplicationRole.AD);
+                    }
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmployeeExists(employee.Id))
+                    if (!EmployeeExists(employeeManagement.Employee.Id))
                     {
                         return NotFound();
                     }
@@ -145,10 +266,7 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Email", "Email", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Email", "Email", employee.SupervisorId);
-
-            return View(employee);
+            return View(employeeManagement);
         }
 
         // GET: Employees/Delete/5
@@ -168,7 +286,15 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            return View(employee);
+            var employeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == id).Where(ep => ep.Status == EmployeePay.VALID).Include(ep => ep.PayGrade).FirstOrDefaultAsync();
+
+            var employeeManagement = new EmployeeManagement
+            {
+                Employee = employee,
+                EmployeePay = employeePay
+            };
+
+            return View(employeeManagement);
         }
 
         // POST: Employees/Delete/5
@@ -176,9 +302,29 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
+            if (_userManager.GetUserId(this.User) == id)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             var employee = await _context.Employees.FindAsync(id);
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
+
+            var approver = _context.Employees.Find(employee.ApproverId);
+            await _userManager.RemoveFromRoleAsync(approver, ApplicationRole.TA);
+            var supervisor = _context.Employees.Find(employee.SupervisorId);
+            await _userManager.RemoveFromRoleAsync(supervisor, ApplicationRole.LM);
+
+            if (employee.Title == Employee.HR_MANAGER)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.HR);
+            }
+            if (employee.Title == Employee.ADMIN)
+            {
+                await _userManager.RemoveFromRoleAsync(employee, ApplicationRole.AD);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
