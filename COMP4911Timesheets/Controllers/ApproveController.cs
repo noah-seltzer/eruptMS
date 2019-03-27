@@ -206,44 +206,32 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(string id, [Bind("EmployeeId,Email,FirstName,LastName,Title,CreatedTime,FlexTime,VacationTime,Status,ApproverId,SupervisorId,Id,UserName,NormalizedUserName,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] Employee employee)
+        public async Task<IActionResult> Reject(int TimesheetId)
         {
-            int x = 0;
-            Int32.TryParse(id, out x);
-            var timesheet = await _context.Timesheets.FindAsync(x);
-            timesheet.Status = 4;
-            _context.SaveChanges();
-
-            if (id != employee.Id)
+            if (TimesheetId == 0)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var timesheet = await _context.Timesheets.FindAsync(TimesheetId);
+            if (timesheet == null)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {   /**
-                    if (!TimesheetExists(employee.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }*/
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            ViewData["ApproverId"] = new SelectList(_context.Employees, "Id", "Id", employee.ApproverId);
-            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Id", "Id", employee.SupervisorId);
-            return View(employee);
+            await Reject(TimesheetId, timesheet);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int TimesheetId, [Bind("Comments")] Timesheet timesheet)
+        {
+            var timesheetToBeChanged = await _context.Timesheets.FindAsync(TimesheetId);
+            timesheetToBeChanged.Status = 4;
+            timesheetToBeChanged.Comments = timesheet.Comments;
+            _context.Update(timesheetToBeChanged);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
