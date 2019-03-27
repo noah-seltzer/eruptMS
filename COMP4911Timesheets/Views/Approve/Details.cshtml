@@ -41,25 +41,6 @@
             @Html.DisplayFor(model => model.Title)
         </dd>
         
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Approver)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Approver.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Supervisor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Supervisor.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
-        
     </dl>
 </div>
 <table class="table">
@@ -85,36 +66,33 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Timesheets)
-        {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimesheetId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WeekEnding)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WeekNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FlexTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
-            </td>
+        @{  int a = 10;
+            foreach (var item in Model.Timesheets)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimesheetId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeekEnding)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeekNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FlexTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Statuses[item.Status])
+                    </td>
 
-            <td>
-                
-                <a asp-action="Approval" asp-route-id="@item.TimesheetId" class="btn btn-success btn-raised">Approve</a>
-            </td>
-            <td>
-                <form asp-action="Reject">
-                    <input type="hidden" asp-for="@item.TimesheetId" />
-                    <input type="submit" value="Reject" class="btn btn-danger btn-raised" />
-                </form>
-            </td>
-        </tr>
+                    <td>
+                        <a asp-action="TimesheetView" asp-route-id="@item.TimesheetId" class="btn btn-success btn-info">View</a>
+                    </td>
+                </tr>
+
+            }
         }
     </tbody>
+              
 </table>

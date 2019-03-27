@@ -94,6 +94,7 @@ namespace COMP4911Timesheets.Controllers
         // POST: Approve/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /**
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("EmployeeId,Email,FirstName,LastName,Title,CreatedTime,FlexTime,VacationTime,Status,ApproverId,SupervisorId,Id,UserName,NormalizedUserName,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] Employee employee)
@@ -127,49 +128,9 @@ namespace COMP4911Timesheets.Controllers
             ViewData["SupervisorId"] = new SelectList(_context.Employees, "Id", "Id", employee.SupervisorId);
             return View(employee);
         }
+            */
 
-        // GET: Approve/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var employee = await _context.Employees
-                .Include(e => e.Approver)
-                .Include(e => e.Supervisor)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
-
-            return View(employee);
-        }
-
-        // POST: Approve/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool EmployeeExists(string id)
-        {
-            
-            return _context.Employees.Any(e => e.Id == id);
-        }
-
-        private bool TimesheetExists(int id)
-        {
-            
-            return _context.Timesheets.Any(m => m.TimesheetId == id);
-        }
 
         // GET: Approve/Delete/5
         /**
@@ -194,17 +155,99 @@ namespace COMP4911Timesheets.Controllers
         }
         */
         // POST: Approve/Delete/5
+        public async Task<IActionResult> TimesheetView(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            /**
+            int x = 0;
+            Int32.TryParse(id, out x);
+            */
+            var timesheet = await _context.Timesheets
+                .Include(e => e.TimesheetRows)
+                .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            if (timesheet == null)
+            {
+                return NotFound();
+            }
+
+            return View(timesheet);
+        }
 
         
-        public async Task<IActionResult> Approval(string id)
+        public async Task<IActionResult> Approval(int id)
+        {
+            if (id == 0)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            Console.WriteLine("2id = " + id);
+            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            timesheet.Status = 3;
+            _context.SaveChanges();
+            await ApprovalConfirmed(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ActionName("Approval")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApprovalConfirmed(int id)
+        {
+            //int x = 0;
+            //Int32.TryParse(id, out x);
+            Console.WriteLine("1id = " + id);
+            if (id == 0)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            Console.WriteLine("2id = " + id);
+            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            
+            timesheet.Status = 3;
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(string id, [Bind("EmployeeId,Email,FirstName,LastName,Title,CreatedTime,FlexTime,VacationTime,Status,ApproverId,SupervisorId,Id,UserName,NormalizedUserName,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] Employee employee)
         {
             int x = 0;
             Int32.TryParse(id, out x);
             var timesheet = await _context.Timesheets.FindAsync(x);
-            timesheet.Status = 3;
+            timesheet.Status = 4;
             _context.SaveChanges();
-            
-            return RedirectToAction(nameof(Details));
+
+            if (id != employee.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(employee);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {   /**
+                    if (!TimesheetExists(employee.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }*/
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ApproverId"] = new SelectList(_context.Employees, "Id", "Id", employee.ApproverId);
+            ViewData["SupervisorId"] = new SelectList(_context.Employees, "Id", "Id", employee.SupervisorId);
+            return View(employee);
         }
     }
 }
