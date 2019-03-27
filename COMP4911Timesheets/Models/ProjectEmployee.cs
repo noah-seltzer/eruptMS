@@ -41,5 +41,6 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Employee ID")]
         public string EmployeeId { get; set; }
         public Employee Employee { get; set; }
+
     }
 }

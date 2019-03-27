@@ -9,6 +9,6 @@ namespace COMP4911Timesheets.ViewModels
     public class ManageProject
     {
         public Project project { get; set; }
-        public List<Tuple<string, int>> requests{ get; set; }
+        public List<ProjectRequest> requests{ get; set; }
     }
 }

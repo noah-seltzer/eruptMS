@@ -5,23 +5,24 @@
 }
 
 <h1>@ViewData["PageTitle"]</h1>
+<form asp-action="Edit">
+    <div class="row">
 
-<div class="row">
-    <div class="col-md-6 col-lg-4 well bs-component">
-        <h4>Project Summary</h4>
-        <hr />
-        <form asp-action="Edit">
+        <div class="col-md-6 col-lg-3 well bs-component">
+            <h4>Project Summary</h4>
+            <hr />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="project.ProjectId" />
 
             <div class="form-group">
                 <label asp-for="project.ProjectCode" class="control-label"></label>
-                <input asp-for="project.ProjectCode" class="form-control" disabled/>
+                <input asp-for="project.ProjectCode" class="form-control" />
                 <span asp-validation-for="project.ProjectCode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.Name" class="control-label"></label>
-                <input asp-for="project.Name" class="form-control" required/>
+                <input asp-for="project.Name" class="form-control" required />
                 <span asp-validation-for="project.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -31,94 +32,88 @@
             </div>
             <div class="form-group">
                 <label asp-for="project.CostingProposal" class="control-label"></label>
-                <input asp-for="project.CostingProposal" class="form-control" required/>
+                <input asp-for="project.CostingProposal" class="form-control" required />
                 <span asp-validation-for="project.CostingProposal" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.OriginalBudget" class="control-label"></label>
-                <input asp-for="project.OriginalBudget" class="form-control" required/>
+                <input asp-for="project.OriginalBudget" class="form-control" required />
                 <span asp-validation-for="project.OriginalBudget" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.Status" class="control-label"></label>
                 <select asp-for="project.Status" class="form-control searchDropDown" asp-items="ViewBag.Status"></select>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+            <input type="submit" value="Save" class="btn btn-primary"/>
+        </div>
 
-    <div class="col-md-8 col-lg-4 well bs-component">
-        <h4>Request Employees</h4>
-        <hr />
-        <form asp-action="Edit">
-
-            @foreach (var r in Model.requests)
+        <div class="col-md-8 col-lg-3 well bs-component">
+            <h4>Employees Requested</h4>
+            <hr />
+            @for (int i = 0; i < Model.requests.Count; ++i)
             {
                 <div class="form-group">
-                    <label class="control-label">@r.Item1</label>
-                    <input class="form-control" type="number" value="@r.Item2" />
+                    <label>@Model.requests[i].PayGrade.PayLevel</label>
+                    <input type="hidden" asp-for="requests[i].PayGradeId" />
+                    <input type="hidden" asp-for="requests[i].ProjectId" />
+                    <input asp-for="requests[i].AmountRequested" class="form-control" type="number" />
                 </div>
             }
+        </div>
 
-            <div class="form-group">
-                <input type="submit" value="Request" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-
-    <div class="col-md-8 col-lg-4 well bs-component">
-        <h4>Work Packages</h4>
-        <hr />
-        <ul>
-            @foreach (var w in Model.project.WorkPackages)
-            {
-                <li>
-                    @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
-                </li>
-            }
-        </ul>
-    </div>
-
-
-    <div class="col-md-8 col-lg-8 well bs-component">
-        <h4>Employees</h4>
-        <hr />
-        <ul>
-            @foreach (var e in Model.project.ProjectEmployees)
-            {
-            <li>
-                <div class="modal fade" id="roleModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Change Role</h4>
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <button type="button" class="btn btn-primary">Make Manager</button>
-                                <button type="button" class="btn btn-primary">Make Assistant</button>
-                                <br />
-                                <label class="form-check-label">Currently Working</label>
-                                <input type="checkbox" class="form-check-inline"/>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
+        <div class="col-md-8 col-lg-5 well bs-component">
+            <h4>Employees</h4>
+            <hr />
+            <ul>
+                @foreach (var e in Model.project.ProjectEmployees)
+                {
+                    <li>
+                        <div class="modal fade" id="roleModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Change Role</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <button type="button" class="btn btn-primary">Make Manager</button>
+                                        <button type="button" class="btn btn-primary">Make Assistant</button>
+                                        <br />
+                                        <label class="form-check-label">Currently Working</label>
+                                        <input type="checkbox" class="form-check-inline" />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <button class="btn btn-raised btn-primary" type="button" data-toggle="modal" data-target="#roleModal">Modify</button>
-                @ProjectEmployee.Roles[e.Role] @e.Employee.Email
-            </li>
-            }
-        </ul>
+                        <button class="btn btn-raised btn-primary" type="button" data-toggle="modal" data-target="#roleModal">Modify</button>
+                        @ProjectEmployee.Roles[e.Role] @e.Employee.Email
+                    </li>
+                }
+            </ul>
+        </div>
+
     </div>
 
-</div>
+    <div class="row">
+        <div class="col-md-8 col-lg-11 well bs-component">
+            <h4>Work Packages</h4>
+            <hr />
+            <ul>
+                @foreach (var w in Model.project.WorkPackages)
+                {
+                    <li>
+                        @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
+                    </li>
+                }
+            </ul>
+        </div>
 
+    </div>
+</form>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
