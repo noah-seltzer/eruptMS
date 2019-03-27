@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Employee>
 @{
 
-    ViewData["Title"] = "Approve Timesheets";
+    ViewData["PageTitle"] = "Approve Timesheets";
     }
 
-    <h1>@ViewData["Title"]</h1>
+    <h1>@ViewData["PageTitle"]</h1>
 
 
     <table class="table">
@@ -23,12 +23,7 @@
                     @Html.DisplayNameFor(model => model.Title)
                 </th>
 
-                <th>
-                    @Html.DisplayNameFor(model => model.Approver)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Supervisor)
-                </th>
+               
                 <th>
                     @Html.DisplayNameFor(model => model.UserName)
                 </th>
@@ -38,7 +33,7 @@
         </thead>
         <tbody>
             
-                @foreach (var item in Model)
+                @foreach (var item in Model.OrderBy(i => i.EmployeeId))
                 {
                     var a = item.Timesheets;
                     int count = 0;
@@ -64,14 +59,9 @@
                                 @Html.DisplayFor(modelItem => item.LastName)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Title)
+                                @Html.DisplayFor(modelItem => Employee.JobTitles[item.Title])
                             </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Approver.Id)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Supervisor.Id)
-                            </td>
+                            
                             <td>
                                 @Html.DisplayFor(modelItem => item.UserName)
                             </td>

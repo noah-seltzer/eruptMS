@@ -1,10 +1,10 @@
 ﻿@model COMP4911Timesheets.Models.Employee
 
 @{
-    ViewData["Title"] = "This Employee needs " + Model.Timesheets.Count + " timesheet approvals";
+    ViewData["PageTitle"] = "This Employee needs " + Model.Timesheets.Count + " timesheet approvals";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>@ViewData["PageTitle"]</h2>
 
 <div>
     <h4>Employee</h4>
@@ -37,8 +37,8 @@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+        <dd class="col-sm-10">
+            @Employee.JobTitles[Model.Title]
         </dd>
         
     </dl>
@@ -46,9 +46,7 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                TimesheetID
-            </th>
+            
             <th>
                 WeekEnding
             </th>
@@ -70,9 +68,7 @@
             foreach (var item in Model.Timesheets)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TimesheetId)
-                    </td>
+                   
                     <td>
                         @Html.DisplayFor(modelItem => item.WeekEnding)
                     </td>
