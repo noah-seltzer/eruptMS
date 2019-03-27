@@ -85,16 +85,10 @@
 
                                 </ul>
                             </li>
-                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "PM"))
-                            {
+                            
                                 <li class="nav-item">
                                     <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
                                 </li>
-                            }
-
-                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheets,TimesheetRows")">
-                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
-                            </li>
 
                         }
                     </ul>
