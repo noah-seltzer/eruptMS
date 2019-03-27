@@ -44,5 +44,6 @@ namespace COMP4911Timesheets.Models
         public List<ProjectReport> ProjectReports { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
         public List<WorkPackage> WorkPackages { get; set; }
+        public List<ProjectRequest> ProjectRequests { get; set; }
     }
 }

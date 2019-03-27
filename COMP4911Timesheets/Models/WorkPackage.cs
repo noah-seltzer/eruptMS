@@ -6,6 +6,21 @@ namespace COMP4911Timesheets.Models
 {
     public class WorkPackage
     {
+
+        public static readonly int INVALID = 0;
+        public static readonly int VALID = 1;
+        public static readonly int OPENED = 2;
+        public static readonly int CLOSED = 3;
+        public static readonly int ARCHIVED = 4;
+
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string> {
+            {0, "Invalid"},
+            {1, "Valid"},
+            {2, "Opened"},
+            {3, "Closed"},
+            {4, "Archived"}
+        };
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Display(Name = "Work Package ID")]
@@ -21,6 +36,7 @@ namespace COMP4911Timesheets.Models
         public string Input { get; set; }
         public string Output { get; set; }
         public string Activity { get; set; }
+        public int Status { get; set; }
 
         [Display(Name = "Project ID")]
         public int? ProjectId { get; set; }
