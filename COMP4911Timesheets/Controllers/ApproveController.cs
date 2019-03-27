@@ -183,7 +183,6 @@ namespace COMP4911Timesheets.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            Console.WriteLine("2id = " + id);
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
             timesheet.Status = 3;
             _context.SaveChanges();
@@ -197,14 +196,11 @@ namespace COMP4911Timesheets.Controllers
         {
             //int x = 0;
             //Int32.TryParse(id, out x);
-            Console.WriteLine("1id = " + id);
             if (id == 0)
             {
                 return RedirectToAction(nameof(Index));
             }
-            Console.WriteLine("2id = " + id);
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
-            
             timesheet.Status = 3;
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
