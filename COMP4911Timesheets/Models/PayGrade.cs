@@ -44,6 +44,7 @@ namespace COMP4911Timesheets.Models
         public int Year { get; set; }
 
         public List<EmployeePay> EmployeePays { get; set; }
+        public List<ProjectRequest> ProjectRequests { get; set; }
         public List<Budget> Budgets { get; set; }
     }
 }
