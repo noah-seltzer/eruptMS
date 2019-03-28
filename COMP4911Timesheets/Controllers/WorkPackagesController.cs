@@ -44,12 +44,12 @@ namespace COMP4911Timesheets.Controllers
                 .Include(w => w.Project)
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
 
-            var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).ToListAsync();
-
+            var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();
+            /*
             for (int i = 0; i < budgets.Count; i++) {
                 budgets[i].PayGrade = await _context.PayGrades.FirstOrDefaultAsync(m => m.PayGradeId == budgets[i].PayGradeId);
             }
-
+            */
             workPackage.Budgets = budgets;
 
             if (workPackage == null)
