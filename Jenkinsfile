@@ -8,7 +8,7 @@ pipeline {
         sh 'sudo sed -i "s/:5000/:$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'sudo sed -i "s/CONNECTION_STRING/\\"DefaultConnection\\": \\"Server=localhost,1433;Database=erupt$containerName;User ID=SA;Password=$dbpassword;\\"/g" ./COMP4911Timesheets/appsettings.json'
-        sh 'cat $WORKSPACE/appSettings.json'
+        sh 'cat $WORKSPACE/appsettings.json'
       }
     }
     stage('build container') {
