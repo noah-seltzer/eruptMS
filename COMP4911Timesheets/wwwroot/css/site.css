@@ -43,11 +43,17 @@ html {
 
 body {
   /* Margin bottom by footer height */
-  margin-bottom: 60px;
+  /* margin-bottom: 60px; */
+  margin: 0;
+  height: 100%;
+}
+.body-container {
+  min-height: calc(100vh - 210px);
+  margin-bottom: 2em;
 }
 .footer {
-  position: absolute;
-  bottom: 0;
+  /* position: absolute;
+  bottom: 0; */
   width: 100%;
   white-space: nowrap;
   /* Set the fixed height of the footer here */
