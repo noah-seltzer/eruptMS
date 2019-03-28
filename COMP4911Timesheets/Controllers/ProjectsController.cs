@@ -113,10 +113,7 @@ namespace COMP4911Timesheets
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var project = _context.Projects
                 .Include(w => w.WorkPackages)
@@ -134,6 +131,44 @@ namespace COMP4911Timesheets
                 .Include(r => r.PayGrade)
                 .Where(r => r.ProjectId == id)
                 .ToList();
+
+            //This is for when new pay grades have been added that the project does not yet have
+            #region Not Enough Pay Grades
+            var grds = _context.PayGrades.ToList();
+            if(reqs.Count < grds.Count)
+            {
+                bool exists = false;
+                foreach(var grade in grds)
+                {
+                    foreach (var req in reqs)
+                    {
+                        if (grade.PayGradeId == req.PayGradeId)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        ProjectRequest request = new ProjectRequest
+                        {
+                            PayGradeId = grade.PayGradeId,
+                            AmountRequested = 0,
+                            ProjectId = id,
+                            Status = ProjectRequest.VALID
+                        };
+                        reqs.Add(request);
+                        _context.Add(request);
+                    }
+                    else
+                    {
+                        exists = false;
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+            #endregion
 
             ManageProject model = new ManageProject();
             model.project = project;
@@ -214,6 +249,17 @@ namespace COMP4911Timesheets
         {
             var project = await _context.Projects.FindAsync(id);
             _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet, ActionName("Close")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Close(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            project.Status = Project.PAUSED;
+            _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
