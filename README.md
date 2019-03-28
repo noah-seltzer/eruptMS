@@ -1,4 +1,4 @@
-#IMPORTANT 
+# IMPORTANT 
 
 change the default connection in COMP4911Timesheets/appsettings.json
 
