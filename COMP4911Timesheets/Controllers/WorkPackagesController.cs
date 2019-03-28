@@ -186,7 +186,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/CreateWorkPackage/6
         public async Task<IActionResult> CreateWorkPackageReport(int? id)
         {
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id &&  m.Status != WorkPackage.CLOSED);
             if (workPackages == null)
             {
                 var theWorkPackage = await _context.WorkPackages.FindAsync(id);

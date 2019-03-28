@@ -8,18 +8,14 @@
     <title>@ViewData["PageTitle"] - COMP4911Timesheets</title>
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/css/Dashboard.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-paper.css" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/Dashboard.css" />
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-paper.css" />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-dark.css" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -39,14 +35,16 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             //var user = await UserManager.FindByNameAsync(User.Identity.Name);
-                            if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
                             {
                                 <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit,Backup,Restore,ProjectIndex", controllers: "Employees,PayGrades,Admins")">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
-                                        Management <span class="caret"></span></a>
+                                        Management <span class="caret"></span>
+                                    </a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="download">
                                         @{
-                                            if (User.IsInRole(role:"AD")) {
+                                            if (User.IsInRole(role: "AD"))
+                                            {
                                                 <li>
                                                     <a class="nav-link" asp-area="" asp-controller="Admins" asp-action="Index">
                                                         Administrative
@@ -76,9 +74,20 @@
                                     </ul>
                                 </li>
                             }
+                            if (User.IsInRole(role: "TA") || User.IsInRole(role: "AD"))
+                            {
+                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
+                            }
+
+                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
+                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
+                            </li>
+
                             <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
+
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
-                                    Project <span class="caret"></span></a>
+                                    Project <span class="caret"></span>
+                                </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="download">
                                     <li>
                                         <a class="nav-link" asp-area="" asp-controller="Projects" asp-action="Index">
@@ -93,9 +102,11 @@
 
                                 </ul>
                             </li>
-                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheets,TimesheetRows")">
-                                <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
                             </li>
+
                         }
                     </ul>
                 </div>

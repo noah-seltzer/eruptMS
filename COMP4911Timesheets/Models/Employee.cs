@@ -81,10 +81,12 @@ namespace COMP4911Timesheets.Models
 
         public int Status { get; set; }
 
+        [Display(Name = "Approver")]
         [ForeignKey("Approver")]
         public string ApproverId { get; set; }
         public Employee Approver { get; set; }
 
+        [Display(Name = "Supervisor")]
         [ForeignKey("Supervisor")]
         public string SupervisorId { get; set; }
         public Employee Supervisor { get; set; }
