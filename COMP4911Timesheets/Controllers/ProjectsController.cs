@@ -135,6 +135,41 @@ namespace COMP4911Timesheets
                 .Where(r => r.ProjectId == id)
                 .ToList();
 
+            var grds = _context.PayGrades.ToList();
+
+            if(reqs.Count < grds.Count)
+            {
+                bool exists = false;
+                foreach(var grade in grds)
+                {
+                    foreach (var req in reqs)
+                    {
+                        if (grade.PayGradeId == req.PayGradeId)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        ProjectRequest request = new ProjectRequest
+                        {
+                            PayGradeId = grade.PayGradeId,
+                            AmountRequested = 0,
+                            ProjectId = id,
+                            Status = ProjectRequest.VALID
+                        };
+                        reqs.Add(request);
+                        _context.Add(request);
+                    }
+                    else
+                    {
+                        exists = false;
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+
             ManageProject model = new ManageProject();
             model.project = project;
             model.project.ProjectEmployees = emps;
@@ -214,6 +249,17 @@ namespace COMP4911Timesheets
         {
             var project = await _context.Projects.FindAsync(id);
             _context.Projects.Remove(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet, ActionName("Close")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Close(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            project.Status = Project.PAUSED;
+            _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
