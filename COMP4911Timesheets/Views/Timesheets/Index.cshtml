@@ -28,8 +28,6 @@
                 @Html.DisplayNameFor(model => model.Employee)
             </th>
             <th></th>
-            <th></th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -53,18 +51,16 @@
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
-            </td>
-            <td>
-
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                    item.Statuses[item.Status] == "Submitted & Not Approved" ||
+                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
-                    <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a>
+                <a asp-action="Edit" asp-route-id="@item.TimesheetId"> | Edit </a>
                 }
-            </td>
-            <td>
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
-                    <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
+                 <a asp-action="Delete" asp-route-id="@item.TimesheetId"> | Delete</a>
                 }
             </td>
         </tr>
