@@ -1,13 +1,16 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["PageTitle"] = "Index";
 }
 
 <h1>WorkPackage - @ViewData["projectName"] @ViewData["projectCode"]</h1>
 <h4>@TempData["info"]</h4>
 <p>
-    <a asp-action="CreateWorkPackage">Create New WorkPackage</a>
+    <a asp-action="CreateWorkPackage">Create New WorkPackage</a> &nbsp|&nbsp
+
+    <a asp-action="ClosedWorkPackageInfo">Closed WorkPackage Info</a>
+
 </p>
 
 <div class="row">
@@ -29,6 +32,9 @@
     </div>
     <div class="col-xs-1">
         @Html.DisplayNameFor(model => model.Activity)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Status)
     </div>
     <div class="col-xs-1">
         @Html.DisplayNameFor(model => model.ParentWorkPackage)
@@ -59,16 +65,29 @@
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.Activity)
             </div>
+            
+            @if (item.Status == WorkPackage.OPENED)
+            {
+            <div class="col-xs-1">
+                Opened</div>
+            }
+            else
+            {
+            <div class="col-xs-1">
+                Archived</div>
+            }
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
             </div>
-        </div>
+            </div>
         <div>
             <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> |
+            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Create Workpackage Report </a> |
             <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add budget Plan </a> |
             <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+            <!--|
+            <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
         </div>
     }
     @if (item.WorkPackageCode.Length != 5)
@@ -92,16 +111,30 @@
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.Activity)
             </div>
+            @if (item.Status == WorkPackage.OPENED)
+            {
+                <div class="col-xs-1">
+                    Opened
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-1">
+                    Archived
+                </div>
+            }
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
             </div>
         </div>
         <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
             <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
-            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add budget Plan </a> |
+            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Create Workpackage Report </a> &nbsp|&nbsp
+            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add budget Plan </a> &nbsp|&nbsp
             <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
-            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
-            <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+            <!-- &nbsp|&nbsp
+    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
         </div>
     }
 }

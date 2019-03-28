@@ -1,15 +1,23 @@
 pipeline {
   agent any
   stages {
-    stage('set properties') {
+    stage('Set Properties') {
       steps {
         sh 'sudo sed -i "s/eruptTEST/$containerName/g" $WORKSPACE/build.yml'
         sh 'cat build.yml'
-        sh 'sudo sed -i "s/:5000/:$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
+        sh 'sudo sed -i "s/{ServicePort}/$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
+        sh 'sudo sed -i "s/CONNECTION_STRING/Server=localhost,1433;Database=$containerName;User ID=SA;Password=$dbpassword;/g" ./COMP4911Timesheets/appsettings.json'
+        sh 'cat $WORKSPACE/COMP4911Timesheets/appsettings.json'
       }
     }
-    stage('build container') {
+    stage('Stop Container') {
+      steps {
+        sh 'sudo docker stop $containerName'
+        sh 'sudo docker rm $containerName'
+      }
+    }
+    stage('Build Container') {
       steps {
         sh 'sudo docker-compose -f build.yml up --build -d'
       }
@@ -19,5 +27,6 @@ pipeline {
     eruptPassword = 'Password!123'
     containerName = sh (returnStdout: true, script: 'echo erupt$GIT_BRANCH').trim()
     port = sh (returnStdout: true, script: 'cat ./COMP4911Timesheets/Properties/$GIT_BRANCH').trim()
+    dbpassword = 'Password!123'
   }
 }

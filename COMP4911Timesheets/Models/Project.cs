@@ -13,7 +13,7 @@ namespace COMP4911Timesheets.Models
         public static readonly int INTERNAL = 2;
         public static readonly int PAUSED = 3;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Invalid"},
             {1, "Ongoing"},
@@ -44,5 +44,6 @@ namespace COMP4911Timesheets.Models
         public List<ProjectReport> ProjectReports { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
         public List<WorkPackage> WorkPackages { get; set; }
+        public List<ProjectRequest> ProjectRequests { get; set; }
     }
 }

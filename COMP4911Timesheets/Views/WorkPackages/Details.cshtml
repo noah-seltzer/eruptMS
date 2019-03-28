@@ -1,7 +1,7 @@
 ﻿@model COMP4911Timesheets.Models.WorkPackage
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["PageTitle"] = "Details";
     ViewData["projectId"] = Model.ProjectId;
 
 }
@@ -11,6 +11,7 @@
 <div>
     <h4>WorkPackage</h4>
     <hr />
+    <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.WorkPackageCode)
@@ -74,6 +75,7 @@
         </dd>
     </dl>
 </div>
+
 <h4>Budget Plan</h4>
 <div class="row">
     <div class="col-xs-1">
@@ -86,7 +88,10 @@
         Type
     </div>
     <div class="col-xs-1">
-        Pay Grade Id
+        Pay Grade Level
+    </div>
+    <div class="col-xs-1">
+        Cost
     </div>
 </div>
 
@@ -103,11 +108,13 @@
             @Html.DisplayFor(model => item.Type)
         </div>
         <div class="col-xs-1">
-            @Html.DisplayFor(model => item.PayGradeId)
+            @Html.DisplayFor(model => item.PayGrade.PayLevel)
+        </div>
+        <div class="col-xs-1">
+            $@Html.DisplayFor(model => item.PayGrade.Cost) / h
         </div>
     </div>
 }
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a> |
     <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
 </div>
