@@ -51,6 +51,9 @@ namespace COMP4911Timesheets.Models
         public int? SignatureId { get; set; }
         public Signature Signature { get; set; }
 
+        [Display(Name = "Comments")]
+        public string Comments { get; set; }
+
         public List<TimesheetRow> TimesheetRows { get; set; }
     }
 }

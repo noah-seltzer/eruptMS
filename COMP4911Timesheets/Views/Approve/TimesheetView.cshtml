@@ -1,0 +1,147 @@
+﻿@model COMP4911Timesheets.Models.Timesheet
+
+@{
+    ViewData["PageTitle"] = "TimesheetView";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<div>
+    <h4>Timesheet</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WeekEnding)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WeekEnding)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FlexTime)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FlexTime)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Statuses[Model.Status])
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+
+    </dl>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Sunday
+            </th>
+            <th>
+                Monday
+            </th>
+            <th>
+                Tuesday
+            </th>
+            <th>
+                Wednesday
+            </th>
+            <th>
+                Thursday
+            </th>
+            <th>
+                Friday
+            </th>
+            <th>
+                Saturday
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ 
+            foreach (var item in Model.TimesheetRows)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SunHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MonHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TueHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WedHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ThuHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FriHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SatHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+
+</table>
+<div>
+    <!--
+    <form asp-action="Approval">
+        <input id="TimesheetId" type="hidden" asp-for="TimesheetId" />
+        <input type="submit" value="Approve" class="btn btn-success btn-raised" />
+    </form>
+         -->
+    <a asp-action="Approval" asp-route-id="@Model.TimesheetId" class="btn btn-success btn-raised">Approve</a>
+
+
+
+    <button onclick="showBox()" class="btn btn-success btn-danger">Reject</button>
+</div>
+<div id="myDIV" style="display:none">
+    <form asp-action="Reject">
+        <div class="form-group">
+            <label asp-for="Comments" class="control-label"></label>
+            <input asp-for="Comments" class="form-control" />
+            <span asp-validation-for="Comments" class="text-danger"></span>
+        </div>
+        <input type="hidden" asp-for="TimesheetId" />
+        <input type="submit" value="Submit Rejection" class="btn btn-danger btn-raised" />
+    </form>
+</div>
+<script>
+
+    function showBox() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+<br />
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
