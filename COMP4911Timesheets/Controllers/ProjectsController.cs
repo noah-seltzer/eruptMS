@@ -148,6 +148,7 @@ namespace COMP4911Timesheets
                             break;
                         }
                     }
+
                     if (!exists)
                     {
                         ProjectRequest request = new ProjectRequest
