@@ -13,8 +13,8 @@ pipeline {
     }
     stage('Stop Container') {
       steps {
-        sh 'echo sudo docker stop $containerName'
-        sh 'echo sudo docker rm $containerName'
+        sh 'sudo docker stop $containerName'
+        sh 'sudo docker rm $containerName'
       }
     }
     stage('Build Container') {
