@@ -8,7 +8,7 @@ FROM
 
 TO
 
-"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
+"DefaultConnection": "Server=(localdb)\\\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
 
 # comp4911timesheets
 
