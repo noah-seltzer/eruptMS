@@ -1,4 +1,14 @@
-# New Document
+#IMPORTANT 
+
+change the default connection in COMP4911Timesheets/appsettings.json
+
+FROM
+
+"DefaultConnection": "CONNECTION_STRING"
+
+TO
+
+"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
 
 # comp4911timesheets
 
