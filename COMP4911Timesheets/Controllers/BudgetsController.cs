@@ -62,7 +62,9 @@ namespace COMP4911Timesheets.Controllers
                 if (tempWorkpackage.ParentWorkPackageId != null) {
                     parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
                 }
-                ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId");
+                var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+
+                ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
 
                 return View();
             }
