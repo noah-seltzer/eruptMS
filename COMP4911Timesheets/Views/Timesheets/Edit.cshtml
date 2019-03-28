@@ -52,11 +52,6 @@
         <input type="hidden" asp-for="Status" />
         <input type="hidden" asp-for="FlexTime" />
 
-        @*<div class="form-group col-sm-4">
-                <label asp-for="WeekEnding" class="control-label"></label>
-                <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays"></select>
-                <span asp-validation-for="WeekEnding" class="text-danger"></span>
-            </div>*@
         @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
         {
             <p>
