@@ -5,7 +5,7 @@ pipeline {
       steps {
         sh 'sudo sed -i "s/eruptTEST/$containerName/g" $WORKSPACE/build.yml'
         sh 'cat build.yml'
-        sh 'sudo sed -i "s/:5000/:$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
+        sh 'sudo sed -i "s/{ServicePort}/$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'sudo sed -i "s/CONNECTION_STRING/Server=localhost,1433;Database=$containerName;User ID=SA;Password=$dbpassword;/g" ./COMP4911Timesheets/appsettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/appsettings.json'
