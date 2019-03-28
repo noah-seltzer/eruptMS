@@ -33,6 +33,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
@@ -43,8 +44,12 @@ namespace COMP4911Timesheets.Controllers
                 .Include(w => w.Project)
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
 
-            var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).ToListAsync();
-
+            var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();
+            /*
+            for (int i = 0; i < budgets.Count; i++) {
+                budgets[i].PayGrade = await _context.PayGrades.FirstOrDefaultAsync(m => m.PayGradeId == budgets[i].PayGradeId);
+            }
+            */
             workPackage.Budgets = budgets;
 
             if (workPackage == null)
@@ -67,13 +72,14 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
             int[] workpackageCode = new int[10];
             for (int i = 0; i < 10; i++) {
                 workpackageCode[i] = -1;
             }
             workPackage.ProjectId = projectId;
+            workPackage.Status = WorkPackage.OPENED; 
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
 
@@ -124,7 +130,7 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateChildWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> CreateChildWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
             int[] workpackageCode = new int[10];
             for (int i = 0; i < 10; i++)
@@ -132,6 +138,7 @@ namespace COMP4911Timesheets.Controllers
                 workpackageCode[i] = -1;
             }
             workPackage.ProjectId = projectId;
+            workPackage.Status = WorkPackage.OPENED;
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
@@ -175,6 +182,46 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
+
+        // GET: WorkPackages/CreateWorkPackage/6
+        public async Task<IActionResult> CreateWorkPackageReport(int? id)
+        {
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
+            if (workPackages == null)
+            {
+                var theWorkPackage = await _context.WorkPackages.FindAsync(id);
+                WorkPackageReport workPackageReport = new WorkPackageReport
+                {
+                    WorkPackage = theWorkPackage,
+                    WeekNumber = Utility.GetWeekNumberByDate(DateTime.Today)
+                };
+                return View(workPackageReport);
+            }
+
+            TempData["info"] = "Workpackage report only can be created on leaf workpackages";
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+            return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
+     
+        }
+
+        // POST: WorkPackageReports/CreateWorkPackageReport
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateWorkPackageReport([Bind("WorkPackageReportId,WeekNumber,Status,Comments,StartingPercentage,CompletedPercentage,CostStarted,CostFinished,WorkAccomplished,WorkAccomplishedNP,Problem,ProblemAnticipated,WorkPackageId")] WorkPackageReport workPackageReport)
+        {
+            workPackageReport.Status = WorkPackageReport.VALID;
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackageReport);
+                await _context.SaveChangesAsync();
+                //return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+        }
+
+
         // GET: WorkPackages/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -184,6 +231,13 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var workPackage = await _context.WorkPackages.FindAsync(id);
+
+            if (workPackage.Status == WorkPackage.CLOSED)
+            {
+                TempData["info"] = "Workpackage already closed you can not change  work package info";
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
+            }
+
             if (workPackage == null)
             {
                 return NotFound();
@@ -198,19 +252,35 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> Edit(int id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
             if (id != workPackage.WorkPackageId)
             {
                 return NotFound();
             }
 
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(workPackage);
-                    await _context.SaveChangesAsync();
+                    if (workPackage.Status == WorkPackage.CLOSED || workPackage.Status == WorkPackage.ARCHIVED)
+                    {
+                        var workPackages = await _context.WorkPackages.Where(u => u.WorkPackageCode.StartsWith(workPackage.WorkPackageCode)).ToListAsync();
+                        foreach (WorkPackage tempWorkPackage in workPackages)
+                        {
+                            if (tempWorkPackage.Status != WorkPackage.CLOSED)
+                            {
+                                tempWorkPackage.Status = workPackage.Status;
+                                _context.Update(tempWorkPackage);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                    else {
+                        _context.Update(workPackage);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -223,44 +293,12 @@ namespace COMP4911Timesheets.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
             }
             ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
         }
-
-        // GET: WorkPackages/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var workPackage = await _context.WorkPackages
-                .Include(w => w.ParentWorkPackage)
-                .Include(w => w.Project)
-                .FirstOrDefaultAsync(m => m.WorkPackageId == id);
-            if (workPackage == null)
-            {
-                return NotFound();
-            }
-
-            return View(workPackage);
-        }
-
-        // POST: WorkPackages/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var workPackage = await _context.WorkPackages.FindAsync(id);
-            _context.WorkPackages.Remove(workPackage);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
         
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
@@ -278,7 +316,7 @@ namespace COMP4911Timesheets.Controllers
 
 
             var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == id).ToListAsync();
+             .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
             //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
@@ -325,6 +363,30 @@ namespace COMP4911Timesheets.Controllers
             workPackages = tempWorkPackages;
 
             //ViewData["NestedLevel"] = maxWorkPackageCodeLength - PROJECT_CODE_LENGTH;
+
+            if (workPackages == null)
+            {
+                return NotFound();
+            }
+            return View(workPackages);
+        }
+
+        //GET: ProjectWorkPackges/ClosedWorkPackageInfo/5
+        public async Task<IActionResult> ClosedWorkPackageInfo()
+        {
+            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+
+            ViewData["projectCode"] = project.ProjectCode;
+            ViewData["projectName"] = project.Name;
+            ViewData["projectId"] = projectId;
+            if (projectId == null)
+            {
+                return NotFound();
+            }
+
+
+            var workPackages = await _context.WorkPackages
+             .Where(u => u.ProjectId == projectId && u.Status == WorkPackage.CLOSED).ToListAsync();
 
             if (workPackages == null)
             {
