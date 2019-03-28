@@ -113,10 +113,7 @@ namespace COMP4911Timesheets
         // GET: Projects/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var project = _context.Projects
                 .Include(w => w.WorkPackages)
@@ -135,8 +132,9 @@ namespace COMP4911Timesheets
                 .Where(r => r.ProjectId == id)
                 .ToList();
 
+            //This is for when new pay grades have been added that the project does not yet have
+            #region Not Enough Pay Grades
             var grds = _context.PayGrades.ToList();
-
             if(reqs.Count < grds.Count)
             {
                 bool exists = false;
@@ -169,6 +167,7 @@ namespace COMP4911Timesheets
                 }
                 await _context.SaveChangesAsync();
             }
+            #endregion
 
             ManageProject model = new ManageProject();
             model.project = project;
