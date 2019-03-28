@@ -1,0 +1,164 @@
+﻿@model COMP4911Timesheets.Models.Timesheet
+
+@{
+    ViewData["PageTitle"] = "Edit";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<div>
+    <h4>Timesheet</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.FlexTime)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Statuses[Model.Status])
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.LastName)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="TimesheetId" />
+        <input type="hidden" asp-for="EmployeeId" />
+        <input type="hidden" asp-for="EmployeePayId" />
+        <input type="hidden" asp-for="SignatureId" />
+        <input type="hidden" asp-for="Status" />
+        <input type="hidden" asp-for="FlexTime" />
+
+        <div class="form-group col-sm-4">
+            <label asp-for="WeekEnding" class="control-label"></label>
+            <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays"></select>
+            <span asp-validation-for="WeekEnding" class="text-danger"></span>
+        </div>
+
+        <p>
+            @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, null)
+        </p>
+
+        <table class="table well bs-component">
+            <thead>
+                <tr>
+                    <th>
+                        Project
+                    </th>
+                    <th>
+                        Work Package
+                    </th>
+                    <th>
+                        Sat
+                    </th>
+                    <th>
+                        Sun
+                    </th>
+                    <th>
+                        Mon
+                    </th>
+                    <th>
+                        Tue
+                    </th>
+                    <th>
+                        Wed
+                    </th>
+                    <th>
+                        Thu
+                    </th>
+                    <th>
+                        Fri
+                    </th>
+                    <th>
+                        Notes
+                    </th>
+
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.TimesheetRows != null)
+                {
+                    foreach (var item in Model.TimesheetRows)
+                    {
+                        <tr>
+                            <td>
+                                @item.WorkPackage.Project.Name
+                            </td>
+                            <td>
+                                @item.WorkPackage.Name
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SatHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SunHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MonHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TueHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.WedHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ThuHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FriHour)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Notes)
+                            </td>
+                            <td>
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                {
+                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                }                            </td>
+                            <td>
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                {
+                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+            {
+                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            }
+            @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
+            {
+                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            }
+        </form>
+    </div>
+</div>
+<br />
+
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

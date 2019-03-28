@@ -1,0 +1,73 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Timesheet>
+
+@{
+    ViewData["PageTitle"] = "Timesheets";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekEnding)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.WeekNumber)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.FlexTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee)
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @item.WeekEnding.ToString("yyyy/MM/dd")
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => item.WeekNumber)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => item.FlexTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
+            </td>
+            <td>
+
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                {
+                    <a asp-action="Edit" asp-route-id="@item.TimesheetId">Edit</a>
+                }
+            </td>
+            <td>
+                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" || item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                {
+                    <a asp-action="Delete" asp-route-id="@item.TimesheetId">Delete</a>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

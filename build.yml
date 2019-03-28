@@ -2,7 +2,7 @@ version: "3.5"
 services:
   project:
     build:
-      context: .\COMP4911Timesheets
+      context: ./COMP4911Timesheets
       dockerfile: build.Dockerfile
-    volumes:
-      - .\COMP4911Timesheets:/app
+    network_mode: "host"
+    container_name: eruptTEST
