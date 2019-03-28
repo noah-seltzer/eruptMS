@@ -43,10 +43,12 @@
                             {
                                 <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit,Backup,Restore", controllers: "Employees,PayGrades,Admins")">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
-                                        Management <span class="caret"></span></a>
+                                        Management <span class="caret"></span>
+                                    </a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="download">
                                         @{
-                                            if (User.IsInRole(role:"AD")) {
+                                            if (User.IsInRole(role: "AD"))
+                                            {
                                                 <li>
                                                     <a class="nav-link" asp-area="" asp-controller="Admins" asp-action="Index">
                                                         Administrative
@@ -67,7 +69,10 @@
                                     </ul>
                                 </li>
                             }
-
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "LM") || User.IsInRole(role: "PM"))
+                            {
+                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
+                            }
 
                             <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
                                 <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
@@ -76,7 +81,8 @@
                             <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
 
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
-                                    Project <span class="caret"></span></a>
+                                    Project <span class="caret"></span>
+                                </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="download">
                                     <li>
                                         <a class="nav-link" asp-area="" asp-controller="Projects" asp-action="Index">
@@ -91,10 +97,10 @@
 
                                 </ul>
                             </li>
-                            
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
-                                </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
+                            </li>
 
                         }
                     </ul>

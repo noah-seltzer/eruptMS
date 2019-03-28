@@ -13,6 +13,11 @@ namespace COMP4911Timesheets.Controllers
     public class ApproveController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private static int INVALID = 0;
+        private static int NOT_SUBMITTED_NOT_APPROVED = 1;
+        private static int SUBMITTED_NOT_APPROVED = 2;
+        private static int SUBMITTED_APPROVED = 3;
+        private static int REJECTED_NEED_RESUBMISSION = 4;
 
         public ApproveController(ApplicationDbContext context)
         {
@@ -78,7 +83,7 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
-            timesheet.Status = 3;
+            timesheet.Status = SUBMITTED_APPROVED;
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));
@@ -95,7 +100,7 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
-            timesheet.Status = 3;
+            timesheet.Status = SUBMITTED_APPROVED;
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
@@ -121,7 +126,7 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Reject(int TimesheetId, [Bind("Comments")] Timesheet timesheet)
         {
             var timesheetToBeChanged = await _context.Timesheets.FindAsync(TimesheetId);
-            timesheetToBeChanged.Status = 4;
+            timesheetToBeChanged.Status = REJECTED_NEED_RESUBMISSION;
             timesheetToBeChanged.Comments = timesheet.Comments;
             _context.Update(timesheetToBeChanged);
             await _context.SaveChangesAsync();
