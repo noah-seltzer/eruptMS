@@ -19,7 +19,7 @@ pipeline {
     }
     stage('Build Container') {
       steps {
-        sh 'sudo docker-compose -f build.yml up --build'
+        sh 'sudo docker-compose -f build.yml up --build -d'
       }
     }
   }
