@@ -79,7 +79,7 @@ namespace COMP4911Timesheets.Controllers
                 workpackageCode[i] = -1;
             }
             workPackage.ProjectId = projectId;
-            workPackage.Status = 2;
+            workPackage.Status = WorkPackage.OPENED; 
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
 
@@ -138,7 +138,7 @@ namespace COMP4911Timesheets.Controllers
                 workpackageCode[i] = -1;
             }
             workPackage.ProjectId = projectId;
-            workPackage.Status = 2;
+            workPackage.Status = WorkPackage.OPENED;
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
@@ -211,7 +211,7 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateWorkPackageReport([Bind("WorkPackageReportId,WeekNumber,Status,Comments,StartingPercentage,CompletedPercentage,CostStarted,CostFinished,WorkAccomplished,WorkAccomplishedNP,Problem,ProblemAnticipated,WorkPackageId")] WorkPackageReport workPackageReport)
         {
-            workPackageReport.Status = 1;
+            workPackageReport.Status = WorkPackageReport.VALID;
             if (ModelState.IsValid)
             {
                 _context.Add(workPackageReport);
@@ -232,7 +232,7 @@ namespace COMP4911Timesheets.Controllers
 
             var workPackage = await _context.WorkPackages.FindAsync(id);
 
-            if (workPackage.Status == 3)
+            if (workPackage.Status == WorkPackage.CLOSED)
             {
                 TempData["info"] = "Workpackage already closed you can not change  work package info";
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
@@ -264,12 +264,12 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
-                    if (workPackage.Status == 3 || workPackage.Status == 4)
+                    if (workPackage.Status == WorkPackage.CLOSED || workPackage.Status == WorkPackage.ARCHIVED)
                     {
                         var workPackages = await _context.WorkPackages.Where(u => u.WorkPackageCode.StartsWith(workPackage.WorkPackageCode)).ToListAsync();
                         foreach (WorkPackage tempWorkPackage in workPackages)
                         {
-                            if (tempWorkPackage.Status != 3)
+                            if (tempWorkPackage.Status != WorkPackage.CLOSED)
                             {
                                 tempWorkPackage.Status = workPackage.Status;
                                 _context.Update(tempWorkPackage);
@@ -316,7 +316,7 @@ namespace COMP4911Timesheets.Controllers
 
 
             var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == id && u.Status != 3).ToListAsync();
+             .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
             //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
