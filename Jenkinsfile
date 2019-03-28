@@ -7,7 +7,7 @@ pipeline {
         sh 'cat build.yml'
         sh 'sudo sed -i "s/{ServicePort}/$port/g" $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/Properties/launchSettings.json'
-        sh 'sudo sed -i "s/CONNECTION_STRING/Server=localhost,1433;Database=$containerName;User ID=SA;Password=$dbpassword;/g" ./COMP4911Timesheets/appsettings.json'
+        sh 'sudo sed -i "s/CONNECTION_STRING/Server=142.232.78.195,1433;Database=$containerName;User ID=SA;Password=$dbpassword;/g" ./COMP4911Timesheets/appsettings.json'
         sh 'cat $WORKSPACE/COMP4911Timesheets/appsettings.json'
       }
     }
