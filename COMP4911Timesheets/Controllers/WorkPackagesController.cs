@@ -386,7 +386,7 @@ namespace COMP4911Timesheets.Controllers
 
 
             var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == projectId && u.Status == 3).ToListAsync();
+             .Where(u => u.ProjectId == projectId && u.Status == WorkPackage.CLOSED).ToListAsync();
 
             if (workPackages == null)
             {
