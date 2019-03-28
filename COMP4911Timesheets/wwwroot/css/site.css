@@ -109,3 +109,12 @@ body {
 .select2-container .select2-selection--single .select2-selection__rendered {
     padding-left: 0px !important;
 }
+
+.projectEmployeeList {
+    list-style: none;
+    padding-left: inherit;
+}
+
+.projectEmployeeList li {
+    padding-bottom: 8px;
+}
