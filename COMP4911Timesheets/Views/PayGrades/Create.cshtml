@@ -14,12 +14,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="PayGrade.PayLevel" class="control-label"></label>
-                <input asp-for="PayGrade.PayLevel" class="form-control" />
+                <input asp-for="PayGrade.PayLevel" class="form-control" required />
                 <span asp-validation-for="PayGrade.PayLevel" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="PayGrade.Cost" class="control-label"></label>
-                <input asp-for="PayGrade.Cost" class="form-control" />
+                <input asp-for="PayGrade.Cost" class="form-control" required/>
                 <span asp-validation-for="PayGrade.Cost" class="text-danger"></span>
             </div>
             <div class="form-group">

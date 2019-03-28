@@ -52,6 +52,7 @@
         <input type="hidden" asp-for="Status" />
         <input type="hidden" asp-for="FlexTime" />
 
+
         @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
         {
             <p>
@@ -60,7 +61,8 @@
         }
 
 
-        <table class="table well bs-component">
+
+        <table class="table well bs-component table-responsive-sm">
             <thead>
                 <tr>
                     <th>
@@ -135,15 +137,20 @@
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                    Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
+
                                     @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+
                                 }
                             </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                    Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
-                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
+                                        new { @class = "btn btn-primary", @role = "button" })
                                 }
                             </td>
                         </tr>
@@ -151,6 +158,7 @@
                 }
             </tbody>
         </table>
+
 
         @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
         {
@@ -162,6 +170,7 @@
         }
     </form>
 </div>
+
 <br />
 <div>
     <a asp-action="Index">Back to List</a>

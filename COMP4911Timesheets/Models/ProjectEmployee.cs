@@ -14,14 +14,14 @@ namespace COMP4911Timesheets.Models
         public static readonly int PROJECT_MANAGER = 100;
         public static readonly int PROJECT_ASSISTANT = 110;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Not Working"},
             {1, "Currently Working"},
             {2, "Pending"}
         };
 
-        public readonly Dictionary<int, string> Roles = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Roles = new Dictionary<int, string>
         {
             {100, "Project Manager"},
             {110, "Project Assistant"}
@@ -41,5 +41,6 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Employee ID")]
         public string EmployeeId { get; set; }
         public Employee Employee { get; set; }
+
     }
 }
