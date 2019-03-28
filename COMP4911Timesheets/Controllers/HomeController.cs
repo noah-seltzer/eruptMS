@@ -6,14 +6,29 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Authorization;
+using COMP4911Timesheets.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _userManager;
+        public HomeController (
+            ApplicationDbContext context,
+            UserManager<Employee> userManager) 
+        {
+            _context = context;
+            _userManager = userManager;
+        }
         [Authorize]
         public IActionResult Index()
         {
+            var currentUserId = _userManager.GetUserId(this.User);
+            var rejectedSheets = _context.Timesheets.Where(t => t.Status == Timesheet.REJECTED_NEED_RESUBMISSION).Where(t => t.EmployeeId == currentUserId).Count();
+            ViewData["RejectedSheets"] = rejectedSheets;
             return View();
         }
 
