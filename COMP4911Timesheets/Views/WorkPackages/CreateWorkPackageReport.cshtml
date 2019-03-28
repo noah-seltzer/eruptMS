@@ -14,15 +14,15 @@
     <div class="col-md-4">
         <form asp-action="CreateWorkPackageReport">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
+            <div class="form-group" style="display: none;">
                 <label asp-for="WorkPackageId" class="control-label"></label>
                 <input asp-for="WorkPackageId" class="form-control" value=@ViewData["WPId"] />
             </div>
-            <div class="form-group">
-                <label asp-for="WeekNumber" class="control-label"></label>
-                <input asp-for="WeekNumber" class="form-control" />
-                <span asp-validation-for="WeekNumber" class="text-danger"></span>
-            </div>
+            <!--<div class="form-group">
+        <label asp-for="WeekNumber" class="control-label"></label>
+        <input asp-for="WeekNumber" class="form-control" />
+        <span asp-validation-for="WeekNumber" class="text-danger"></span>
+    </div>-->
 
             <div class="form-group">
                 <label asp-for="Comments" class="control-label"></label>
@@ -31,32 +31,32 @@
             </div>
             <!--
 
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
+    <div class="form-group">
+        <label asp-for="Status" class="control-label"></label>
+        <input asp-for="Status" class="form-control" />
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
 
-            <div class="form-group">
-                <label asp-for="StartingPercentage" class="control-label"></label>
-                <input asp-for="StartingPercentage" class="form-control" />
-                <span asp-validation-for="StartingPercentage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompletedPercentage" class="control-label"></label>
-                <input asp-for="CompletedPercentage" class="form-control" />
-                <span asp-validation-for="CompletedPercentage" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CostStarted" class="control-label"></label>
-                <input asp-for="CostStarted" class="form-control" />
-                <span asp-validation-for="CostStarted" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CostFinished" class="control-label"></label>
-                <input asp-for="CostFinished" class="form-control" />
-                <span asp-validation-for="CostFinished" class="text-danger"></span>
-            </div>-->
+    <div class="form-group">
+        <label asp-for="StartingPercentage" class="control-label"></label>
+        <input asp-for="StartingPercentage" class="form-control" />
+        <span asp-validation-for="StartingPercentage" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CompletedPercentage" class="control-label"></label>
+        <input asp-for="CompletedPercentage" class="form-control" />
+        <span asp-validation-for="CompletedPercentage" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CostStarted" class="control-label"></label>
+        <input asp-for="CostStarted" class="form-control" />
+        <span asp-validation-for="CostStarted" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CostFinished" class="control-label"></label>
+        <input asp-for="CostFinished" class="form-control" />
+        <span asp-validation-for="CostFinished" class="text-danger"></span>
+    </div>-->
             <div class="form-group">
                 <label asp-for="WorkAccomplished" class="control-label"></label>
                 <input asp-for="WorkAccomplished" class="form-control" />
