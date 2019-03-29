@@ -28,7 +28,9 @@ namespace COMP4911Timesheets.Controllers
         {
             var currentUserId = _userManager.GetUserId(this.User);
             var rejectedSheets = _context.Timesheets.Where(t => t.Status == Timesheet.REJECTED_NEED_RESUBMISSION).Where(t => t.EmployeeId == currentUserId).Count();
+            var isProjectManager = _context.ProjectEmployees.Where(pe => pe.Role == ProjectEmployee.PROJECT_MANAGER || pe.Role == ProjectEmployee.PROJECT_ASSISTANT).Where(pe => pe.EmployeeId == currentUserId).Count();
             ViewData["RejectedSheets"] = rejectedSheets;
+            ViewData["isProjectManager"] = isProjectManager;
             return View();
         }
 
