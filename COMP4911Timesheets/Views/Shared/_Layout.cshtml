@@ -34,49 +34,48 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            //var user = await UserManager.FindByNameAsync(User.Identity.Name);
-                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA"))
                             {
-                                <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit,Backup,Restore,ProjectIndex", controllers: "Employees,PayGrades,Admins")">
+                                <li class="nav-item dropdown @Html.IsSelected(actions: 
+                                                            "Index,Create,Details,Delete,Edit,Backup,Restore,TimesheetView,Approval,ApprovalConfirmed,Reject",
+                                                            controllers: "Employees,PayGrades,Admins,Approve")">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
                                         Management <span class="caret"></span>
                                     </a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="download">
                                         @{
-                                            if (User.IsInRole(role: "AD"))
+                                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR"))
+                                            {
+                                                if (User.IsInRole(role: "AD"))
+                                                {
+                                                    <li>
+                                                        <a class="nav-link" asp-area="" asp-controller="Admins" asp-action="Index">
+                                                            Administrative
+                                                        </a>
+                                                    </li>
+                                                }
+                                                <li>
+                                                    <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">
+                                                        Employees
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="nav-link" asp-area="" asp-controller="PayGrades" asp-action="Index">
+                                                        Pay Grades
+                                                    </a>
+                                                </li>
+                                            }
+                                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "TA"))
                                             {
                                                 <li>
-                                                    <a class="nav-link" asp-area="" asp-controller="Admins" asp-action="Index">
-                                                        Administrative
+                                                    <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">
+                                                        Approve
                                                     </a>
                                                 </li>
                                             }
                                         }
-                                        @{
-                                            if (User.IsInRole(role:"LM")) {
-                                                <li>
-                                                    <a class="nav-link" asp-area="" asp-controller="LineManagers" asp-action="Index">
-                                                        Supervisors
-                                                    </a>
-                                                </li>
-                                            }
-                                        }
-                                        <li>
-                                            <a class="nav-link" asp-area="" asp-controller="Employees" asp-action="Index">
-                                                Employees
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="nav-link" asp-area="" asp-controller="PayGrades" asp-action="Index">
-                                                Pay Grades
-                                            </a>
-                                        </li>
                                     </ul>
                                 </li>
-                            }
-                            if (User.IsInRole(role: "TA") || User.IsInRole(role: "AD"))
-                            {
-                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
                             }
 
                             <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
@@ -102,11 +101,6 @@
 
                                 </ul>
                             </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Approve" asp-action="Index">Management</a>
-                            </li>
-
                         }
                     </ul>
                 </div>

@@ -113,7 +113,7 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-
+            //Project
             var packages = await _context.WorkPackages.ToListAsync();
             var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem
