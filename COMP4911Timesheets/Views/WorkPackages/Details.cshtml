@@ -79,7 +79,10 @@
 <h4>Budget Plan</h4>
 <div class="row">
     <div class="col-xs-1">
-        Hour
+        PM Budget
+    </div>
+    <div class="col-xs-1">
+        RE Estimate
     </div>
     <div class="col-xs-1">
         Status
@@ -97,23 +100,26 @@
 
 @foreach (var item in Model.Budgets)
 {
-    <div class="row">
-        <div class="col-xs-1">
-            @Html.DisplayFor(model => item.Hour)
-        </div>
-        <div class="col-xs-1">
-            @Html.DisplayFor(model => item.Status)
-        </div>
-        <div class="col-xs-1">
-            @Html.DisplayFor(model => item.Type)
-        </div>
-        <div class="col-xs-1">
-            @Html.DisplayFor(model => item.PayGrade.PayLevel)
-        </div>
-        <div class="col-xs-1">
-            $@Html.DisplayFor(model => item.PayGrade.Cost) / h
-        </div>
+<div class="row">
+    <div class="col-xs-1">
+        @Html.DisplayFor(model => item.Hour)
     </div>
+    <div class="col-xs-1">
+        @Html.DisplayFor(model => item.REHour)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayFor(model => item.Status)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayFor(model => item.Type)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayFor(model => item.PayGrade.PayLevel)
+    </div>
+    <div class="col-xs-1">
+        $@Html.DisplayFor(model => item.PayGrade.Cost) / h
+    </div>
+</div>
 }
 <div>
     <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
