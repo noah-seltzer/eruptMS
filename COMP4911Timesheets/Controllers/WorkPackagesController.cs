@@ -306,8 +306,10 @@ namespace COMP4911Timesheets.Controllers
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {
-            var userId = _userManager.GetUserId(HttpContext.User);
-            
+            if (User.IsInRole("RE")) {
+
+            }            
+
             projectId = id;
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
 
