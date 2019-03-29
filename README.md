@@ -8,12 +8,18 @@ FROM
 
 TO
 
-"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
+"DefaultConnection": "Server=(localdb)\\\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
 
 # comp4911timesheets
 
 [Code Conventions](/docs/conventions.md)
 [Database Setup](/docs/dbsetup.md)
+
+# Environments
+
+http://deimos.edu.bcit.ca -> TEST
+http://deimos.edu.bcit.ca:5000 -> TEST
+http://deimos.edu.bcit.ca:5001 -> UAT (not initilized, builds will fail for the time being)
 
 #### To deploy on docker with live compiling (windows tested only)
 
