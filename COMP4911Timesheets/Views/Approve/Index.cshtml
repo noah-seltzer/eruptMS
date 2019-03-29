@@ -2,76 +2,65 @@
 @{
 
     ViewData["PageTitle"] = "Approve Timesheets";
-    }
+}
 
-    <h1>@ViewData["PageTitle"]</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.EmployeeId)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.FirstName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.LastName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-
-               
-                <th>
-                    @Html.DisplayNameFor(model => model.UserName)
-                </th>
-
-                <th>Waiting for Approval</th>
-            </tr>
-        </thead>
-        <tbody>
+<br />
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>Waiting for Approval</th>
+        </tr>
+    </thead>
+    <tbody>
             
-                @foreach (var item in Model.OrderBy(i => i.EmployeeId))
+            @foreach (var item in Model.OrderBy(i => i.EmployeeId))
+            {
+                var a = item.Timesheets;
+                int count = 0;
+                if (a != null)
                 {
-                    var a = item.Timesheets;
-                    int count = 0;
-                    if (a != null)
+                    foreach (var waiting in a)
                     {
-                        foreach (var waiting in a)
-                        {
-                            if (waiting.Status == 2) { count++; }
-                        }
+                        if (waiting.Status == 2) { count++; }
                     }
+                }
 
-                    if (count > 0)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.EmployeeId)
-                            </td>
+                if (count > 0)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EmployeeId)
+                        </td>
 
-                            <td>
-                                @Html.DisplayFor(modelItem => item.FirstName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.LastName)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => Employee.JobTitles[item.Title])
-                            </td>
-                            
-                            <td>
-                                @Html.DisplayFor(modelItem => item.UserName)
-                            </td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@item.Id">
-                                    @count
-                                </a>
-                            </td>
-                        </tr>   }
-                       }
-             
-        </tbody>
-    </table>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LastName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => Employee.JobTitles[item.Title])
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id">
+                                @count
+                            </a>
+                        </td>
+                    </tr>   }
+             }
+    </tbody>
+</table>
