@@ -127,6 +127,14 @@ namespace COMP4911Timesheets
                 .Where(e => e.ProjectId == id)
                 .ToList();
 
+            var manager = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                .FirstOrDefault();
+
+            var assistant = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                .FirstOrDefault();
+
             var reqs = _context.ProjectRequests
                 .Include(r => r.PayGrade)
                 .Where(r => r.ProjectId == id)
@@ -174,8 +182,16 @@ namespace COMP4911Timesheets
             model.project = project;
             model.project.ProjectEmployees = emps;
             model.requests = reqs;
+            model.projectManager = manager.EmployeeId;
+            if (assistant != null)
+                model.managersAssistant = assistant.EmployeeId;
 
-            ViewData["Status"] = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
+            List<SelectListItem> empList = new List<SelectListItem>();
+            empList.AddRange(new SelectList(_context.Employees, "Id", "Email"));
+            ViewBag.EmployeesM = empList;
+            empList.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            ViewBag.EmployeesA = empList;
+            ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
 
             return View(model);
         }
@@ -204,6 +220,26 @@ namespace COMP4911Timesheets
                             r.ProjectId == req.ProjectId && r.PayGradeId == req.PayGradeId);
 
                         updateReq.AmountRequested = req.AmountRequested;
+                    }
+
+                    var manager = _context.ProjectEmployees
+                        .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                        .FirstOrDefault();
+
+                    if (model.projectManager != manager.EmployeeId)
+                    {
+                        manager.EmployeeId = model.projectManager;
+                        _context.Update(manager);
+                    }
+
+                    var assistant = _context.ProjectEmployees
+                        .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                        .FirstOrDefault();
+
+                    if (model.managersAssistant != assistant.EmployeeId)
+                    {
+                        assistant.EmployeeId = model.managersAssistant;
+                        _context.Update(assistant);
                     }
 
                     await _context.SaveChangesAsync();
@@ -258,7 +294,7 @@ namespace COMP4911Timesheets
         public async Task<IActionResult> Close(int id)
         {
             var project = await _context.Projects.FindAsync(id);
-            project.Status = Project.PAUSED;
+            project.Status = Project.CLOSED;
             _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

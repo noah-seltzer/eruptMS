@@ -15,6 +15,12 @@ TO
 [Code Conventions](/docs/conventions.md)
 [Database Setup](/docs/dbsetup.md)
 
+# Environments
+
+http://deimos.edu.bcit.ca -> TEST
+http://deimos.edu.bcit.ca:5000 -> TEST
+http://deimos.edu.bcit.ca:5001 -> UAT (not initilized, builds will fail for the time being)
+
 #### To deploy on docker with live compiling (windows tested only)
 
 1. navigate to project folder (outer folder)
