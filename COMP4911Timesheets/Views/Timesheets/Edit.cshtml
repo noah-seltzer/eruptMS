@@ -147,7 +147,7 @@
                                     Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
-                                        new { @class = "btn-link", @role = "button" })
+                                        new { @class = "btn btn-danger", @role = "button" })
                                 }
                             </td>
                         </tr>
@@ -162,7 +162,7 @@
         }
         @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
         {
-            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger", @role = "button" })
         }
     </form>
 </div>
