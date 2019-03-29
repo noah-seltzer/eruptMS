@@ -1,7 +1,7 @@
 ﻿@model COMP4911Timesheets.Models.Timesheet
 
 @{
-    ViewData["PageTitle"] = "TimesheetView";
+    ViewData["PageTitle"] = "Timesheet View";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -9,64 +9,73 @@
 <div>
     <h4>Timesheet</h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.WeekEnding)
         </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.WeekEnding)
+        <dd class="col-sm-8">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.WeekNumber)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.WeekNumber)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FlexTime)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.FlexTime)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
-        <dd class="col-sm-10">
-            @Model.Statuses[Model.Status])
+        <dd class="col-sm-8">
+            @Model.Statuses[Model.Status]
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Comments)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Comments)
         </dd>
 
     </dl>
 </div>
 
-<table class="table">
+<table class="table well bs-component table-responsive-sm">
     <thead>
         <tr>
             <th>
-                Sunday
+                Project
             </th>
             <th>
-                Monday
+                Work Package
             </th>
             <th>
-                Tuesday
+                Sat
             </th>
             <th>
-                Wednesday
+                Sun
             </th>
             <th>
-                Thursday
+                Mon
             </th>
             <th>
-                Friday
+                Tue
             </th>
             <th>
-                Saturday
+                Wed
+            </th>
+            <th>
+                Thu
+            </th>
+            <th>
+                Fri
+            </th>
+            <th>
+                Notes
             </th>
         </tr>
     </thead>
@@ -75,6 +84,15 @@
             foreach (var item in Model.TimesheetRows)
             {
                 <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackage.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackage.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SatHour)
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SunHour)
                     </td>
@@ -94,9 +112,6 @@
                         @Html.DisplayFor(modelItem => item.FriHour)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.SatHour)
-                    </td>
-                    <td>
                         @Html.DisplayFor(modelItem => item.Notes)
                     </td>
                 </tr>
@@ -112,17 +127,17 @@
         <input type="submit" value="Approve" class="btn btn-success btn-raised" />
     </form>
          -->
-    <a asp-action="Approval" asp-route-id="@Model.TimesheetId" class="btn btn-success btn-raised">Approve</a>
+    <a asp-action="Approval" asp-route-id="@Model.TimesheetId" class="btn btn-info btn-raised">Approve</a>
 
 
 
-    <button onclick="showBox()" class="btn btn-success btn-danger">Reject</button>
+    <button onclick="showBox()" class="btn btn-danger btn-raised">Reject</button>
 </div>
 <div id="myDIV" style="display:none">
     <form asp-action="Reject">
         <div class="form-group">
             <label asp-for="Comments" class="control-label"></label>
-            <input asp-for="Comments" class="form-control" />
+            <input asp-for="Comments" class="form-control" required/>
             <span asp-validation-for="Comments" class="text-danger"></span>
         </div>
         <input type="hidden" asp-for="TimesheetId" />

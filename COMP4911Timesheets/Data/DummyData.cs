@@ -65,19 +65,19 @@ namespace COMP4911Timesheets.Data
                     else if (employee.EmployeeId == 2)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "HR", "PM", "RE"
+                            "HR", "PM", "RE", "TA"
                         });
                     }
                     else if (employee.EmployeeId == 3)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "PM", "PA"
+                            "PM", "PA", "TA"
                         });
                     }
                     else if (employee.EmployeeId == 4)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "PM", "PA", "RE"
+                            "PM", "PA", "RE", "TA"
                         });
                     }
                     else if (employee.EmployeeId == 7)

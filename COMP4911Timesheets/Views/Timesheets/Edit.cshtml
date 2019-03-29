@@ -27,6 +27,18 @@
         <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekEnding)
+        </dt>
+        <dd class="col-sm-8">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
     </dl>
 </div>
 
@@ -40,15 +52,15 @@
         <input type="hidden" asp-for="Status" />
         <input type="hidden" asp-for="FlexTime" />
 
-        <div class="form-group col-sm-4">
-            <label asp-for="WeekEnding" class="control-label"></label>
-            <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays" disabled></select>
-            <span asp-validation-for="WeekEnding" class="text-danger"></span>
-        </div>
 
-        <p>
-            @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, null)
-        </p>
+        @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+        {
+            <p>
+                @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            </p>
+        }
+
+
 
         <table class="table well bs-component table-responsive-sm">
             <thead>
@@ -83,8 +95,6 @@
                     <th>
                         Notes
                     </th>
-
-                    <th></th>
                     <th></th>
                 </tr>
             </thead>
@@ -127,8 +137,8 @@
                             <td>
                                 @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
                                     Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
-                                {
-                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
+                              {
+                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, 
                                         new { @class = "btn btn-primary", @role = "button" })
                                 }
                             </td>
@@ -137,7 +147,7 @@
                                     Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
-                                        new { @class = "btn btn-primary", @role = "button" })
+                                        new { @class = "btn btn-danger", @role = "button" })
                                 }
                             </td>
                         </tr>
@@ -146,25 +156,25 @@
             </tbody>
         </table>
 
-            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
-            {
-                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId },
-                    new { @class = "btn btn-primary", @role = "button" })
-            }
-            @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
-            {
-                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId },
-                    new { @class = "btn btn-primary", @role = "button" })
-            }
-        </form>
-    </div>
+        @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+        {
+            @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+        }
+        @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
+        {
+            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger", @role = "button" })
+        }
+    </form>
+</div>
+
 <br />
-
-
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
