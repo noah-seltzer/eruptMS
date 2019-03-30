@@ -9,6 +9,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        Find by week ending: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+    </p>
+}
 <table class="table well bs-component">
     <thead>
         <tr>
@@ -33,37 +40,37 @@
     <tbody>
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @item.WeekEnding.ToString("yyyy/MM/dd")
-            </td>
-            <td class="priority-2">
-                @Html.DisplayFor(modelItem => item.WeekNumber)
-            </td>
-            <td class="priority-2">
-                @Html.DisplayFor(modelItem => item.FlexTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.LastName)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
-                {
-                <a asp-action="Edit" asp-route-id="@item.TimesheetId"> | Edit </a>
-                }
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
-                {
-                 <a asp-action="Delete" asp-route-id="@item.TimesheetId"> | Delete</a>
-                }
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @item.WeekEnding.ToString("yyyy/MM/dd")
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.FlexTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Statuses[item.Status])
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
+                    @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                       item.Statuses[item.Status] == "Submitted & Not Approved" ||
+                       item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.TimesheetId"> | Edit </a>
+                    }
+                    @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                       item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.TimesheetId"> | Delete</a>
+                    }
+                </td>
+            </tr>
         }
     </tbody>
 </table>
