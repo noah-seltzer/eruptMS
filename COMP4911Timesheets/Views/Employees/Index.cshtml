@@ -9,6 +9,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        Find by name: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+    </p>
+}
 <table class="table well bs-component">
     <thead>
         <tr>
