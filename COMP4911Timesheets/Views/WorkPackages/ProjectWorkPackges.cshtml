@@ -82,12 +82,13 @@
             </div>
         <div>
             <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> |
-            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Create Workpackage Report </a> |
-            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add budget Plan </a> |
+            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> |
+            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> |
+            <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
             <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
             <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
             <!--|
-            <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
+    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
         </div>
     }
     @if (item.WorkPackageCode.Length != 5)
@@ -129,8 +130,9 @@
         </div>
         <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
             <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
-            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Create Workpackage Report </a> &nbsp|&nbsp
-            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add budget Plan </a> &nbsp|&nbsp
+            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> &nbsp|&nbsp
+            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> &nbsp|&nbsp
+            <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
             <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
             <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
             <!-- &nbsp|&nbsp
