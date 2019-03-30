@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.Budget>
 
 @{
-    ViewData["PageTitle"] = "Index";
+    ViewData["PageTitle"] = "Budgets";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
