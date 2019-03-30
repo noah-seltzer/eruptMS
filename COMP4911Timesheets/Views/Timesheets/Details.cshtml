@@ -32,7 +32,7 @@
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Statuses[Model.Status])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
         </dd>
         <dt class = "col-sm-4">
             @Html.DisplayNameFor(model => model.Employee)
@@ -126,9 +126,9 @@
 
 
 <div>
-    @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-        Model.Statuses[Model.Status] == "Submitted & Not Approved" ||
-        Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+    @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
+        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
     {
         <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
     }

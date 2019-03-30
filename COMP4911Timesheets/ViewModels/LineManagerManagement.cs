@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using COMP4911Timesheets.Models;
 
 namespace COMP4911Timesheets.ViewModels
@@ -6,7 +7,11 @@ namespace COMP4911Timesheets.ViewModels
     {
         public Employee Employee { get; set; }
         public Project Project { get; set; }
-        public ProjectEmployee ProjectEmployee { get; set; }
         public Timesheet Timesheet { get; set; }
+        public ProjectRequest ProjectRequest { get; set; }
+        public ProjectEmployee ProjectEmployee { get; set; }
+        public List<ProjectEmployee> ProjectEmployees { get; set; }
+        public List<Employee> Employees { get; set; }
+        public List<string> EmployeeIds { get; set; }
     }
 }

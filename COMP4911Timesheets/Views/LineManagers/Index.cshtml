@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
 
 @{
-    ViewData["PageTitle"] = "Management";
+    ViewData["PageTitle"] = "Employees";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -28,6 +28,9 @@
             <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Employee.Email)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.Timesheets)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -51,7 +54,12 @@
                     @Html.DisplayFor(modelItem => item.Employee.Email)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Employee.Id">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Employee.Id">
+                        @item.Employee.Timesheets.Count
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="ChangeTA" asp-route-id="@item.Employee.Id">Change TA</a>
                 </td>
             </tr>
         }

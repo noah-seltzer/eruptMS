@@ -81,6 +81,10 @@ body {
     border-bottom: 0 !important;
 }
 
+/* Multiple Select Input Box */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    color: #000000 !important;
+}
 
 /* Custom workpacke col width
 -------------------------------------------------- */
@@ -371,4 +375,3 @@ body {
     opacity: .65;
     filter: alpha(opacity=65)
 }
-

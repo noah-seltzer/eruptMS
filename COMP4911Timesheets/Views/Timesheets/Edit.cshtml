@@ -19,7 +19,7 @@
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Statuses[Model.Status])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
         </dd>
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Employee)
@@ -123,8 +123,8 @@
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                                    Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                    COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Edit  |  ", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
                                         new { @class = "btn-link", @role = "button" })
@@ -139,13 +139,13 @@
             </tbody>
         </table>
 
-            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+            @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
             {
                 @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId },
                     new { @class = "btn btn-primary btn-raised", @role = "button" })
             }
-            @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
+            @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved")
             {
                 @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId },
                     new { @class = "btn btn-primary btn-raised", @role = "button" })

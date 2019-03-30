@@ -1,7 +1,7 @@
-﻿@model COMP4911Timesheets.Models.Timesheet
+﻿@model COMP4911Timesheets.ViewModels.LineManagerManagement
 
 @{
-    ViewData["PageTitle"] = "Timesheet View";
+    ViewData["PageTitle"] = "Timesheet";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -11,34 +11,34 @@
     <hr />
     <dl class="row col-lg-6 well bs-component">
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekEnding)
+            @Html.DisplayNameFor(model => model.Timesheet.WeekEnding)
         </dt>
         <dd class="col-sm-8">
-            @Model.WeekEnding.ToString("yyyy/MM/dd")
+            @Model.Timesheet.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekNumber)
+            @Html.DisplayNameFor(model => model.Timesheet.WeekNumber)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.WeekNumber)
+            @Html.DisplayFor(model => model.Timesheet.WeekNumber)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.FlexTime)
+            @Html.DisplayNameFor(model => model.Timesheet.FlexTime)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.FlexTime)
+            @Html.DisplayFor(model => model.Timesheet.FlexTime)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Status)
+            @Html.DisplayNameFor(model => model.Timesheet.Status)
         </dt>
         <dd class="col-sm-8">
-            @COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status]
+            @COMP4911Timesheets.Models.Timesheet.Statuses[Model.Timesheet.Status]
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Comments)
+            @Html.DisplayNameFor(model => model.Timesheet.Comments)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Comments)
+            @Html.DisplayFor(model => model.Timesheet.Comments)
         </dd>
 
     </dl>
@@ -81,7 +81,7 @@
     </thead>
     <tbody>
         @{ 
-            foreach (var item in Model.TimesheetRows)
+            foreach (var item in Model.Timesheet.TimesheetRows)
             {
                 <tr>
                     <td>
@@ -121,13 +121,7 @@
 
 </table>
 <div>
-    <!--
-    <form asp-action="Approval">
-        <input id="TimesheetId" type="hidden" asp-for="TimesheetId" />
-        <input type="submit" value="Approve" class="btn btn-success btn-raised" />
-    </form>
-         -->
-    <a asp-action="Approval" asp-route-id="@Model.TimesheetId" class="btn btn-info btn-raised">Approve</a>
+    <a asp-action="Approval" asp-route-id="@Model.Timesheet.TimesheetId" class="btn btn-info btn-raised">Approve</a>
 
 
 
@@ -136,11 +130,11 @@
 <div id="myDIV" style="display:none">
     <form asp-action="Reject">
         <div class="form-group">
-            <label asp-for="Comments" class="control-label"></label>
-            <input asp-for="Comments" class="form-control" required/>
-            <span asp-validation-for="Comments" class="text-danger"></span>
+            <label asp-for="Timesheet.Comments" class="control-label"></label>
+            <input asp-for="Timesheet.Comments" class="form-control" required/>
+            <span asp-validation-for="Timesheet.Comments" class="text-danger"></span>
         </div>
-        <input type="hidden" asp-for="TimesheetId" />
+        <input type="hidden" asp-for="Timesheet.TimesheetId" />
         <input type="submit" value="Submit Rejection" class="btn btn-danger btn-raised" />
     </form>
 </div>

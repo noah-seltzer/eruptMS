@@ -44,21 +44,21 @@
                 @Html.DisplayFor(modelItem => item.FlexTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Statuses[item.Status])
+                @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Timesheet.Statuses[item.Status])
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Employee.LastName)
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                    COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Submitted & Not Approved" ||
+                    COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
                 <a asp-action="Edit" asp-route-id="@item.TimesheetId"> | Edit </a>
                 }
-                @if (item.Statuses[item.Status] == "Not Submitted & Not Approved" ||
-                    item.Statuses[item.Status] == "Rejected & Need Resubmission")
+                @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                    COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
                  <a asp-action="Delete" asp-route-id="@item.TimesheetId"> | Delete</a>
                 }
