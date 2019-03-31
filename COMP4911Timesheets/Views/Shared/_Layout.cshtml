@@ -34,7 +34,7 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA"))
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA") || User.IsInRole(role: "LM"))
                             {
                                 <li class="nav-item dropdown @Html.IsSelected(actions: 
                                                             "Index,Create,Details,Delete,Edit,Backup,Restore,TimesheetView,Approval,ApprovalConfirmed,Reject",
@@ -73,9 +73,15 @@
                                                     </a>
                                                 </li>
                                             }
+                                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "LM"))
+                                            {
+                                                <li>
+                                                    <a class="nav-link" asp-area="" asp-controller="LineManagers" asp-action="Index">
+                                                        Supervisory
+                                                    </a>
+                                                </li>
+                                            }
                                         }
-
-
                                     </ul>
                                 </li>
                             }

@@ -14,7 +14,7 @@ namespace COMP4911Timesheets.Models
         public static readonly int SUBMITTED_APPROVED = 3;
         public static readonly int REJECTED_NEED_RESUBMISSION = 4;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Invalid"},
             {1, "Not Submitted & Not Approved"},
