@@ -9,6 +9,14 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+<p>
+    Find by week ending: @Html.TextBox("SearchString")
+    <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+    <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+</p>
+}
 <table class="table well bs-component">
     <thead>
         <tr>
