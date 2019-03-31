@@ -1,7 +1,7 @@
-﻿@model COMP4911Timesheets.Models.Timesheet
+﻿@model COMP4911Timesheets.ViewModels.LineManagerManagement
 
 @{
-    ViewData["PageTitle"] = "Details";
+    ViewData["PageTitle"] = "Timesheet";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -10,35 +10,35 @@
     <h4>Timesheet</h4>
     <hr />
     <dl class="row col-lg-6 well bs-component">
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekEnding)
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.WeekEnding)
         </dt>
         <dd class="col-sm-8">
-            @Model.WeekEnding.ToString("yyyy/MM/dd")
+            @Model.Timesheet.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekNumber)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.WeekNumber)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.FlexTime)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.FlexTime)
-        </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.Status)
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.WeekNumber)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
+            @Html.DisplayFor(model => model.Timesheet.WeekNumber)
         </dd>
-        <dt class = "col-sm-4">
-            @Html.DisplayNameFor(model => model.Employee)
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.FlexTime)
         </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.Employee.LastName)
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Timesheet.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @COMP4911Timesheets.Models.Timesheet.Statuses[Model.Timesheet.Status]
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.Comments)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Timesheet.Comments)
         </dd>
 
     </dl>
@@ -77,21 +77,18 @@
             <th>
                 Notes
             </th>
-
-            <th></th>
         </tr>
     </thead>
     <tbody>
-        @if (Model.TimesheetRows != null)
-        {
-            foreach (var item in Model.TimesheetRows)
+        @{ 
+            foreach (var item in Model.Timesheet.TimesheetRows)
             {
                 <tr>
                     <td>
-                        @item.WorkPackage.Project.Name
+                        @item.WorkPackage.Project.ProjectCode
                     </td>
                     <td>
-                        @item.WorkPackage.Name
+                        @item.WorkPackage.WorkPackageCode
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SatHour)
@@ -117,21 +114,43 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Notes)
                     </td>
-
                 </tr>
             }
         }
     </tbody>
+
 </table>
-
-
 <div>
-    @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
-        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
-    {
-        <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
+    <a asp-action="Approval" asp-route-id="@Model.Timesheet.TimesheetId" class="btn btn-info btn-raised">Approve</a>
+
+
+
+    <button onclick="showBox()" class="btn btn-danger btn-raised">Reject</button>
+</div>
+<div id="myDIV" style="display:none">
+    <form asp-action="Reject">
+        <div class="form-group">
+            <label asp-for="Timesheet.Comments" class="control-label"></label>
+            <input asp-for="Timesheet.Comments" class="form-control" required/>
+            <span asp-validation-for="Timesheet.Comments" class="text-danger"></span>
+        </div>
+        <input type="hidden" asp-for="Timesheet.TimesheetId" />
+        <input type="submit" value="Submit Rejection" class="btn btn-danger btn-raised" />
+    </form>
+</div>
+<script>
+
+    function showBox() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
     }
-    <br />
+</script>
+<br />
+<div>
     <a asp-action="Index">Back to List</a>
 </div>
+

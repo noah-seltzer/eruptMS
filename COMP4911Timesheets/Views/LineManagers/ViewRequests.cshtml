@@ -1,0 +1,29 @@
+@model COMP4911Timesheets.ViewModels.LineManagerManagement
+@{
+    ViewData["PageTitle"] = "Requests";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<form asp-action="HandleRequests">
+    <div class="row well bs-component">
+        <div class="col-md-6">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Project.ProjectId" />
+            @foreach (var projectRequest in Model.Project.ProjectRequests) 
+            {
+                <div class="form-group">
+                    <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
+                    <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly/>
+                    <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
+                </div>
+            }
+        </div>
+        <div class="col-md-6">
+        </div>
+
+    </div>
+</form>
+<div>
+    <a asp-action="ProjectIndex">Back to List</a>
+</div>
