@@ -323,10 +323,18 @@ namespace COMP4911Timesheets.Controllers
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {         
-   
+            
             projectId = id;
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
-
+            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var projectEmployee =  _context.ProjectEmployees
+                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+            
+            if (User.IsInRole(role: "PM") && projectEmployee == null) {
+                TempData["info"] = "You are not the project's PM, Please choose the currect project";
+                return RedirectToAction("Index", "Projects");
+            }
+            
             ViewData["projectCode"] = project.ProjectCode;
             ViewData["projectName"] = project.Name;
 
@@ -334,9 +342,6 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
-
-            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
 
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
@@ -350,7 +355,8 @@ namespace COMP4911Timesheets.Controllers
                     WorkPackage tempwp = _context.WorkPackages
                         .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
                     workPackages.Add(tempwp);
-                }               
+                }
+                return View(workPackages);
             }
             else { 
                 workPackages = await _context.WorkPackages
