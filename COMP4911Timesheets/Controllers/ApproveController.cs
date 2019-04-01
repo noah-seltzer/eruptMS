@@ -49,6 +49,12 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            var timesheets = _context.Timesheets
+                .Where(ts => ts.Status == Timesheet.SUBMITTED_NOT_APPROVED)
+                .Where(ts => ts.EmployeeId == id);
+            
+            ViewData["Timesheets"] = timesheets.ToList();
+
             return View(employee);
         }
         

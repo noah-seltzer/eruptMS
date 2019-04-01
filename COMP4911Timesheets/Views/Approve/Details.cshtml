@@ -65,7 +65,7 @@
     </thead>
     <tbody>
         @{ int a = 10;
-            foreach (var item in Model.Timesheets)
+            foreach (var item in ViewData["Timesheets"] as IEnumerable<COMP4911Timesheets.Models.Timesheet>)
             {
                 <tr>
 
