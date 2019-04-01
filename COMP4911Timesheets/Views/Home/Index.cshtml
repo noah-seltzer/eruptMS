@@ -110,7 +110,7 @@
         @if(!(@ViewData["isProjectManager"].Equals(0)) || User.IsInRole(role: "AD"))
         {
         <div class="col-lg-4 col-md-4 col-xs-6">
-            <div class="small-box bg-orange">
+            <div class="small-box bg-olive">
                 <div class="inner">
                     <h4>Projects</h4>
                     <p>&nbsp;</p>
@@ -124,21 +124,24 @@
             </div>
         </div>
         }
-        <!-- <div class="col-lg-4 col-md-4 col-xs-6">
-            <div class="small-box bg-red">
+        @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-blue">
                 <div class="inner">
-                    <h4>New Timesheet</h4>
+                    <h4>Line Managers</h4>
                     <p>&nbsp;</p>
                 </div>
                 <div class="icon">
                     <i class="material-icons">content_paste</i>
                 </div>
-                <a class="small-box-footer" asp-area="" asp-controller="Timesheets" asp-action="Create">
+                <a class="small-box-footer" asp-area="" asp-controller="Home" asp-action="Index">
                     More info <i class="material-icons">chevron_right</i>
                 </a>
             </div>
         </div>
-        <div class="col-lg-4 col-md-4 col-xs-6">
+        }
+        <!-- <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-purple">
                 <div class="inner">
                     <h4>Rejected</h4>
