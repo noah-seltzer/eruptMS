@@ -65,19 +65,19 @@ namespace COMP4911Timesheets.Data
                     else if (employee.EmployeeId == 2)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "HR", "PM", "RE"
+                            "HR", "PM", "RE", "TA", "LM"
                         });
                     }
                     else if (employee.EmployeeId == 3)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "PM", "PA"
+                            "PM", "PA", "TA", "LM"
                         });
                     }
                     else if (employee.EmployeeId == 4)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
-                            "PM", "PA", "RE"
+                            "PM", "PA", "RE", "TA", "LM"
                         });
                     }
                     else if (employee.EmployeeId == 7)
@@ -1579,7 +1579,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 2).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1588,7 +1588,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 3).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1597,7 +1597,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 4).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1606,7 +1606,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 7).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1615,7 +1615,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 8).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1624,7 +1624,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 9).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1633,7 +1633,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 10).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1642,7 +1642,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 12).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1651,7 +1651,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-14), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 13).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1660,7 +1660,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 2).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1669,7 +1669,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 3).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1678,7 +1678,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 4).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1687,7 +1687,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 7).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1696,7 +1696,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 8).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1705,7 +1705,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 9).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1714,7 +1714,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 10).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1723,7 +1723,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 12).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 },
                 new Timesheet
                 {
@@ -1732,7 +1732,7 @@ namespace COMP4911Timesheets.Data
                     WeekEnding=Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday),
                     WeekNumber=Utility.GetWeekNumberByDate(Utility.GetPreviousWeekday(DateTime.Today.AddDays(-7), DayOfWeek.Friday)),
                     SignatureId=context.Signatures.Where(s => s.EmployeeId == context.Employees.Where(e => e.EmployeeId == 13).First().Id).First().SignatureId,
-                    Status=Timesheet.SUBMITTED_APPROVED
+                    Status=Timesheet.SUBMITTED_NOT_APPROVED
                 }
             };
             return timesheets;

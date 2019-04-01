@@ -6,7 +6,7 @@
 
 <h1>Create</h1>
 
-<h4>Budget</h4>
+<h4>Project Manager Budget</h4>
 <hr />
 <h5>@TempData["budgetInfo"]</h5>
     <div class="row">
@@ -14,7 +14,7 @@
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label asp-for="Hour" class="control-label"></label>
+                    <label asp-for="Hour" class="control-label">Man-Days</label>
                     <input asp-for="Hour" class="form-control" />
                     <span asp-validation-for="Hour" class="text-danger"></span>
                 </div>
@@ -24,17 +24,16 @@
         <input asp-for="Status" class="form-control" />
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
-        -->
-                <div class="form-group">
-                    <label asp-for="WeekNumber" class="control-label"></label>
-                    <input asp-for="WeekNumber" class="form-control" />
-                    <span asp-validation-for="WeekNumber" class="text-danger"></span>
-                </div>
+
+    <div class="form-group">
+        <label asp-for="WeekNumber" class="control-label"></label>
+        <input asp-for="WeekNumber" class="form-control" />
+        <span asp-validation-for="WeekNumber" class="text-danger"></span>
+    </div>      -->
                 <div class="form-group">
                     <label asp-for="Type" class="control-label"></label>
                     <select asp-for="Type" class="form-control">
-                        <option value="10">Estimates</option>
-                        <option value="20">Actuals</option>
+                        <option value="10">Project Manager Budget</option>
                     </select>
                     <span asp-validation-for="Type" class="text-danger"></span>
                 </div>

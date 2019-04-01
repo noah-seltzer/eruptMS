@@ -130,46 +130,7 @@ namespace COMP4911Timesheets.Controllers
 
             return View(payGradeManagment);
         }
-
-        // GET
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (id <= 0)
-            {
-                return NotFound();
-            }
-
-            var payGrade = await _context.PayGrades
-                .Include(pg => pg.EmployeePays)
-                .FirstOrDefaultAsync(pg => pg.PayGradeId == id);
-            if (payGrade == null)
-            {
-                return NotFound();
-            }
-            if (payGrade.EmployeePays.Count != 0)
-            {
-                return BadRequest("You cannot remove the pay grade that has assigned employees");
-            }
-
-            var payGradeManagement = new PayGradeManagement
-            {
-                PayGrade = payGrade
-            };
-
-            return View(payGradeManagement);
-        }
-
-        // POST
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var payGradeToBeDeleted = await _context.PayGrades.FindAsync(id);
-            _context.PayGrades.Remove(payGradeToBeDeleted);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
+        
         private bool PayGradeExists(int id)
         {
             return _context.PayGrades.Any(pg => pg.PayGradeId == id);

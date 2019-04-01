@@ -23,15 +23,32 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Timesheets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var applicationDbContext = _context.Timesheets
+            var timesheets = new List<Timesheet>();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                timesheets = await _context.Timesheets
                 .Include(t => t.Employee)
                 .Include(t => t.EmployeePay)
                 .Include(t => t.Signature)
                 .Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User))
-                .OrderByDescending(t => t.WeekNumber);
-            return View(await applicationDbContext.ToListAsync());
+                .Where(t => t.WeekEnding.ToString("yyyy/MM/dd").Contains(searchString))
+                .OrderByDescending(t => t.WeekNumber)
+                .ToListAsync();
+            } else
+            {
+                timesheets = await _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.EmployeePay)
+                .Include(t => t.Signature)
+                .Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User))
+                .OrderByDescending(t => t.WeekNumber)
+                .ToListAsync();
+            }
+
+            return View(timesheets);
         }
 
         // GET: Timesheets/Details/5(timesheetid)
