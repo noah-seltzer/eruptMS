@@ -124,7 +124,7 @@
             </div>
         </div>
         }
-        @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+        @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD") || User.IsInRole(role: "TA"))
         {
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-blue">
@@ -140,21 +140,21 @@
                 </a>
             </div>
         </div>
-        }
-        <!-- <div class="col-lg-4 col-md-4 col-xs-6">
-            <div class="small-box bg-purple">
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-navy">
                 <div class="inner">
-                    <h4>Rejected</h4>
-                    <p>@ViewData["RejectedSheets"] - Need action</p>
+                    <h4>Approve</h4>
+                    <p>&nbsp;</p>
                 </div>
                 <div class="icon">
-                    <i class="material-icons">assignment_late</i>
+                    <i class="material-icons">assignment_turned_in</i>
                 </div>
-                <a class="small-box-footer" asp-area="" asp-controller="Timesheets" asp-action="Index">
+                <a class="small-box-footer" asp-area="" asp-controller="Approve" asp-action="Index">
                     More info <i class="material-icons">chevron_right</i>
                 </a>
             </div>
-        </div> -->
+        </div>
+        }
     </div>
 </section>
 
