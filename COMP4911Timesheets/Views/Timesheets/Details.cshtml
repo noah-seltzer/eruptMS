@@ -10,37 +10,42 @@
     <h4>Timesheet</h4>
     <hr />
     <dl class="row col-lg-6 well bs-component">
-        <dt class = "col-sm-4">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.WeekEnding)
         </dt>
         <dd class="col-sm-8">
             @Model.WeekEnding.ToString("yyyy/MM/dd")
         </dd>
-        <dt class = "col-sm-4">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.WeekNumber)
         </dt>
-        <dd class = "col-sm-8">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.WeekNumber)
         </dd>
-        <dt class = "col-sm-4">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FlexTime)
         </dt>
-        <dd class = "col-sm-8">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.FlexTime)
         </dd>
-        <dt class = "col-sm-4">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-8">
             @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
         </dd>
-        <dt class = "col-sm-4">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Employee)
         </dt>
-        <dd class = "col-sm-8">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
-
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
     </dl>
 </div>
 

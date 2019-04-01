@@ -10,6 +10,18 @@
     <hr />
     <dl class="row col-lg-6 well bs-component">
         <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekEnding)
+        </dt>
+        <dd class="col-sm-8">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FlexTime)
         </dt>
         <dd class="col-sm-8">
@@ -28,17 +40,12 @@
             @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekEnding)
+            @Html.DisplayNameFor(model => model.Comments)
         </dt>
         <dd class="col-sm-8">
-            @Model.WeekEnding.ToString("yyyy/MM/dd")
+            @Html.DisplayFor(model => model.Comments)
         </dd>
-        <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.WeekNumber)
-        </dt>
-        <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.WeekNumber)
-        </dd>
+
     </dl>
 </div>
 
