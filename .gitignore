@@ -267,5 +267,3 @@ __pycache__/
 *.pyc
 
 .DS_Store
-
-COMP4911Timesheets/appsettings.json
