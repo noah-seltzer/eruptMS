@@ -138,29 +138,13 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Reject(int TimesheetId)
-        {
-            if (TimesheetId == 0)
-            {
-                return NotFound();
-            }
-
-            var timesheet = await _context.Timesheets.FindAsync(TimesheetId);
-            if (timesheet == null)
-            {
-                return NotFound();
-            }
-            await Reject(TimesheetId, timesheet);
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost]
+        [HttpPost, ActionName("Reject")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(int TimesheetId, [Bind("Timesheet.Comments")] Timesheet timesheet)
+        public async Task<IActionResult> Reject(LineManagerManagement lineManagerManagement)
         {
-            var timesheetToBeChanged = await _context.Timesheets.FindAsync(TimesheetId);
+            var timesheetToBeChanged = await _context.Timesheets.FindAsync(lineManagerManagement.Timesheet.TimesheetId);
             timesheetToBeChanged.Status = Timesheet.REJECTED_NEED_RESUBMISSION;
-            timesheetToBeChanged.Comments = timesheet.Comments;
+            timesheetToBeChanged.Comments = lineManagerManagement.Timesheet.Comments;
             _context.Update(timesheetToBeChanged);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
