@@ -19,9 +19,13 @@ Edmund is using "Server=tcp:127.0.0.1,1433;Database=Erupt;UID=sa;PWD=Password123
 # Environments
 
 http://deimos.edu.bcit.ca -> TEST
+
 http://deimos.edu.bcit.ca:5000 -> STAGE
+
 http://deimos.edu.bcit.ca:5001 -> UAT (not initilized, builds will fail for the time being)
+
 http://deimos.edu.bcit.ca:5001 -> JENKINS (noah's branch)
+
 #### To deploy on docker with live compiling (windows tested only)
 
 1. navigate to project folder (outer folder)
