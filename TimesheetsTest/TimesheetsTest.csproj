@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0.0" Culture="neutral" PublicKeyToken="adb9793829ddae60" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0.0" Culture="neutral" PublicKeyToken="adb9793829ddae60" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0.0" Culture="neutral" PublicKeyToken="adb9793829ddae60" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.0.0" Culture="neutral" PublicKeyToken="b03f5f7f11d50a3a" />
   </ItemGroup>
 
   <ItemGroup>
