@@ -107,7 +107,7 @@
     </div>
     
     <div class="row">
-        @if(User.IsInRole(role: "PM") || User.IsInRole(role: "AD"))
+        @if(User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "AD"))
         {
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-olive">
