@@ -33,13 +33,24 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var employees = await _context.Employees
-                .Include(e => e.Approver)
-                .Include(e => e.Supervisor)
-                .Include(e => e.ProjectEmployees)
-                .OrderBy(s => s.EmployeeId)
-                .Where(e => e.SupervisorId == currentUser.Id)
-                .ToListAsync();
+            List<Employee> employees;
+            if (User.IsInRole(role: "AD")) {
+                employees = await _context.Employees
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .Include(e => e.ProjectEmployees)
+                    .OrderBy(s => s.EmployeeId)
+                    .ToListAsync();
+            } else {
+                employees = await _context.Employees
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .Include(e => e.ProjectEmployees)
+                    .OrderBy(s => s.EmployeeId)
+                    .Where(e => e.SupervisorId == currentUser.Id)
+                    .ToListAsync();
+            }
+
             var lineManagerManagements = new List<LineManagerManagement>();
             foreach (var employee in employees)
             {
