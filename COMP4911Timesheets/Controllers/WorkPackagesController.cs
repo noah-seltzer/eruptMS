@@ -27,10 +27,27 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var applicationDbContext = _context.WorkPackages.Include(w => w.ParentWorkPackage).Include(w => w.Project);
-            return View(await applicationDbContext.ToListAsync());
+            var workPackages = new List<WorkPackage>();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                workPackages = await _context.WorkPackages
+                    .Include(w => w.ParentWorkPackage)
+                    .Include(w => w.Project)
+                    .Where(w => w.Project.ProjectCode.Contains(searchString)
+                            || w.WorkPackageCode.Contains(searchString))
+                    .ToListAsync();
+            } else
+            {
+                workPackages = await _context.WorkPackages
+                    .Include(w => w.ParentWorkPackage)
+                    .Include(w => w.Project)
+                    .ToListAsync();
+            }
+
+            return View(workPackages);
         }
 
         // GET: WorkPackages/Details/5
