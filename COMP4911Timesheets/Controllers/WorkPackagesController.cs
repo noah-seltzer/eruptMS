@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -17,17 +18,36 @@ namespace COMP4911Timesheets.Controllers
         private static int? projectId;
         private static int? parentWorkPKId;
         public static int PROJECT_CODE_LENGTH = 4;
+        private readonly UserManager<Employee> _userManager;
 
-        public WorkPackagesController(ApplicationDbContext context)
+        public WorkPackagesController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: WorkPackages
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var applicationDbContext = _context.WorkPackages.Include(w => w.ParentWorkPackage).Include(w => w.Project);
-            return View(await applicationDbContext.ToListAsync());
+            var workPackages = new List<WorkPackage>();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                workPackages = await _context.WorkPackages
+                    .Include(w => w.ParentWorkPackage)
+                    .Include(w => w.Project)
+                    .Where(w => w.Project.ProjectCode.Contains(searchString)
+                            || w.WorkPackageCode.Contains(searchString))
+                    .ToListAsync();
+            } else
+            {
+                workPackages = await _context.WorkPackages
+                    .Include(w => w.ParentWorkPackage)
+                    .Include(w => w.Project)
+                    .ToListAsync();
+            }
+
+            return View(workPackages);
         }
 
         // GET: WorkPackages/Details/5
@@ -303,6 +323,10 @@ namespace COMP4911Timesheets.Controllers
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {
+            if (User.IsInRole("RE")) {
+
+            }            
+
             projectId = id;
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
 

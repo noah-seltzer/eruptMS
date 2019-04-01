@@ -1,4 +1,4 @@
-﻿@model IEnumerable<COMP4911Timesheets.ViewModels.EmployeeManagement>
+﻿@model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
 
 @{
     ViewData["PageTitle"] = "Employees";
@@ -7,22 +7,12 @@
 <h1>@ViewData["PageTitle"]</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="ProjectIndex">Projects</a>
 </p>
-@using (Html.BeginForm())
-{
-<p>
-    Find by name: @Html.TextBox("SearchString")
-    <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
-    <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
-</p>
-}
+
 <table class="table well bs-component">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee.EmployeeId)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Employee.FirstName)
             </th>
@@ -30,13 +20,16 @@
                 @Html.DisplayNameFor(model => model.Employee.LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
+                @Html.DisplayNameFor(model => model.Employee.Approver)
             </th>
             <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Employee.Title)
             </th>
             <th class="priority-2">
-                @Html.DisplayNameFor(model => model.Employee.Status)
+                @Html.DisplayNameFor(model => model.Employee.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.Timesheets)
             </th>
             <th></th>
         </tr>
@@ -46,27 +39,27 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.Employee.FirstName)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Employee.LastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
+                    @Html.DisplayFor(modelItem => item.Employee.Approver.Email)
                 </td>
                 <td class="priority-2">
                     @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Employee.Title])
                 </td>
                 <td class="priority-2">
-                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Employee.Status])
+                    @Html.DisplayFor(modelItem => item.Employee.Email)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Employee.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Employee.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Employee.Id">Delete</a>
+                    <a asp-action="Details" asp-route-id="@item.Employee.Id">
+                        @item.Employee.Timesheets.Count
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="ChangeTA" asp-route-id="@item.Employee.Id">Change TA</a>
                 </td>
             </tr>
         }

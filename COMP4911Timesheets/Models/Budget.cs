@@ -31,6 +31,8 @@ namespace COMP4911Timesheets.Models
 
         public double Hour { get; set; }
 
+        public double REHour { get; set; }
+
         public int Status { get; set; }
 
         [Display(Name = "Week Number")]

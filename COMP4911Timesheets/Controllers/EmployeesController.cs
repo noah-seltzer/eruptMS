@@ -31,12 +31,26 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var employees = await _context.Employees
-                .Include(e => e.Approver)
-                .Include(e => e.Supervisor)
-                .OrderBy(s => s.EmployeeId).ToListAsync();
+            var employees = new List<Employee>();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                employees = await _context.Employees
+                    .Where(s => s.LastName.Contains(searchString)
+                                       || s.FirstName.Contains(searchString))
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .OrderBy(s => s.EmployeeId).ToListAsync();
+            } else
+            {
+                employees = await _context.Employees
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .OrderBy(s => s.EmployeeId).ToListAsync();
+            }
+            
             var employeeManagements = new List<EmployeeManagement>();
             foreach (var employee in employees)
             {

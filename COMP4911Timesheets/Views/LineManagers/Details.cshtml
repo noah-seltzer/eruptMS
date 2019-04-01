@@ -1,7 +1,7 @@
-﻿@model COMP4911Timesheets.Models.Employee
+﻿@model COMP4911Timesheets.ViewModels.LineManagerManagement
 
 @{
-    ViewData["PageTitle"] = "This Employee needs " + Model.Timesheets.Count + " timesheet approvals";
+    ViewData["PageTitle"] = "Timesheet Approval";
 }
 
 <h2>@ViewData["PageTitle"]</h2>
@@ -11,34 +11,28 @@
     <hr />
     <dl class="row col-lg-6 well bs-component">
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.EmployeeId)
+            @Html.DisplayNameFor(model => model.Employee.Email)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.EmployeeId)
+            @Html.DisplayFor(model => model.Employee.Email)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.Employee.FirstName)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Email)
+            @Html.DisplayFor(model => model.Employee.FirstName)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.DisplayNameFor(model => model.Employee.LastName)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.FirstName)
+            @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
         <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.LastName)
+            @Html.DisplayNameFor(model => model.Employee.Title)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class="col-sm-4">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-8">
-            @Employee.JobTitles[Model.Title]
+            @Employee.JobTitles[Model.Employee.Title]
         </dd>
 
     </dl>
@@ -64,8 +58,8 @@
         </tr>
     </thead>
     <tbody>
-        @{ int a = 10;
-            foreach (var item in Model.Timesheets)
+        @{ 
+            foreach (var item in Model.Employee.Timesheets)
             {
                 <tr>
 

@@ -23,9 +23,21 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Projects.ToListAsync());
+            var projects = new List<Project>();
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                projects = await _context.Projects
+                    .Where(s => s.Name.Contains(searchString)
+                             || s.ProjectCode.Contains(searchString))
+                    .ToListAsync();
+            } else
+            {
+                projects = await _context.Projects.ToListAsync();
+            }
+                return View(projects);
         }
 
         // GET: Projects/Details/5
