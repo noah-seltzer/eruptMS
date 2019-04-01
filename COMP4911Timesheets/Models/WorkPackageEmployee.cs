@@ -14,14 +14,14 @@ namespace COMP4911Timesheets.Models
         public static readonly int RESPONSIBLE_ENGINEER = 100;
         public static readonly int ASSIGNED_EMPLOYEE = 200;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Not Working"},
             {1, "Currently Working"},
             {2, "Pending"}
         };
 
-        public readonly Dictionary<int, string> Roles = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Roles = new Dictionary<int, string>
         {
             {100, "Responsible Engineer"},
             {200, "Assigned Employee"}
