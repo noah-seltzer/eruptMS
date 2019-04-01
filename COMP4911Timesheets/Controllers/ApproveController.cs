@@ -73,6 +73,8 @@ namespace COMP4911Timesheets.Controllers
             var timesheet = await _context.Timesheets
                 .Include(e => e.TimesheetRows)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var projects = await _context.Projects.ToListAsync();
+            var packages = await _context.WorkPackages.ToListAsync();
             if (timesheet == null)
             {
                 return NotFound();

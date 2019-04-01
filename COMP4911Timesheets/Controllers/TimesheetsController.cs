@@ -164,6 +164,20 @@ namespace COMP4911Timesheets.Controllers
                 timesheet.FlexTime = 40;
 
                 _context.Add(timesheet);
+
+                //add HR reserved rows
+                var wp1 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "SICK");
+                TimesheetRow tr1 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp1};
+                _context.Add(tr1);
+                var wp2 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "VACN");
+                TimesheetRow tr2 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp2 };
+                _context.Add(tr2);
+                var wp3 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "SHOL");
+                TimesheetRow tr3 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp3 };
+                _context.Add(tr3);
+                var wp4 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "FLEX");
+                TimesheetRow tr4 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp4 };
+                _context.Add(tr4);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
