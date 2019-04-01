@@ -305,11 +305,8 @@ namespace COMP4911Timesheets.Controllers
         
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
-        {
-            if (User.IsInRole("RE")) {
-
-            }            
-
+        {         
+   
             projectId = id;
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
 
@@ -322,8 +319,27 @@ namespace COMP4911Timesheets.Controllers
             }
 
 
-            var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
+            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+            List<WorkPackage> workPackages = new List<WorkPackage>();
+
+
+            if (User.IsInRole(role: "RE"))
+            {
+                var REWorkPackages = await _context.WorkPackageEmployees
+                           .Where(u => u.EmployeeId == users.Id && u.Role == WorkPackageEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
+                
+                foreach (WorkPackageEmployee temp in REWorkPackages) {
+                    WorkPackage tempwp = _context.WorkPackages
+                        .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
+                    workPackages.Add(tempwp);
+                }               
+            }
+            else { 
+                workPackages = await _context.WorkPackages
+                 .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
+            }
+
             //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
