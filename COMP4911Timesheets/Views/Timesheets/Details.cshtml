@@ -2,6 +2,7 @@
 
 @{
     ViewData["PageTitle"] = "Details";
+    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -80,6 +81,9 @@
                 Fri
             </th>
             <th>
+                Total
+            </th>
+            <th>
                 Notes
             </th>
 
@@ -100,24 +104,34 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SatHour)
+                        @{sat += item.SatHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SunHour)
+                        @{ sun += item.SunHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.MonHour)
+                        @{ mon += item.MonHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.TueHour)
+                        @{ tue += item.TueHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.WedHour)
+                        @{ wed += item.WedHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.ThuHour)
+                        @{ thu += item.ThuHour;}
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.FriHour)
+                        @{fri += item.FriHour;}
+                    </td>
+                    <td>
+                        @(item.SatHour + item.SunHour + item.MonHour + item.TueHour + item.WedHour + item.ThuHour + item.FriHour)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Notes)
@@ -126,14 +140,47 @@
                 </tr>
             }
         }
+
+        <tr>
+            <td></td>
+            <td>
+                Total
+            </td>
+            <td>
+                @sat
+            </td>
+            <td>
+                @sun
+            </td>
+            <td>
+                @mon
+            </td>
+            <td>
+                @tue
+            </td>
+            <td>
+                @wed
+            </td>
+            <td>
+                @thu
+            </td>
+            <td>
+                @fri
+            </td>
+            <td>
+                @(mon + tue + wed + thu + fri + sat + sun)
+            </td>
+            <td></td>
+
+        </tr>
     </tbody>
 </table>
 
 
 <div>
     @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
-        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+     COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
+     COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
     {
         <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
     }
