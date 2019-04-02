@@ -51,6 +51,7 @@ namespace COMP4911Timesheets.Models
 
         public List<Budget> Budgets { get; set; }
         public List<WorkPackageReport> WorkPackageReports { get; set; }
+        public List<ResponsibleEngineerReport> ResponsibleEngineerReports { get; set; }
         public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<TimesheetRow> TimesheetRows { get; set; }
     }

@@ -80,6 +80,7 @@ namespace COMP4911Timesheets.Data
         public DbSet<WorkPackage> WorkPackages { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<WorkPackageReport> WorkPackageReports { get; set; }
+        public DbSet<ResponsibleEngineerReport> ResponsibleEngineerReport { get; set; }
         public DbSet<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
         public DbSet<TimesheetRow> TimesheetRows { get; set; }
