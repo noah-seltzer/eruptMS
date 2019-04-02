@@ -2,7 +2,6 @@
 
 Pre-install: 
 - Create an mssql database which can be accessed by the intended host
-- keep 
 
 Stage 1: configure environment
 
@@ -19,7 +18,7 @@ Stage 2: build container
 
 
 
-# IMPORTANT 
+# IMPORTANT (for developers)
 
 change the default connection in COMP4911Timesheets/appsettings.json
 
