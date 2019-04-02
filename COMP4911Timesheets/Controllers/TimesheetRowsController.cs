@@ -115,13 +115,13 @@ namespace COMP4911Timesheets.Controllers
 
             //Project
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-                  .Select(s => new SelectListItem
-                  {
-                      Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                  });
-            ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
+            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            //      .Select(s => new SelectListItem
+            //      {
+            //          Value = s.WorkPackageId.ToString(),
+            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+            //      });
+            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 
@@ -171,13 +171,13 @@ namespace COMP4911Timesheets.Controllers
 
 
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-                  .Select(s => new SelectListItem
-                  {
-                      Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                  });
-            ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
+            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            //      .Select(s => new SelectListItem
+            //      {
+            //          Value = s.WorkPackageId.ToString(),
+            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+            //      });
+            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 
