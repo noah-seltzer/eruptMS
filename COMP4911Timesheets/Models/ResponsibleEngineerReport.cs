@@ -17,8 +17,8 @@ namespace COMP4911Timesheets.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Display(Name = "Work Package Report ID")]
-        public int WorkPackageReportId { get; set; }
+        [Display(Name = "Responsible Engineer Report ID")]
+        public int ResponsibleEngineerReportId { get; set; }
 
         [Display(Name = "Week Number")]
         public int WeekNumber { get; set; }
