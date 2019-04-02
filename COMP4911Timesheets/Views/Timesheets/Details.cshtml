@@ -2,7 +2,7 @@
 
 @{
     ViewData["PageTitle"] = "Details";
-    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0;
+    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0, earn = 0;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -173,14 +173,105 @@
             <td></td>
 
         </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                Flex Hour Earned
+            </td>
+            <td>
+                @if (sat > 0)
+                {
+                    earn += sat;
+                    @(sat)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (sun > 0)
+                {
+                    earn += sun;
+                    @(sun)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (mon > 8)
+                {
+                    earn += (mon - 8);
+                    @(mon - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (tue > 8)
+                {
+                    earn += (tue - 8);
+                    @(tue - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (wed > 8)
+                {
+                    earn += (wed - 8);
+                    @(wed - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (thu > 8)
+                {
+                    earn += (thu - 8);
+                    @(thu - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (fri > 8)
+                {
+                    earn += (fri - 8);
+                    @(fri - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @earn
+            </td>
+            <td></td>
+
+        </tr>
+
+
     </tbody>
 </table>
 
 
 <div>
     @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-     COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
-     COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+  COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
+  COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
     {
         <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
     }

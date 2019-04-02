@@ -2,7 +2,7 @@
 
 @{
     ViewData["PageTitle"] = "Edit";
-    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0;
+    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0, earn = 0;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -27,6 +27,12 @@
         </dt>
         <dd class="col-sm-8">
             @Html.DisplayFor(model => model.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            Emp FlexTime
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.FlexTime)
         </dd>
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Status)
@@ -157,7 +163,7 @@
                             </td>
                             <td>
                                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                                COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                               COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
                                         new { @class = "btn btn-primary", @role = "button" })
@@ -165,7 +171,7 @@
                             </td>
                             <td>
                                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                                COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                               COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
                                         new { @class = "btn btn-danger", @role = "button" })
@@ -204,6 +210,95 @@
                     </td>
                     <td>
                         @(mon + tue + wed + thu + fri + sat + sun)
+                    </td>
+                    <td></td>
+
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>
+                        Flex Hour Earned
+                    </td>
+                    <td>
+                        @if (sat > 0)
+                        {
+                            earn += sat;
+                            @(sat)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (sun > 0)
+                        {
+                            earn += sun;
+                            @(sun)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (mon > 8)
+                        {
+                            earn += (mon - 8);
+                            @(mon - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (tue > 8)
+                        {
+                            earn += (tue - 8);
+                            @(tue - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (wed > 8)
+                        {
+                            earn += (wed - 8);
+                            @(wed - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (thu > 8)
+                        {
+                            earn += (thu - 8);
+                            @(thu - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (fri > 8)
+                        {
+                            earn += (fri - 8);
+                            @(fri - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @earn
                     </td>
                     <td></td>
 

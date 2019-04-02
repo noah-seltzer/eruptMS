@@ -8,12 +8,27 @@
 
 <h4>TimesheetRow</h4>
 <hr />
+<dl class="row col-lg-6 well bs-component">
+    <dt class="col-sm-4">
+        Project
+    </dt>
+    <dd class="col-sm-8">
+        @Model.WorkPackage.Project.Name
+    </dd>
+    <dt class="col-sm-4">
+        Package
+    </dt>
+    <dd class="col-sm-8">
+        @Model.WorkPackage.Name
+    </dd>
+</dl>
 <div class="row">
     <div class="col-md-4 well bs-component">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="TimesheetId" />
             <input type="hidden" asp-for="TimesheetRowId" />
+            <input type="hidden" asp-for="WorkPackageId" />
             <div class="form-group">
                 <label asp-for="SatHour" class="control-label"></label>
                 <input asp-for="SatHour" class="form-control" type="number" max="24" min="0" />
@@ -53,11 +68,6 @@
                 <label asp-for="Notes" class="control-label"></label>
                 <input asp-for="Notes" class="form-control" />
                 <span asp-validation-for="Notes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WorkPackageId" class="control-label"></label>
-                <select asp-for="WorkPackageId" class="form-control searchDropDown" asp-items="ViewBag.WorkPackageId"></select>
-                <span asp-validation-for="WorkPackageId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-raised" />
