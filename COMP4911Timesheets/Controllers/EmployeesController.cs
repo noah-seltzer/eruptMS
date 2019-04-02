@@ -43,14 +43,15 @@ namespace COMP4911Timesheets.Controllers
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .OrderBy(s => s.EmployeeId).ToListAsync();
-            } else
+            }
+            else
             {
                 employees = await _context.Employees
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .OrderBy(s => s.EmployeeId).ToListAsync();
             }
-            
+
             var employeeManagements = new List<EmployeeManagement>();
             foreach (var employee in employees)
             {
@@ -200,6 +201,13 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
+                    var something = _userManager.GetUserId(this.User);
+                    if (id == _userManager.GetUserId(this.User) && employeeManagement.Employee.Title == Employee.ADMIN)
+                    {
+                        ViewBag.ErrorMessage = "You cannot assign yourself to admin";
+                        return await Edit(id);
+                    }
+
                     var oldEmployee = await _context.Employees.FindAsync(id);
                     if (oldEmployee != null)
                     {

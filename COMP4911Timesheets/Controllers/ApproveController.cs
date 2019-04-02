@@ -49,6 +49,13 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            var timesheets = await _context.Timesheets
+                .Where(ts => ts.Status == Timesheet.SUBMITTED_NOT_APPROVED)
+                .Where(ts => ts.EmployeeId == id)
+                .ToListAsync();
+            
+            employee.Timesheets = timesheets;
+
             return View(employee);
         }
         
@@ -84,8 +91,12 @@ namespace COMP4911Timesheets.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t=>t.Employee).FirstOrDefaultAsync(m => m.TimesheetId == id);
             timesheet.Status = SUBMITTED_APPROVED;
+
+            //add flex hours to employee
+            timesheet.Employee.FlexTime += timesheet.FlexTime;
+
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));

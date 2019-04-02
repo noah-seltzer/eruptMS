@@ -37,7 +37,8 @@ namespace COMP4911Timesheets.Controllers
                 .Where(t => t.WeekEnding.ToString("yyyy/MM/dd").Contains(searchString))
                 .OrderByDescending(t => t.WeekNumber)
                 .ToListAsync();
-            } else
+            }
+            else
             {
                 timesheets = await _context.Timesheets
                 .Include(t => t.Employee)
@@ -110,7 +111,7 @@ namespace COMP4911Timesheets.Controllers
             //Add Fridays in previous month
             for (int i = 4; i > 0; i--)
             {
-                var oldfriday = friday.AddDays(- i * 7);
+                var oldfriday = friday.AddDays(-i * 7);
                 //Check if timesheet for this week exist
                 bool exist = false;
                 foreach (Timesheet t in timesheets)
@@ -161,13 +162,13 @@ namespace COMP4911Timesheets.Controllers
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
-                timesheet.FlexTime = 40;
+                timesheet.FlexTime = 0;
 
                 _context.Add(timesheet);
 
                 //add HR reserved rows
                 var wp1 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "SICK");
-                TimesheetRow tr1 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp1};
+                TimesheetRow tr1 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp1 };
                 _context.Add(tr1);
                 var wp2 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "VACN");
                 TimesheetRow tr2 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp2 };
@@ -199,23 +200,23 @@ namespace COMP4911Timesheets.Controllers
                 .Include(t => t.TimesheetRows)
                 .FirstOrDefaultAsync(m => m.TimesheetId == id);
 
-            DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
-            Timesheet model = new Timesheet()
-            {
-                //default this Friday
-                WeekEnding = friday
-            };
-            List<DateTime> fridays = new List<DateTime>();
-            for (int i = 0; i < 30; i++)
-            {
-                fridays.Add(friday.AddDays(i * 7));
-            }
-            var fridayslist = fridays.Select(s => new SelectListItem
-            {
-                Value = s.Date.ToString(),
-                Text = s.Date.ToString("yyyy/MM/dd")
-            });
-            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
+            //DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
+            //Timesheet model = new Timesheet()
+            //{
+            //    //default this Friday
+            //    WeekEnding = friday
+            //};
+            //List<DateTime> fridays = new List<DateTime>();
+            //for (int i = 0; i < 30; i++)
+            //{
+            //    fridays.Add(friday.AddDays(i * 7));
+            //}
+            //var fridayslist = fridays.Select(s => new SelectListItem
+            //{
+            //    Value = s.Date.ToString(),
+            //    Text = s.Date.ToString("yyyy/MM/dd")
+            //});
+            //ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
 
 
             if (timesheet == null)
@@ -231,14 +232,34 @@ namespace COMP4911Timesheets.Controllers
             }
 
             //calculate flex time
-            timesheet.FlexTime = 40;
+            timesheet.FlexTime = 0;
             if (timesheet.TimesheetRows != null)
             {
+                double sat = 0, sun = 0, mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, flexused = 0;
                 foreach (TimesheetRow tr in timesheet.TimesheetRows)
                 {
-                    timesheet.FlexTime = timesheet.FlexTime - tr.SatHour - tr.SunHour - tr.MonHour - tr.TueHour - tr.WedHour - tr.ThuHour - tr.FriHour;
+                    if (tr.WorkPackage.WorkPackageCode == "FLEX")
+                    {
+                        flexused += tr.SatHour + tr.SunHour + tr.MonHour + tr.TueHour + tr.WedHour + tr.ThuHour + tr.FriHour;
+                    }
+                    sat += tr.SatHour;
+                        sun += tr.SunHour;
+                        mon += tr.MonHour;
+                        tue += tr.TueHour;
+                        wed += tr.WedHour;
+                        thu += tr.ThuHour;
+                        fri += tr.FriHour;
                 }
+                if (sat > 0) timesheet.FlexTime += sat;
+                if (sun > 0) timesheet.FlexTime += sun;
+                if (mon > 8) timesheet.FlexTime += mon - 8;
+                if (tue > 8) timesheet.FlexTime += tue - 8;
+                if (wed > 8) timesheet.FlexTime += wed - 8;
+                if (thu > 8) timesheet.FlexTime += thu - 8;
+                if (fri > 8) timesheet.FlexTime += fri - 8;
+                timesheet.FlexTime -= flexused;
             }
+
             try
             {
                 _context.Update(timesheet);
