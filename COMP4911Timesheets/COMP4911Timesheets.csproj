@@ -11,19 +11,6 @@
     <WarningLevel>1</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\Migrations\**" />
-    <Content Remove="Data\Migrations\**" />
-    <EmbeddedResource Remove="Data\Migrations\**" />
-    <None Remove="Data\Migrations\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Data\Migrations\20190401220324_InitialCreate.cs" />
-    <Compile Include="Data\Migrations\20190401220324_InitialCreate.Designer.cs" />
-    <Compile Include="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -32,6 +19,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.2105168" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="Moq" Version="4.10.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>
