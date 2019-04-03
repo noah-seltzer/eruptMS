@@ -99,6 +99,7 @@ namespace COMP4911Timesheets
                 WorkPackage mgmt = new WorkPackage
                 {
                     ProjectId = pId,
+                    WorkPackageCode = "00000",
                     ParentWorkPackageId = null,
                     Name = "Management",
                     Description = ""
