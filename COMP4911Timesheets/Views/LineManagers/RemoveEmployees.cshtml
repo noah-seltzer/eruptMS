@@ -1,0 +1,56 @@
+@model COMP4911Timesheets.ViewModels.LineManagerManagement
+
+@{
+    ViewData["PageTitle"] = "Remove Employees";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectEmployee.Role)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProjectEmployees)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.ProjectEmployee.Roles[item.Role])
+                </td>
+                <td>
+                    @{
+                        if (item.Role != COMP4911Timesheets.Models.ProjectEmployee.PROJECT_MANAGER) {
+                            <a asp-action="RemoveEmployee" asp-route-id="@item.ProjectEmployeeId">Remove Employees</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-action="ProjectIndex">Back to List</a>
+</div>

@@ -6,10 +6,5 @@ namespace TimesheetsTest
 {
     public class EmployeeControllerTest
     {
-
-        [Fact]
-        public void Test1()
-        {
-        }
     }
 }

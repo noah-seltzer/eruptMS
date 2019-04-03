@@ -1,11 +1,10 @@
-﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace COMP4911Timesheets.Models
 {
-    public class ProjectReport
+    public class ResponsibleEngineerReport
     {
         public static readonly int INVALID = 0;
         public static readonly int VALID = 1;
@@ -18,8 +17,15 @@ namespace COMP4911Timesheets.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Display(Name = "Project Report ID")]
-        public int ProjectReportId { get; set; }
+        [Display(Name = "Responsible Engineer Report ID")]
+        public int ResponsibleEngineerReportId { get; set; }
+
+        [Display(Name = "Week Number")]
+        public int WeekNumber { get; set; }
+
+        public int Status { get; set; }
+
+        public string Comments { get; set; }
 
         [Display(Name = "Starting Percentage")]
         public double StartingPercentage { get; set; }
@@ -33,13 +39,19 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Cost Finished")]
         public double CostFinished { get; set; }
 
-        [Display(Name = "Created Time")]
-        public DateTime CreatedTime { get; set; }
+        [Display(Name = "Work Accomplished")]
+        public string WorkAccomplished { get; set; }
 
-        public int Status { get; set; }
+        [Display(Name = "Work Planned")]
+        public string WorkPlanned { get; set; }
 
-        [Display(Name = "Project ID")]
-        public int? ProjectId { get; set; }
-        public Project Project { get; set; }
+        public string Problem { get; set; }
+
+        [Display(Name = "Problem Anticipated")]
+        public string ProblemAnticipated { get; set; }
+
+        [Display(Name = "Work Package ID")]
+        public int? WorkPackageId { get; set; }
+        public WorkPackage WorkPackage { get; set; }
     }
 }

@@ -5,6 +5,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
     <title>@ViewData["PageTitle"] - COMP4911Timesheets</title>
 
     <environment include="Development">
@@ -34,7 +39,7 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA"))
+                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA") || User.IsInRole(role: "LM"))
                             {
                                 <li class="nav-item dropdown @Html.IsSelected(actions: 
                                                             "Index,Create,Details,Delete,Edit,Backup,Restore,TimesheetView,Approval,ApprovalConfirmed,Reject",
@@ -73,9 +78,23 @@
                                                     </a>
                                                 </li>
                                             }
+                                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "LM"))
+                                            {
+                                                <li>
+                                                    <a class="nav-link" asp-area="" asp-controller="LineManagers" asp-action="Index">
+                                                        Supervisory
+                                                    </a>
+                                                </li>
+                                            }
+                                            if (User.IsInRole(role: "AD") || User.IsInRole(role: "PM"))
+                                            {
+                                                <li>
+                                                    <a class="nav-link" asp-area="" asp-controller="WeeklyWorkPackagesReport" asp-action="Index">
+                                                        Weekly WP Report
+                                                    </a>
+                                                </li>
+                                            }
                                         }
-
-
                                     </ul>
                                 </li>
                             }

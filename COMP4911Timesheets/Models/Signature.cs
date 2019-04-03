@@ -11,7 +11,7 @@ namespace COMP4911Timesheets.Models
         public static readonly int INVALID = 0;
         public static readonly int VALID = 1;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Invalid"},
             {1, "Valid"}

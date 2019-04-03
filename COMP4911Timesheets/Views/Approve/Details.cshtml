@@ -67,26 +67,28 @@
         @{ int a = 10;
             foreach (var item in Model.Timesheets)
             {
-                <tr>
 
-                    <td>
-                        @{string date = item.WeekEnding.ToString("yyyy/MM/dd");}
-                        @Html.DisplayFor(modelItem => date)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.WeekNumber)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.FlexTime)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Statuses[item.Status])
-                    </td>
+                    <tr>
+                        <td>
+                            @{string date = item.WeekEnding.ToString("yyyy/MM/dd");}
+                            @Html.DisplayFor(modelItem => date)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WeekNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FlexTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Timesheet.Statuses[item.Status])
+                        </td>
 
-                    <td>
-                        <a asp-action="TimesheetView" asp-route-id="@item.TimesheetId" class="btn btn-primary btn-raised">View</a>
-                    </td>
-                </tr>
+                        <td>
+                            <a asp-action="TimesheetView" asp-route-id="@item.TimesheetId" class="btn btn-primary btn-raised">View</a>
+                        </td>
+                    </tr>
+                
+
 
             }
         }
