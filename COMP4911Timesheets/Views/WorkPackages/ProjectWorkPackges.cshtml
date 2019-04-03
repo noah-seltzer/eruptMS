@@ -10,135 +10,138 @@
     <a asp-action="CreateWorkPackage">Create New WorkPackage</a> &nbsp|&nbsp
 
     <a asp-action="ClosedWorkPackageInfo">Closed Work Package Info</a>
-
 </p>
 
-<div class="row">
-
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.WorkPackageCode)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Name)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Description)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Contractor)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Purpose)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Activity)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.Status)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayNameFor(model => model.ParentWorkPackage)
-    </div>
-</div>
-
-@foreach (var item in Model)
-{
-    @if (item.WorkPackageCode.Length == 5)
-    {
-        <div class="collapsed row hoverBg" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
-
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.WorkPackageCode)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Name)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Description)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Contractor)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Purpose)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Activity)
-            </div>
-            
-            @if (item.Status == WorkPackage.OPENED)
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackageCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contractor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Purpose)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ParentWorkPackage)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.WorkPackageCode.Length == 5)
             {
-            <div class="col-xs-1">
-                Opened</div>
-            }
-            else
-            {
-            <div class="col-xs-1">
-                Archived</div>
-            }
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
-            </div>
-            </div>
-        <div>
-            <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> |
-            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> |
-            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> |
-            <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
-            <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
-            <!--|
-    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
-        </div>
-    }
-    @if (item.WorkPackageCode.Length != 5)
-    {
-        <div class="row collapse hoverBg w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.WorkPackageCode)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Name)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Description)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Contractor)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Purpose)
-            </div>
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.Activity)
-            </div>
-            @if (item.Status == WorkPackage.OPENED)
-            {
-                <div class="col-xs-1">
-                    Opened
-                </div>
-            }
-            else
-            {
-                <div class="col-xs-1">
-                    Archived
-                </div>
-            }
-            <div class="col-xs-1">
-                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
-            </div>
-        </div>
-        <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
-            <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
-            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> &nbsp|&nbsp
-            <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> &nbsp|&nbsp
-            <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
-            <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
-            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
-            <!-- &nbsp|&nbsp
-    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
-        </div>
-    }
-}
+                <tr data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </td>
+                    @if (item.Status == WorkPackage.OPENED)
+                    {
+                        <td>
+                            Opened
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Archived
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </td>
+                </tr>
 
-
+                <tr>
+                    <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> |
+                    <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> |
+                    <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> |
+                    <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
+                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+                    <!--|
+                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
+                </tr>
+            }
+            @if (item.WorkPackageCode.Length != 5)
+            {
+                <tr class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse"
+                    data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </td>
+                    @if (item.Status == WorkPackage.OPENED)
+                    {
+                        <td>
+                            Opened
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Archived
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </td>
+                </tr>
+                <tr class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length-1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
+                    <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
+                    <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a> &nbsp|&nbsp
+                    <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> &nbsp|&nbsp
+                    <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
+                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+                    <!-- &nbsp|&nbsp
+                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>-->
+                </tr>
+            }
+        }
+    </tbody>
+</table>

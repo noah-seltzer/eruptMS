@@ -9,7 +9,7 @@
 <h1>@ViewData["PageTitle"]</h1>
 
 <div>
-    <h4>WorkPackage</h4>
+    <h4>Work Package</h4>
     <hr />
     <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
     <dl class="row col-lg-6 well bs-component">
@@ -77,50 +77,55 @@
 </div>
 
 <h4>Budget Plan</h4>
-<div class="row well bs-component">
-    <div class="col-xs-1">
-        PM Budget
-    </div>
-    <div class="col-xs-1">
-        RE Estimate
-    </div>
-    <div class="col-xs-1">
-        Status
-    </div>
-    <div class="col-xs-1">
-        Type
-    </div>
-    <div class="col-xs-1">
-        Pay Grade Level
-    </div>
-    <div class="col-xs-1">
-        Cost
-    </div>
-</div>
-
-@foreach (var item in Model.Budgets)
-{
-<div class="row well bs-component">
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Hour)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.REHour)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Status)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.Type)
-    </div>
-    <div class="col-xs-1">
-        @Html.DisplayFor(model => item.PayGrade.PayLevel)
-    </div>
-    <div class="col-xs-1">
-        $@Html.DisplayFor(model => item.PayGrade.Cost) / h
-    </div>
-</div>
-}
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                PM Budget
+            </th>
+            <th>
+                RE Estimate
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Pay Grade Level
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Budgets)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(model => item.Hour)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.REHour)
+                </td>>
+                <td>
+                    @Html.DisplayFor(model => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.PayGrade.PayLevel)
+                </td>
+                <td>
+                    $@Html.DisplayFor(model => item.PayGrade.Cost) / h
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 <div>
     <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
 </div>
