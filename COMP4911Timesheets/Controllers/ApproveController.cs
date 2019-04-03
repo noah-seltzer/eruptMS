@@ -7,28 +7,45 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class ApproveController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _userManager;
         private static int INVALID = 0;
         private static int NOT_SUBMITTED_NOT_APPROVED = 1;
         private static int SUBMITTED_NOT_APPROVED = 2;
         private static int SUBMITTED_APPROVED = 3;
         private static int REJECTED_NEED_RESUBMISSION = 4;
 
-        public ApproveController(ApplicationDbContext context)
+        public ApproveController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Approve
         public async Task<IActionResult> Index()
         {
             var Employees = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor).Include(e => e.Timesheets);
-            return View(await Employees.ToListAsync());
+            List<Employee> temp = await Employees.ToListAsync();
+            List<Employee> supervisedEmployee = new List<Employee>();
+            //if (_context.Employees.Find(_userManager.GetUserAsync(this.User)) == Employee.ADMIN)
+            if(_context.Employees.Find(_userManager.GetUserId(this.User)).Title == Employee.ADMIN)
+            {
+                return View(await Employees.ToListAsync());
+            }
+            foreach (Employee e in temp)
+            {
+                if (e.ApproverId == _userManager.GetUserId(this.User))
+                {
+                    supervisedEmployee.Add(e);
+                }
+            }
+            return View(supervisedEmployee);
         }
 
         // GET: Approve/Details/5
