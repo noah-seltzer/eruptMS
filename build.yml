@@ -11,5 +11,3 @@ services:
       - /home/noaselt/eruptJENKINS-data:/app/Data
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
