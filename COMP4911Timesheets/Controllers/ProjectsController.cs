@@ -115,6 +115,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Create
+        [Authorize (Roles = "AD")]
         public IActionResult Create()
         {
             ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
@@ -125,6 +126,7 @@ namespace COMP4911Timesheets
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "AD")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProjectCode,Name,Description,ProjectManager")] NewProject input)
         {
@@ -183,6 +185,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Edit/5
+        [Authorize(Roles = "PM,PA")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -280,6 +283,7 @@ namespace COMP4911Timesheets
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "PM,PA")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ManageProject model)
         {
@@ -395,6 +399,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Delete/5
+        [Authorize(Roles = "AD")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -414,6 +419,7 @@ namespace COMP4911Timesheets
 
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "AD")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
