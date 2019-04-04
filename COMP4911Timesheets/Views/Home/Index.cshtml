@@ -10,9 +10,10 @@
 <br/>
 
 <section class="content align-content-center">
+
+    <div class="row">
     @if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
     {
-    <div class="row">
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-aqua">
                 <div class="inner">
@@ -58,10 +59,7 @@
             </div>
         </div>
         }
-        
-    </div>
     }
-    <div class="row">
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-orange">
                 <div class="inner">
@@ -104,9 +102,7 @@
                 </a>
             </div>
         </div>
-    </div>
-    
-    <div class="row">
+
         @if(User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "AD"))
         {
         <div class="col-lg-4 col-md-4 col-xs-6">
