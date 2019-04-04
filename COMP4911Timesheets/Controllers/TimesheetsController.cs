@@ -250,8 +250,8 @@ namespace COMP4911Timesheets.Controllers
                         thu += tr.ThuHour;
                         fri += tr.FriHour;
                 }
-                if (sat > 0) timesheet.FlexTime += sat;
-                if (sun > 0) timesheet.FlexTime += sun;
+                if (sat > 8) timesheet.FlexTime += sat - 8;
+                if (sun > 8) timesheet.FlexTime += sun - 8;
                 if (mon > 8) timesheet.FlexTime += mon - 8;
                 if (tue > 8) timesheet.FlexTime += tue - 8;
                 if (wed > 8) timesheet.FlexTime += wed - 8;

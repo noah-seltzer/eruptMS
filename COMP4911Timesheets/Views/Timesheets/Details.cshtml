@@ -180,10 +180,10 @@
                 Flex Hour Earned
             </td>
             <td>
-                @if (sat > 0)
+                @if (sat > 8)
                 {
-                    earn += sat;
-                    @(sat)
+                    earn += sat - 8;
+                    @(sat - 8)
                 }
                 else
                 {
@@ -191,10 +191,10 @@
                 }
             </td>
             <td>
-                @if (sun > 0)
+                @if (sun > 8)
                 {
-                    earn += sun;
-                    @(sun)
+                    earn += sun - 8;
+                    @(sun - 8)
                 }
                 else
                 {
@@ -270,8 +270,8 @@
 
 <div>
     @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-  COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
-  COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+ COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved" ||
+ COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
     {
         <a asp-action="Edit" asp-route-id="@Model.TimesheetId">Edit</a>
     }
