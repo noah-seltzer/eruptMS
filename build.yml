@@ -7,3 +7,5 @@ services:
       context: ./COMP4911Timesheets
       dockerfile: build.Dockerfile
     container_name: eruptTEST
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
