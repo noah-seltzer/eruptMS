@@ -7,5 +7,9 @@ services:
       context: ./COMP4911Timesheets
       dockerfile: build.Dockerfile
     container_name: eruptTEST
+    volumes:
+      - /home/noaselt/eruptJENKINS-data:/app/Data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
