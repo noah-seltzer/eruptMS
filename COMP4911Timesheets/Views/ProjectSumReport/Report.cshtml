@@ -10,19 +10,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.WorkPackageCode)
+                Work Packages
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.WorkPackageName)
+                PM Estimates Cost / (Man-Days)
             </th>
             <th>
-                $ACTUALS/$ESTIMATES
+                $Actuals Cost / (Man-Days)
             </th>
             <th>
-                ACTUAL TO DATE ACMP
-            </th>
-            <th>
-                ESTIMATE COMPLETE EAC
+                $Estimates Cost / (Man-Days)
             </th>
             <th>
                 %@Html.DisplayNameFor(model => model.Variance)
@@ -38,19 +35,16 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    @Html.DisplayFor(modelItem => item.WorkPackageName) ( @Html.DisplayFor(modelItem => item.WorkPackageCode) )
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.WorkPackageName)
+                    $@Html.DisplayFor(modelItem => item.PMCost) /  @Html.DisplayFor(modelItem => item.PMHour) 
                 </td>
                 <td>
-                    $@Html.DisplayFor(modelItem => item.ACost) / $@Html.DisplayFor(modelItem => item.ECost)
+                    $@Html.DisplayFor(modelItem => item.ACost) /  @Html.DisplayFor(modelItem => item.AHour) 
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AHour)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EHour)
+                    $@Html.DisplayFor(modelItem => item.RECost) /  @Html.DisplayFor(modelItem => item.REHour)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Variance)
