@@ -23,7 +23,7 @@ namespace COMP4911Timesheets.Controllers
         public WorkPackagesController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
-            _userManager = userManager;
+            _userManager = userManager;  
         }
 
         // GET: WorkPackages
@@ -102,20 +102,22 @@ namespace COMP4911Timesheets.Controllers
             workPackage.Status = WorkPackage.OPENED; 
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
-
+            int workPackageLength = 0;
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
                 
                 if (tempWorkPackage.WorkPackageCode.Length == PROJECT_CODE_LENGTH + 1) {
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(PROJECT_CODE_LENGTH, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
 
             string theWorkpackageCode = null;
-
+            
             for (int i = 0; i < 10; i++) {
                 if (workpackageCode[i] == -1 && i != 0) {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
@@ -162,12 +164,15 @@ namespace COMP4911Timesheets.Controllers
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            int workPackageLength = 0;
+
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
 
                 if (tempWorkPackage.ParentWorkPackageId == parentWorkPackage.WorkPackageId)
                 {
-                   // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
+                    // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(parentWorkPackage.WorkPackageCode.Length, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
@@ -178,7 +183,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 if (workpackageCode[i] == -1 && i != 0)
                 {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
