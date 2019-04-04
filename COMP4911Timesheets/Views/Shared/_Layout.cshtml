@@ -95,8 +95,8 @@
                                 <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
                             </li>
 
-                            <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")">
-
+                            <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport")"
+                                style="width: 190px;">
                                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
                                     Project <span class="caret"></span>
                                 </a>
