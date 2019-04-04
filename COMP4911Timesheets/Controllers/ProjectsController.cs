@@ -132,12 +132,18 @@ namespace COMP4911Timesheets
         {
             if (ModelState.IsValid)
             {
+                if (input.ProjectCode.ToString().Length != 4)
+                {
+                    ViewBag.CodeError = "Project code must be four digits long.";
+                    return View(input);
+                }
+
                 bool projectCodeExists = _context.Projects
                                                  .Where(p => p.ProjectCode == input.ProjectCode)
-                                                 .First() != null;
+                                                 .FirstOrDefault() != null;
                 if (projectCodeExists)
                 {
-                    ViewBag.CodeTaken = "Project with code " + input.ProjectCode + " aleady exists!";
+                    ViewBag.CodeError = "Project with code " + input.ProjectCode + " aleady exists!";
                     return View(input);
                 }
 
