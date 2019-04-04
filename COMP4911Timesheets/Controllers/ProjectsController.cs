@@ -249,10 +249,49 @@ namespace COMP4911Timesheets
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                         .FirstOrDefault();
 
-                    if (model.managersAssistant != assistant.EmployeeId)
+                    if (!String.IsNullOrEmpty(model.managersAssistant))
                     {
-                        assistant.EmployeeId = model.managersAssistant;
-                        _context.Update(assistant);
+                        if (assistant == null)
+                        {
+                            assistant = _context.ProjectEmployees
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            
+                            if(assistant == null)
+                            {
+                                assistant = new ProjectEmployee
+                                {
+                                    EmployeeId = model.managersAssistant,
+                                    ProjectId = id,
+                                    Role = ProjectEmployee.PROJECT_ASSISTANT,
+                                    Status = ProjectEmployee.CURRENTLY_WORKING
+                                };
+                                _context.Add(assistant);
+                            }
+                            else
+                            {
+                                assistant.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                                _context.Update(assistant);
+                            }
+                        }
+                        else if (model.managersAssistant != assistant.EmployeeId)
+                        {
+                            assistant.Role = ProjectEmployee.EMPLOYEE;
+                            var emp = _context.ProjectEmployees
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            emp.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                            _context.Update(assistant);
+                            _context.Update(emp);
+                        }
+                    }
+                    else
+                    {
+                        if(assistant != null)
+                        {
+                            assistant.Role = ProjectEmployee.EMPLOYEE;
+                            _context.Update(assistant);
+                        }
                     }
 
                     await _context.SaveChangesAsync();
