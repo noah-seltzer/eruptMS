@@ -152,13 +152,16 @@ namespace COMP4911Timesheets
                 };
                 _context.Add(manager);
 
+                Employee mgr = _context.Employees.Find(manager.EmployeeId);
+                await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+
                 WorkPackage mgmt = new WorkPackage
                 {
                     ProjectId = pId,
                     WorkPackageCode = "00000",
                     ParentWorkPackageId = null,
                     Name = "Management",
-                    Description = ""
+                    Description = "",
                 };
                 _context.Add(mgmt);
 
@@ -299,62 +302,77 @@ namespace COMP4911Timesheets
                         updateReq.AmountRequested = req.AmountRequested;
                     }
 
-                    var manager = _context.ProjectEmployees
+                    var managerPE = _context.ProjectEmployees
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
                         .FirstOrDefault();
 
-                    if (model.projectManager != manager.EmployeeId)
+                    if (model.projectManager != managerPE.EmployeeId)
                     {
-                        manager.EmployeeId = model.projectManager;
-                        _context.Update(manager);
+                        Employee oldmgr = _context.Employees.Find(managerPE.EmployeeId);
+                        await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.PM);
+
+                        Employee mgr = _context.Employees.Find(managerPE.EmployeeId);
+                        await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+
+                        managerPE.EmployeeId = model.projectManager;
+                        _context.Update(managerPE);
                     }
 
-                    var assistant = _context.ProjectEmployees
+                    var assistantPE = _context.ProjectEmployees
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                         .FirstOrDefault();
 
-                    if (!String.IsNullOrEmpty(model.managersAssistant))
+                    if (!String.IsNullOrEmpty(model.managersAssistant)) //if we are setting an assistant
                     {
-                        if (assistant == null)
+                        if (assistantPE == null)                        //if the project doesnt have an assitant already
                         {
-                            assistant = _context.ProjectEmployees
+                            assistantPE = _context.ProjectEmployees     //get the new assistants PE entry
                                 .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
                                 .FirstOrDefault();
                             
-                            if(assistant == null)
+                            if(assistantPE == null)                     //if the new PA wasnt already on the project (no PE entry)
                             {
-                                assistant = new ProjectEmployee
+                                assistantPE = new ProjectEmployee       //add them to the project as the PA 
                                 {
                                     EmployeeId = model.managersAssistant,
                                     ProjectId = id,
                                     Role = ProjectEmployee.PROJECT_ASSISTANT,
                                     Status = ProjectEmployee.CURRENTLY_WORKING
                                 };
-                                _context.Add(assistant);
+                                _context.Add(assistantPE);
                             }
-                            else
+                            else                                        //if they were on the project, just update PE to have PA
                             {
-                                assistant.Role = ProjectEmployee.PROJECT_ASSISTANT;
-                                _context.Update(assistant);
+                                assistantPE.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                                _context.Update(assistantPE);
                             }
+
                         }
-                        else if (model.managersAssistant != assistant.EmployeeId)
+                        else if (model.managersAssistant != assistantPE.EmployeeId) //if the project already had a PA and this one is NEW
                         {
-                            assistant.Role = ProjectEmployee.EMPLOYEE;
+                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
                             var emp = _context.ProjectEmployees
                                 .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
                                 .FirstOrDefault();
                             emp.Role = ProjectEmployee.PROJECT_ASSISTANT;
-                            _context.Update(assistant);
+                            _context.Update(assistantPE);
                             _context.Update(emp);
+                            Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
+                            await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
                         }
+
+                        Employee assistant = _context.Employees.Find(assistantPE.EmployeeId);
+                        await _usermgr.AddToRoleAsync(assistant, ApplicationRole.PA);
+
                     }
                     else
-                    {
-                        if(assistant != null)
+                    {                                   // if we are clearing the PA
+                        if (assistantPE != null)
                         {
-                            assistant.Role = ProjectEmployee.EMPLOYEE;
-                            _context.Update(assistant);
+                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
+                            _context.Update(assistantPE);
+                            Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
+                            await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
                         }
                     }
 
