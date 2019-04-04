@@ -132,6 +132,15 @@ namespace COMP4911Timesheets
         {
             if (ModelState.IsValid)
             {
+                bool projectCodeExists = _context.Projects
+                                                 .Where(p => p.ProjectCode == input.ProjectCode)
+                                                 .First() != null;
+                if (projectCodeExists)
+                {
+                    ViewBag.CodeTaken = "Project with code " + input.ProjectCode + " aleady exists!";
+                    return View(input);
+                }
+
                 Project project = new Project
                 {
                     ProjectCode = input.ProjectCode,
