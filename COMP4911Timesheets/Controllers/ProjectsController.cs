@@ -9,6 +9,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using COMP4911Timesheets.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets
 {
@@ -16,28 +17,83 @@ namespace COMP4911Timesheets
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _usermgr;
 
-        public ProjectsController(ApplicationDbContext context)
+        public ProjectsController(ApplicationDbContext context,
+                                  UserManager<Employee> userman)
         {
             _context = context;
+            _usermgr = userman;
         }
 
         // GET: Projects
         public async Task<IActionResult> Index(string searchString)
         {
-            var projects = new List<Project>();
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            ProjectListingModel model = new ProjectListingModel();
+
+            if (User.IsInRole("AD"))
+            {
+                model.managedProjects = await _context.Projects.ToListAsync();
+                model.assignedProjects = new List<Project>();
+                return View(model);
+            }
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                projects = await _context.Projects
-                    .Where(s => s.Name.Contains(searchString)
-                             || s.ProjectCode.Contains(searchString))
-                    .ToListAsync();
-            } else
-            {
-                projects = await _context.Projects.ToListAsync();
+                model.managedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid 
+                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
+                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                        .Where(p => p.Name.Contains(searchString)
+                                    || p.ProjectCode.Contains(searchString))
+                .ToListAsync();
             }
-                return View(projects);
+            else
+            {
+                model.managedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid
+                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
+                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                .ToListAsync();
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.EmployeeId == uid)
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                        .Where(p => p.Name.Contains(searchString)
+                                 || p.ProjectCode.Contains(searchString))
+                .ToListAsync();
+            }
+            else
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.EmployeeId == uid)
+                .Join(_context.Projects,
+                      p => p.ProjectId,
+                      pe => pe.ProjectId,
+                      (pe, p) => p)
+                .ToListAsync();
+            }
+
+            return View(model);
         }
 
         // GET: Projects/Details/5
@@ -99,6 +155,7 @@ namespace COMP4911Timesheets
                 WorkPackage mgmt = new WorkPackage
                 {
                     ProjectId = pId,
+                    WorkPackageCode = "00000",
                     ParentWorkPackageId = null,
                     Name = "Management",
                     Description = ""
@@ -248,10 +305,49 @@ namespace COMP4911Timesheets
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                         .FirstOrDefault();
 
-                    if (model.managersAssistant != assistant.EmployeeId)
+                    if (!String.IsNullOrEmpty(model.managersAssistant))
                     {
-                        assistant.EmployeeId = model.managersAssistant;
-                        _context.Update(assistant);
+                        if (assistant == null)
+                        {
+                            assistant = _context.ProjectEmployees
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            
+                            if(assistant == null)
+                            {
+                                assistant = new ProjectEmployee
+                                {
+                                    EmployeeId = model.managersAssistant,
+                                    ProjectId = id,
+                                    Role = ProjectEmployee.PROJECT_ASSISTANT,
+                                    Status = ProjectEmployee.CURRENTLY_WORKING
+                                };
+                                _context.Add(assistant);
+                            }
+                            else
+                            {
+                                assistant.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                                _context.Update(assistant);
+                            }
+                        }
+                        else if (model.managersAssistant != assistant.EmployeeId)
+                        {
+                            assistant.Role = ProjectEmployee.EMPLOYEE;
+                            var emp = _context.ProjectEmployees
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            emp.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                            _context.Update(assistant);
+                            _context.Update(emp);
+                        }
+                    }
+                    else
+                    {
+                        if(assistant != null)
+                        {
+                            assistant.Role = ProjectEmployee.EMPLOYEE;
+                            _context.Update(assistant);
+                        }
                     }
 
                     await _context.SaveChangesAsync();
