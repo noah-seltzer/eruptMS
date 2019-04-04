@@ -9,6 +9,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using COMP4911Timesheets.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets
 {
@@ -16,28 +17,83 @@ namespace COMP4911Timesheets
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _usermgr;
 
-        public ProjectsController(ApplicationDbContext context)
+        public ProjectsController(ApplicationDbContext context,
+                                  UserManager<Employee> userman)
         {
             _context = context;
+            _usermgr = userman;
         }
 
         // GET: Projects
         public async Task<IActionResult> Index(string searchString)
         {
-            var projects = new List<Project>();
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            ProjectListingModel model = new ProjectListingModel();
+
+            if (User.IsInRole("AD"))
+            {
+                model.managedProjects = await _context.Projects.ToListAsync();
+                model.assignedProjects = new List<Project>();
+                return View(model);
+            }
 
             if (!String.IsNullOrEmpty(searchString))
             {
-                projects = await _context.Projects
-                    .Where(s => s.Name.Contains(searchString)
-                             || s.ProjectCode.Contains(searchString))
-                    .ToListAsync();
-            } else
-            {
-                projects = await _context.Projects.ToListAsync();
+                model.managedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid 
+                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
+                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                        .Where(p => p.Name.Contains(searchString)
+                                    || p.ProjectCode.Contains(searchString))
+                .ToListAsync();
             }
-                return View(projects);
+            else
+            {
+                model.managedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid
+                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
+                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                .ToListAsync();
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.EmployeeId == uid)
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                        .Where(p => p.Name.Contains(searchString)
+                                 || p.ProjectCode.Contains(searchString))
+                .ToListAsync();
+            }
+            else
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.EmployeeId == uid)
+                .Join(_context.Projects,
+                      p => p.ProjectId,
+                      pe => pe.ProjectId,
+                      (pe, p) => p)
+                .ToListAsync();
+            }
+
+            return View(model);
         }
 
         // GET: Projects/Details/5

@@ -23,7 +23,7 @@ namespace COMP4911Timesheets.Controllers
         public WorkPackagesController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
-            _userManager = userManager;
+            _userManager = userManager;  
         }
 
         // GET: WorkPackages
@@ -102,20 +102,22 @@ namespace COMP4911Timesheets.Controllers
             workPackage.Status = WorkPackage.OPENED; 
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
-
+            int workPackageLength = 0;
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
                 
                 if (tempWorkPackage.WorkPackageCode.Length == PROJECT_CODE_LENGTH + 1) {
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(PROJECT_CODE_LENGTH, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
 
             string theWorkpackageCode = null;
-
+            
             for (int i = 0; i < 10; i++) {
                 if (workpackageCode[i] == -1 && i != 0) {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
@@ -162,12 +164,15 @@ namespace COMP4911Timesheets.Controllers
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            int workPackageLength = 0;
+
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
 
                 if (tempWorkPackage.ParentWorkPackageId == parentWorkPackage.WorkPackageId)
                 {
-                   // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
+                    // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(parentWorkPackage.WorkPackageCode.Length, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
@@ -178,7 +183,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 if (workpackageCode[i] == -1 && i != 0)
                 {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
@@ -322,14 +328,19 @@ namespace COMP4911Timesheets.Controllers
         
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
-        {
-            if (User.IsInRole("RE")) {
-
-            }            
-
+        {         
+            
             projectId = id;
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
-
+            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var projectEmployee =  _context.ProjectEmployees
+                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+            
+            if (User.IsInRole(role: "PM") && projectEmployee == null) {
+                TempData["info"] = "You are not the project's PM, Please choose the currect project";
+                return RedirectToAction("Index", "Projects");
+            }
+            
             ViewData["projectCode"] = project.ProjectCode;
             ViewData["projectName"] = project.Name;
 
@@ -338,9 +349,26 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            List<WorkPackage> workPackages = new List<WorkPackage>();
 
-            var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
+
+            if (User.IsInRole(role: "RE"))
+            {
+                var REWorkPackages = await _context.WorkPackageEmployees
+                           .Where(u => u.EmployeeId == users.Id && u.Role == WorkPackageEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
+                
+                foreach (WorkPackageEmployee temp in REWorkPackages) {
+                    WorkPackage tempwp = _context.WorkPackages
+                        .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
+                    workPackages.Add(tempwp);
+                }
+                return View(workPackages);
+            }
+            else { 
+                workPackages = await _context.WorkPackages
+                 .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
+            }
+
             //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
