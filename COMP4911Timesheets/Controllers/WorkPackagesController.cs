@@ -81,6 +81,37 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
+        // GET: WorkPackages/CreateInternalWorkPackage
+        public IActionResult CreateInternalWorkPackage()
+        {
+            TempData["projectId"] = projectId;
+            return View();
+        }
+
+
+        // POST: WorkPackages/CreateInternalWorkPackage
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateInternalWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        {
+           
+            workPackage.ProjectId = projectId;
+            workPackage.Status = WorkPackage.OPENED;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackage);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+            }
+            //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
+            //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
+            return View(workPackage);
+        }
+
+
         // GET: WorkPackages/CreateWorkPackage
         public IActionResult CreateWorkPackage()
         {
@@ -380,8 +411,12 @@ namespace COMP4911Timesheets.Controllers
                     .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
             }
 
-            //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
+
+            if (project.Status == Project.INTERNAL) {
+                return View("InternalProjectWorkPackges", workPackages);
+            }
+            //order the workpackages
 
             int maxWorkPackageCodeLength = 0;
 
