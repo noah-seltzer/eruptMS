@@ -109,10 +109,16 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.PMHour = PMHour / 8;
                 tempReport.PMCost = PMCost;
 
-                double tempVar = (int)(aHour / REHour * 10000);
-                tempReport.Variance = tempVar / 100;
+                if (REHour != 0)
+                {
+                    double tempVar = (int)(aHour / REHour * 10000);
+                    tempReport.Variance = tempVar / 100;
+                }
+                else {
+                    tempReport.Variance = 0;
+                }
 
-                if(workPackageReport != null) { 
+                if (workPackageReport != null) { 
                     tempReport.Comment = workPackageReport.Comments;
                 }
                 projectSumReports.Add(tempReport);
