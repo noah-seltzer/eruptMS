@@ -307,7 +307,7 @@ namespace COMP4911Timesheets.Controllers
                 _context.ProjectRequests.Update(projectRequest);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(ProjectIndex));
+            return RedirectToAction(nameof(ViewRequests), new { id = lineManagerManagement.ProjectRequest.ProjectId });
         }
 
         public async Task<IActionResult> ChangeTA(string id)
