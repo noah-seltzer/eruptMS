@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="projectManager" class="control-label"></label>
-                <select asp-for="projectManager" class="form-control searchDropDown" asp-items="ViewBag.EmployeesM" asp-disabled="@User.IsInRole(role:'PA')"></select>
+                <select asp-for="projectManager" class="form-control searchDropDown" asp-items="ViewBag.EmployeesM" asp-disabled='@User.IsInRole(role:"PA")'></select>
             </div>
             <div class="form-group">
                 <label asp-for="managersAssistant" class="control-label"></label>
