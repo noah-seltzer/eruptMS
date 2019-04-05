@@ -303,6 +303,8 @@ namespace COMP4911Timesheets
             ViewBag.EmployeesM = empItemsAll;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
+            ViewBag.WPs = new SelectList(_context.WorkPackages.Where(w => w.ProjectId == project.ProjectId).ToList()
+                , "Name", "Name", project.WorkPackages.First());
 
             return View(model);
         }
