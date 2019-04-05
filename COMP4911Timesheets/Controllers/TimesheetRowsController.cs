@@ -54,10 +54,11 @@ namespace COMP4911Timesheets.Controllers
             }
 
             //authorization
-            if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
+            if (timesheet.Employee.Id != _userManager.GetUserId(User))
             {
                 return NotFound();
             }
+
 
             //check any available wp
             if (wpl.Count == 0)
@@ -73,6 +74,36 @@ namespace COMP4911Timesheets.Controllers
                       Text = s.Project.Name + " --- " + s.Name
                   });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
+
+//            string uid = (await _userManager.GetUserAsync(User)).Id;
+
+//            var listInfo = _context.ProjectEmployees
+//                .Where(pe => pe.EmployeeId == uid 
+//                          && pe.Status == ProjectEmployee.CURRENTLY_WORKING)
+//                .Join(_context.WorkPackages,
+//                pe => pe.ProjectId,
+//                wp => wp.ProjectId,
+//                (pe, wp) => new { PE = pe, WP = wp })
+//                .Join(_context.Projects,
+//                i => i.PE.ProjectId,
+//                p => p.ProjectId,
+//                (i, p) => new { WorkPackgeInfo = i.WP, ProjectInfo = p })
+//                .Distinct()
+//                .ToList();
+
+//            var list = new List<SelectListItem>();
+//            foreach(var info in listInfo)
+//            {
+//                list.Add(new SelectListItem
+//                {
+//                    Value = info.WorkPackgeInfo.WorkPackageId.ToString(),
+//                    Text = info.ProjectInfo.Name + "---" + info.WorkPackgeInfo.Name
+//                });   
+//            }
+
+
+//            ViewData["WorkPackageId"] = new SelectList(list, "Value", "Text");
+//>>>>>>> origin/TEST
             return View(model);
         }
 

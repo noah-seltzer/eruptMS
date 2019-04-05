@@ -164,7 +164,9 @@ namespace COMP4911Timesheets.Controllers
 
                 if (sign == null)
                 {
-                    TempData["info"] = "No available signature";
+                    TempData["Link"] = "Signature";
+                    TempData["begin"] = "Fill in a ";
+                    TempData["end"] = " pass phrase in your profile first";
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
 
@@ -202,12 +204,63 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+
             var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == id);
             var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
             foreach (TimesheetRow tr in timesheetrows)
             {
                 var package = _context.WorkPackages.Find(tr.WorkPackageId);
                 var project = _context.Projects.Find(package.ProjectId);
+            }
+
+            string uid = (await _userManager.GetUserAsync(User)).Id;
+
+            var hr_work_pkgs = _context.ProjectEmployees
+                    .Where(p => p.EmployeeId == uid
+                        && p.ProjectId == 1)
+                    .Join(_context.WorkPackages,
+                    w => w.WorkPackageId,
+                    p => p.WorkPackageId,
+                    (p, w) => w)
+                    .Include(wp => wp.Project)
+                    .ToList();
+
+            if(hr_work_pkgs.Count < 4)
+            {//missing hr work packages
+                var newPEs = new List<ProjectEmployee>();
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 1
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 2
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 3
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 4
+                });
+                await _context.SaveChangesAsync();
             }
 
             if (timesheet == null)
