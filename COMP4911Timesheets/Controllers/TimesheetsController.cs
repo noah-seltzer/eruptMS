@@ -202,8 +202,56 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var projects = await _context.Projects.ToListAsync();
-            var workpackages = await _context.WorkPackages.ToListAsync();
+            string uid = (await _userManager.GetUserAsync(User)).Id;
+
+            var hr_work_pkgs = _context.ProjectEmployees
+                    .Where(p => p.EmployeeId == uid
+                        && p.ProjectId == 1)
+                    .Join(_context.WorkPackages,
+                    w => w.WorkPackageId,
+                    p => p.WorkPackageId,
+                    (p, w) => w)
+                    .Include(wp => wp.Project)
+                    .ToList();
+
+            if(hr_work_pkgs.Count < 4)
+            {//missing hr work packages
+                var newPEs = new List<ProjectEmployee>();
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 1
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 2
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 3
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 4
+                });
+                await _context.SaveChangesAsync();
+            }
+
             var timesheet = await _context.Timesheets
                 .Include(t => t.Employee)
                 .Include(t => t.TimesheetRows)

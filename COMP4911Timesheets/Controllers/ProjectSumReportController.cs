@@ -9,25 +9,44 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
 {
-    //[Authorize]
+    [Authorize(Roles = "PM,PA,AD")]
     public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<Employee> _userManager;
+        private readonly UserManager<Employee> _usermanager;
 
-        public ProjectSumReportController(ApplicationDbContext context, UserManager<Employee> userManager)
+        public ProjectSumReportController(ApplicationDbContext context, UserManager<Employee> mgr)
         {
             _context = context;
-            _userManager = userManager;
+            _usermanager = mgr;
         }
 
         // GET: ProjectSumReport
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+            var uid = (await _usermanager.GetUserAsync(User)).Id;
+            List<Project> managedProjects;
+
+            if (User.IsInRole("AD"))
+            {
+                managedProjects = await _context.Projects.ToListAsync();
+                return View(managedProjects);
+            }
+
+            managedProjects = await _context.ProjectEmployees
+            .Where(pe => pe.EmployeeId == uid
+                        && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+            .Join(_context.Projects,
+                    p => p.ProjectId,
+                    pe => pe.ProjectId,
+                    (pe, p) => p)
+            .ToListAsync();
+
+            return View(managedProjects);
         }
 
 
@@ -40,7 +59,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
-            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var users = _usermanager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var projectEmployee = _context.ProjectEmployees
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
@@ -63,6 +82,19 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
+
+            var manager = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                .FirstOrDefault();
+
+            var assistant = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                .FirstOrDefault();
+
+            //Check authorization to see report
+            var uid = (await _usermanager.GetUserAsync(User)).Id;
+            if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
+                return RedirectToAction(nameof(Index));
 
             ViewData["ProjectName"] = project.Name;
 
@@ -109,10 +141,16 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.PMHour = PMHour / 8;
                 tempReport.PMCost = PMCost;
 
-                double tempVar = (int)(aHour / REHour * 10000);
-                tempReport.Variance = tempVar / 100;
+                if (REHour != 0)
+                {
+                    double tempVar = (int)(aHour / REHour * 10000);
+                    tempReport.Variance = tempVar / 100;
+                }
+                else {
+                    tempReport.Variance = 0;
+                }
 
-                if(workPackageReport != null) { 
+                if (workPackageReport != null) { 
                     tempReport.Comment = workPackageReport.Comments;
                 }
                 projectSumReports.Add(tempReport);
