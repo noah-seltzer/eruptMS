@@ -343,6 +343,7 @@ namespace COMP4911Timesheets.Controllers
             var projectEmployee = _context.ProjectEmployees
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
+
             if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
             {
                 TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
