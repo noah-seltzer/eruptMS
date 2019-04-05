@@ -54,9 +54,11 @@ namespace COMP4911Timesheets.Controllers
             {
                 ProjectSumReport tempReport = new ProjectSumReport();
                 double aHour = 0;
-                double eHour = 0;
+                double PMHour = 0;
+                double REHour = 0;
                 double aCost = 0;
-                double eCost = 0;
+                double PMCost = 0;
+                double RECost = 0;
                 var budgets = await _context.Budgets.Where(u => u.WorkPackageId == tempWorkPackage.WorkPackageId).ToListAsync();
                 foreach (Budget tempBudget in budgets)
                 {
@@ -68,8 +70,10 @@ namespace COMP4911Timesheets.Controllers
                     }
                     else if (tempBudget.Type == Budget.ESTIMATE)
                     {
-                        eHour += tempBudget.Hour;
-                        eCost += payGrade.Cost * eHour;
+                        PMHour += tempBudget.Hour;
+                        PMCost += payGrade.Cost * PMHour;
+                        REHour += tempBudget.REHour;
+                        RECost += payGrade.Cost * REHour;
                     }
 
                 }
@@ -79,11 +83,15 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.WorkPackageCode = tempWorkPackage.WorkPackageCode;
                 tempReport.WorkPackageName = tempWorkPackage.Name;
                 tempReport.ACost = aCost;
-                tempReport.ECost = eCost;
-                tempReport.AHour = aHour;
-                tempReport.EHour = eHour;
-                double tempVar = (int)(aHour / eHour * 10000);
+                tempReport.RECost = RECost;
+                tempReport.AHour = aHour / 8;
+                tempReport.REHour = REHour / 8;
+                tempReport.PMHour = PMHour / 8;
+                tempReport.PMCost = PMCost;
+
+                double tempVar = (int)(aHour / REHour * 10000);
                 tempReport.Variance = tempVar / 100;
+
                 if(workPackageReport != null) { 
                     tempReport.Comment = workPackageReport.Comments;
                 }

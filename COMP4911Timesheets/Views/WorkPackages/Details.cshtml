@@ -3,7 +3,6 @@
 @{
     ViewData["PageTitle"] = "Details";
     ViewData["projectId"] = Model.ProjectId;
-
 }
 
 <h1>Details</h1>
@@ -11,7 +10,10 @@
 <div>
     <h4>WorkPackage</h4>
     <hr />
-    <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+    @if (Model.Status != WorkPackage.CLOSED) {
+        <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+    }
+
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.WorkPackageCode)

@@ -341,11 +341,11 @@ namespace COMP4911Timesheets.Controllers
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
             var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var projectEmployee = _context.ProjectEmployees
-                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+                .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
-            if (User.IsInRole(role: "PM") && projectEmployee == null)
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
             {
-                TempData["info"] = "You are not the project's PM, Please choose the currect project";
+                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
                 return RedirectToAction("Index", "Projects");
             }
 

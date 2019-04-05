@@ -95,6 +95,7 @@ namespace COMP4911Timesheets.Controllers
             var tempBudgets = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
 
             if (tempBudgets != null) {
+                ViewData["projectId"] = workpackage.ProjectId;
                 TempData["budgetInfo"] = "You can not add same pay grade for same workpackage";
                 return View();
             }
