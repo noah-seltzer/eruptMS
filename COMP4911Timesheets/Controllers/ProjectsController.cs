@@ -282,7 +282,7 @@ namespace COMP4911Timesheets
             if (assistant != null)
                 model.managersAssistant = assistant.EmployeeId;
 
-            List<Employee> employees = _context.Employees.Where(e => e.Id != model.projectManager).ToList();
+            List<Employee> employees = emps.Select(pe => pe.Employee).ToList();
 
             List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
             empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
@@ -292,7 +292,7 @@ namespace COMP4911Timesheets
             List<SelectListItem> empItemsAll = new List<SelectListItem>();
             empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
             var managerObj = _context.Employees.Find(model.projectManager);
-            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
+            // empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
             ViewBag.EmployeesM = empItemsAll;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
