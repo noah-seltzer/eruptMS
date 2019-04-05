@@ -4,7 +4,7 @@
     ViewData["PageTitle"] = "Index";
 }
 
-<h1>Closed Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
+<h1>Closed Internal Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
 <h4>@TempData["info"]</h4>
 
 <table class="table well bs-component">
@@ -72,4 +72,4 @@
     </tbody>
 </table>
 
-<a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
+<a asp-action="CreateInternalWorkPackage" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
