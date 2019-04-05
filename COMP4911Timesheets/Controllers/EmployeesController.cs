@@ -135,6 +135,32 @@ namespace COMP4911Timesheets.Controllers
                     await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.AD);
                 }
 
+                var internalProjects = await _context.Projects
+                    .Where(p => p.Status == Project.INTERNAL)
+                    .Include(p => p.WorkPackages)
+                    .ToListAsync();
+                foreach (Project internalProject in internalProjects)
+                {
+                    var workPackages = internalProject.WorkPackages;
+                    foreach (WorkPackage workPackage in workPackages)
+                    {
+                        if (workPackage.WorkPackageCode == "00000")
+                        {
+                            continue;
+                        }
+                        var projectEmployee = new ProjectEmployee
+                        {
+                            EmployeeId = employeeManagement.Employee.Id,
+                            ProjectId = internalProject.ProjectId,
+                            WorkPackageId = workPackage.WorkPackageId,
+                            Status = ProjectEmployee.CURRENTLY_WORKING,
+                            Role = ProjectEmployee.EMPLOYEE
+                        };
+                        _context.Add(projectEmployee);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 var supervisor = _context.Employees.Find(employeeManagement.Employee.SupervisorId);
                 await _userManager.AddToRoleAsync(supervisor, ApplicationRole.LM);
                 var approver = _context.Employees.Find(employeeManagement.Employee.ApproverId);
