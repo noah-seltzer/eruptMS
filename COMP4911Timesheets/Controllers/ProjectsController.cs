@@ -348,8 +348,10 @@ namespace COMP4911Timesheets
                 return NotFound();
             }
 
-            if (model.projectManager == model.managersAssistant)
-                model.managersAssistant = null;
+            if (model.projectManager == model.managersAssistant) {
+                ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
+                return await Edit(id);
+            }
 
             if (ModelState.IsValid)
             {
