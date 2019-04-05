@@ -42,7 +42,7 @@ namespace COMP4911Timesheets
             if (!String.IsNullOrEmpty(searchString))
             {
                 model.managedProjects = await _context.ProjectEmployees
-                .Where(pe => pe.EmployeeId == uid 
+                .Where(pe => pe.EmployeeId == uid
                           && (pe.Role == ProjectEmployee.PROJECT_MANAGER
                               || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
                 .Join(_context.Projects,
@@ -69,15 +69,15 @@ namespace COMP4911Timesheets
             if (!String.IsNullOrEmpty(searchString))
             {
                 model.assignedProjects = await _context.ProjectEmployees
-                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
-                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
-                          && pe.EmployeeId == uid)
-                .Join(_context.Projects,
+                    .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
+                        && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                        && pe.EmployeeId == uid)
+                    .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
                         (pe, p) => p)
-                        .Where(p => p.Name.Contains(searchString)
-                                 || p.ProjectCode.Contains(searchString))
+                    .Where(p => p.Name.Contains(searchString)
+                        || p.ProjectCode.Contains(searchString))
                 .ToListAsync();
             }
             else
@@ -90,6 +90,7 @@ namespace COMP4911Timesheets
                       p => p.ProjectId,
                       pe => pe.ProjectId,
                       (pe, p) => p)
+                .Distinct()
                 .ToListAsync();
             }
 
@@ -115,7 +116,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Create
-        [Authorize (Roles = "AD")]
+        [Authorize(Roles = "AD")]
         public IActionResult Create()
         {
             ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
@@ -200,7 +201,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Edit/5
-        [Authorize(Roles = "PM,PA")]
+        [Authorize(Roles = "PM,PA,AD")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -215,6 +216,11 @@ namespace COMP4911Timesheets
             var emps = _context.ProjectEmployees
                 .Include(e => e.Employee)
                 .Where(e => e.ProjectId == id)
+                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING)
+                .Where(e => e.Role == ProjectEmployee.PROJECT_MANAGER
+                    || e.Role == ProjectEmployee.PROJECT_ASSISTANT
+                    || e.Role == ProjectEmployee.NOT_ASSIGNED)
+                .Distinct()
                 .ToList();
 
             var manager = _context.ProjectEmployees
@@ -233,10 +239,10 @@ namespace COMP4911Timesheets
             //This is for when new pay grades have been added that the project does not yet have
             #region Not Enough Pay Grades
             var grds = _context.PayGrades.ToList();
-            if(reqs.Count < grds.Count)
+            if (reqs.Count < grds.Count)
             {
                 bool exists = false;
-                foreach(var grade in grds)
+                foreach (var grade in grds)
                 {
                     foreach (var req in reqs)
                     {
@@ -286,7 +292,7 @@ namespace COMP4911Timesheets
             List<SelectListItem> empItemsAll = new List<SelectListItem>();
             empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
             var managerObj = _context.Employees.Find(model.projectManager);
-            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id});
+            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
             ViewBag.EmployeesM = empItemsAll;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
@@ -314,7 +320,7 @@ namespace COMP4911Timesheets
                     _context.Update(model.project);
 
                     foreach (var req in model.requests)
-                    { 
+                    {
                         var updateReq = _context.ProjectRequests.FirstOrDefault(r =>
                             r.ProjectId == req.ProjectId && r.PayGradeId == req.PayGradeId);
 
@@ -348,8 +354,8 @@ namespace COMP4911Timesheets
                             assistantPE = _context.ProjectEmployees     //get the new assistants PE entry
                                 .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
                                 .FirstOrDefault();
-                            
-                            if(assistantPE == null)                     //if the new PA wasnt already on the project (no PE entry)
+
+                            if (assistantPE == null)                     //if the new PA wasnt already on the project (no PE entry)
                             {
                                 assistantPE = new ProjectEmployee       //add them to the project as the PA 
                                 {
