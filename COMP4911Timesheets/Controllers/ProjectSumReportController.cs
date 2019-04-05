@@ -8,23 +8,45 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "PM,PA,AD")]
     public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _usermgr;
 
-        public ProjectSumReportController(ApplicationDbContext context)
+        public ProjectSumReportController(ApplicationDbContext context, UserManager<Employee> mgr)
         {
             _context = context;
+            _usermgr = mgr;
         }
 
         // GET: ProjectSumReport
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            List<Project> managedProjects;
+
+            if (User.IsInRole("AD"))
+            {
+                managedProjects = await _context.Projects.ToListAsync();
+                return View(managedProjects);
+            }
+
+            managedProjects = await _context.ProjectEmployees
+            .Where(pe => pe.EmployeeId == uid
+                        && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+            .Join(_context.Projects,
+                    p => p.ProjectId,
+                    pe => pe.ProjectId,
+                    (pe, p) => p)
+            .ToListAsync();
+
+            return View(managedProjects);
         }
 
 
@@ -43,6 +65,19 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
+
+            var manager = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                .FirstOrDefault();
+
+            var assistant = _context.ProjectEmployees
+                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                .FirstOrDefault();
+
+            //Check authorization to see report
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
+                return RedirectToAction(nameof(Index));
 
             ViewData["ProjectName"] = project.Name;
 
