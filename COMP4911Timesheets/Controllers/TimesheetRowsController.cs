@@ -23,7 +23,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
 
-        // GET: TimesheetRows/Create
+        // GET: TimesheetRows/Create/timesheetId
         public async Task<IActionResult> Create(int id)
         {
 
@@ -31,8 +31,27 @@ namespace COMP4911Timesheets.Controllers
             {
                 TimesheetId = id
             };
-            var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.ProjectEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            var pes = _context.ProjectEmployees.Where(pe => pe.EmployeeId == timesheet.EmployeeId);
+            List<WorkPackage> wpl = new List<WorkPackage>();
+            foreach (ProjectEmployee pe in pes)
+            {
+                bool exist = false;
+                foreach (TimesheetRow tr in timesheetrows)
+                {
+                    if (tr.WorkPackageId == pe.WorkPackageId)
+                    {
+                        exist = true;
+                    }
+                }
+                if (!exist)
+                {
+                    var wp = await _context.WorkPackages.Include(wpp => wpp.Project).FirstOrDefaultAsync(wpp => wpp.WorkPackageId == pe.WorkPackageId);
+                    wpl.Add(wp);
+                }
+            }
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -40,12 +59,18 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.ProjectEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            //check any available wp
+            if (wpl.Count == 0)
+            {
+                TempData["info2"] = "No available work package";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var wpes = wpl
                   .Select(s => new SelectListItem
                   {
                       Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+                      Text = s.Project.Name + " --- " + s.Name
                   });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(model);
@@ -66,8 +91,27 @@ namespace COMP4911Timesheets.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
-            var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.ProjectEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var pes = _context.ProjectEmployees.Where(pe => pe.EmployeeId == timesheet.EmployeeId);
+            List<WorkPackage> wpl = new List<WorkPackage>();
+            foreach (ProjectEmployee pe in pes)
+            {
+                bool exist = false;
+                foreach (TimesheetRow tr in timesheetrows)
+                {
+                    if (tr.WorkPackageId == pe.WorkPackageId)
+                    {
+                        exist = true;
+                    }
+                }
+                if (!exist)
+                {
+                    var wp = await _context.WorkPackages.Include(wpp => wpp.Project).FirstOrDefaultAsync(wpp => wpp.WorkPackageId == pe.WorkPackageId);
+                    wpl.Add(wp);
+                }
+            }
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -75,14 +119,12 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-
-            var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.ProjectEmployees.OrderBy(pe => pe.WorkPackageId)
-                .Select(s => new SelectListItem
-                {
-                    Value = s.WorkPackageId.ToString(),
-                    Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                });
+            var wpes = wpl
+                  .Select(s => new SelectListItem
+                  {
+                      Value = s.WorkPackageId.ToString(),
+                      Text = s.Project.Name + " --- " + s.Name
+                  });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
@@ -103,12 +145,10 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var package = _context.WorkPackages.Find(timesheetRow.WorkPackageId);
+            var project = _context.Projects.Find(package.ProjectId);
 
-            var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.Employee.ProjectEmployees)
-                .FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -116,14 +156,6 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var packages = await _context.WorkPackages.ToListAsync();
-            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-            //      .Select(s => new SelectListItem
-            //      {
-            //          Value = s.WorkPackageId.ToString(),
-            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-            //      });
-            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 
@@ -162,11 +194,11 @@ namespace COMP4911Timesheets.Controllers
 
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
-            var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.Employee.ProjectEmployees)
-                .FirstOrDefaultAsync(t => t.TimesheetId == id);
+
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var package = _context.WorkPackages.Find(timesheetRow.WorkPackageId);
+            var project = _context.Projects.Find(package.ProjectId);
+
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -175,14 +207,6 @@ namespace COMP4911Timesheets.Controllers
             }
 
 
-            var packages = await _context.WorkPackages.ToListAsync();
-            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-            //      .Select(s => new SelectListItem
-            //      {
-            //          Value = s.WorkPackageId.ToString(),
-            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-            //      });
-            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 
