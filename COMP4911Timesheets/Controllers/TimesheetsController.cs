@@ -159,6 +159,13 @@ namespace COMP4911Timesheets.Controllers
 
                 //select valid
                 var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Signature.VALID);
+
+                if (sign==null)
+                {
+                    TempData["info"] = "No available signature";
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
