@@ -61,7 +61,36 @@ namespace COMP4911Timesheets
                         pe => pe.ProjectId,
                         (pe, p) => p)
                 .ToListAsync();
+            }  
+            /*
+             * THIS IS NOT DUPLICATE CODE, THEYRE TWO DIFFERENT LISTS!!!
+             */
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid
+                          && pe.WorkPackageId == null
+                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                        .Where(p => p.Name.Contains(searchString) || p.ProjectCode.Contains(searchString))
+                .ToListAsync();
             }
+            else
+            {
+                model.assignedProjects = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid
+                          && pe.WorkPackageId == null
+                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                .Join(_context.Projects,
+                        p => p.ProjectId,
+                        pe => pe.ProjectId,
+                        (pe, p) => p)
+                .ToListAsync();
+            }
+
             return View(model);
         }
 
@@ -183,17 +212,6 @@ namespace COMP4911Timesheets
 
             if (project == null) return NotFound();
 
-            //We get the ProjectEmployees separately so we can Include the Employee of each 
-            var mgmtAndUnasigned = _context.ProjectEmployees
-                .Include(e => e.Employee)
-                .Where(e => e.ProjectId == id 
-                    && e.Status == ProjectEmployee.CURRENTLY_WORKING
-                    &&(e.Role == ProjectEmployee.PROJECT_MANAGER
-                    || e.Role == ProjectEmployee.PROJECT_ASSISTANT
-                    || e.Role == ProjectEmployee.NOT_ASSIGNED))
-                .Distinct()
-                .ToList();
-
             var manager = _context.ProjectEmployees
                 .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
                 .FirstOrDefault();
@@ -201,6 +219,22 @@ namespace COMP4911Timesheets
             var assistant = _context.ProjectEmployees
                 .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                 .FirstOrDefault();
+
+            //Check authorization to edit
+            var uid = (await _usermgr.GetUserAsync(HttpContext.User)).Id;
+            if (manager.EmployeeId != uid && assistant.EmployeeId != uid && !User.IsInRole("AD"))
+                return RedirectToAction(nameof(Index));
+
+            //We get the ProjectEmployees separately so we can Include the Employee of each 
+            var mgmtAndUnasigned = _context.ProjectEmployees
+                .Include(e => e.Employee)
+                .Where(e => e.ProjectId == id
+                    && e.Status == ProjectEmployee.CURRENTLY_WORKING
+                    && (e.Role == ProjectEmployee.PROJECT_MANAGER
+                    || e.Role == ProjectEmployee.PROJECT_ASSISTANT
+                    || e.Role == ProjectEmployee.NOT_ASSIGNED))
+                .Distinct()
+                .ToList();
 
             var reqs = _context.ProjectRequests
                 .Include(r => r.PayGrade)
