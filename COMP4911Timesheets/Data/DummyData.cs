@@ -550,12 +550,6 @@ namespace COMP4911Timesheets.Data
                 },
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find(1).ProjectId,
-                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
-                    Status=ProjectEmployee.CURRENTLY_WORKING,
-                    Role=ProjectEmployee.PROJECT_ASSISTANT
-                },
-                new ProjectEmployee {
-                    ProjectId=context.Projects.Find(1).ProjectId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.PROJECT_ASSISTANT
@@ -972,17 +966,10 @@ namespace COMP4911Timesheets.Data
                 new ProjectEmployee {
                     ProjectId=context.Projects.Find(1).ProjectId,
                     WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
-                    EmployeeId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
-                    Status=ProjectEmployee.CURRENTLY_WORKING,
-                    Role=ProjectEmployee.EMPLOYEE
-                },
-                new ProjectEmployee {
-                    ProjectId=context.Projects.Find(1).ProjectId,
-                    WorkPackageId=context.WorkPackages.Find(5).WorkPackageId,
                     EmployeeId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     Status=ProjectEmployee.CURRENTLY_WORKING,
                     Role=ProjectEmployee.EMPLOYEE
-                },
+                }
             };
             return projectEmployees;
         }

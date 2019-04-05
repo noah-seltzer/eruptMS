@@ -42,7 +42,7 @@ namespace COMP4911Timesheets
             if (!String.IsNullOrEmpty(searchString))
             {
                 model.managedProjects = await _context.ProjectEmployees
-                .Where(pe => pe.EmployeeId == uid     
+                .Where(pe => pe.EmployeeId == uid
                           && pe.WorkPackageId == null) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
@@ -61,7 +61,7 @@ namespace COMP4911Timesheets
                         pe => pe.ProjectId,
                         (pe, p) => p)
                 .ToListAsync();
-            }  
+            }
             /*
              * THIS IS NOT DUPLICATE CODE, THEYRE TWO DIFFERENT LISTS!!!
              */
@@ -292,7 +292,7 @@ namespace COMP4911Timesheets
                 .ToList();
 
             List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
-            empItemsNoManager.AddRange(new SelectList(employees , "Id", "Email"));
+            empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
             empItemsNoManager.Insert(0, new SelectListItem { Text = "None", Value = "" });
             ViewBag.EmployeesA = empItemsNoManager;
 
@@ -371,7 +371,7 @@ namespace COMP4911Timesheets
                         else if (model.managersAssistant != assistantPE.EmployeeId) //if the project already had a PA and this one is NEW
                         {
                             _context.Remove(assistantPE);
-                            _context.Update(new ProjectEmployee      
+                            _context.Update(new ProjectEmployee
                             {
                                 EmployeeId = model.managersAssistant,
                                 ProjectId = id,
@@ -390,7 +390,7 @@ namespace COMP4911Timesheets
                     else
                     {                                   // if we are clearing the PA
                         if (assistantPE != null)
-                        { 
+                        {
                             Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
                             await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
                             _context.Remove(assistantPE);
