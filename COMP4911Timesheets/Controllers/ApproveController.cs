@@ -13,9 +13,6 @@ namespace COMP4911Timesheets.Controllers
     public class ApproveController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private static int INVALID = 0;
-        private static int NOT_SUBMITTED_NOT_APPROVED = 1;
-        private static int SUBMITTED_NOT_APPROVED = 2;
         private static int SUBMITTED_APPROVED = 3;
         private static int REJECTED_NEED_RESUBMISSION = 4;
 
@@ -53,13 +50,13 @@ namespace COMP4911Timesheets.Controllers
                 .Where(ts => ts.Status == Timesheet.SUBMITTED_NOT_APPROVED)
                 .Where(ts => ts.EmployeeId == id)
                 .ToListAsync();
-            
+
             employee.Timesheets = timesheets;
 
             return View(employee);
         }
-        
-        
+
+
         // POST: Approve/Delete/5
         public async Task<IActionResult> TimesheetView(int id)
         {
@@ -84,14 +81,14 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        
+
         public async Task<IActionResult> Approval(int id)
         {
             if (id == 0)
             {
                 return RedirectToAction(nameof(Index));
             }
-            var timesheet = await _context.Timesheets.Include(t=>t.Employee).FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(m => m.TimesheetId == id);
             timesheet.Status = SUBMITTED_APPROVED;
 
             //add flex hours to employee

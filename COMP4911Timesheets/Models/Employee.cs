@@ -99,7 +99,6 @@ namespace COMP4911Timesheets.Models
         public List<EmployeePay> EmployeePays { get; set; }
         public List<Signature> Signatures { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
-        public List<WorkPackageEmployee> WorkPackageEmployees { get; set; }
         public List<Timesheet> Timesheets { get; set; }
     }
 }
