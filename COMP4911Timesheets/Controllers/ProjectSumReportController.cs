@@ -8,17 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _userManager;
 
-        public ProjectSumReportController(ApplicationDbContext context)
+        public ProjectSumReportController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: ProjectSumReport
@@ -36,8 +39,25 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
+            var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
+            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var projectEmployee = _context.ProjectEmployees
+                .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+
+            if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "PA") && !User.IsInRole(role: "AD"))
+            {
+                TempData["info"] = "Please login with AD, PM OR PA";
+                return RedirectToAction("Index", "ProjectSumReport");
+            }
+
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            {
+                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+                return RedirectToAction("Index", "ProjectSumReport");
+            }
+
+
+
 
             if (project == null)
             {
