@@ -153,12 +153,19 @@ namespace COMP4911Timesheets.Controllers
 
 
                 //select the valid employee pay
-                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
+                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == EmployeePay.VALID);
                 timesheet.EmployeePay = emppay;
                 timesheet.EmployeePayId = emppay.EmployeePayId;
 
                 //select valid
-                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
+                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Signature.VALID);
+
+                if (sign==null)
+                {
+                    TempData["info"] = "No available signature";
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
@@ -243,15 +250,15 @@ namespace COMP4911Timesheets.Controllers
                         flexused += tr.SatHour + tr.SunHour + tr.MonHour + tr.TueHour + tr.WedHour + tr.ThuHour + tr.FriHour;
                     }
                     sat += tr.SatHour;
-                        sun += tr.SunHour;
-                        mon += tr.MonHour;
-                        tue += tr.TueHour;
-                        wed += tr.WedHour;
-                        thu += tr.ThuHour;
-                        fri += tr.FriHour;
+                    sun += tr.SunHour;
+                    mon += tr.MonHour;
+                    tue += tr.TueHour;
+                    wed += tr.WedHour;
+                    thu += tr.ThuHour;
+                    fri += tr.FriHour;
                 }
-                if (sat > 0) timesheet.FlexTime += sat;
-                if (sun > 0) timesheet.FlexTime += sun;
+                if (sat > 8) timesheet.FlexTime += sat - 8;
+                if (sun > 8) timesheet.FlexTime += sun - 8;
                 if (mon > 8) timesheet.FlexTime += mon - 8;
                 if (tue > 8) timesheet.FlexTime += tue - 8;
                 if (wed > 8) timesheet.FlexTime += wed - 8;
@@ -386,12 +393,32 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // POST: Timesheets/Submit/5(timesheetid)
-        public async Task<IActionResult> Submit(int id)
+
+        public async Task<IActionResult> Submit(int id, string pass)
         {
             var timesheet = await _context.Timesheets.FindAsync(id);
+            var oldSignature = _context.Signatures.Where(s => s.EmployeeId == _userManager.GetUserId(HttpContext.User)).Where(s => s.Status == Signature.VALID).FirstOrDefault();
+            var decryptedOldSignature = Utility.HashDecrypt(oldSignature.HashedSignature);
+            if (pass + oldSignature.CreatedTime != decryptedOldSignature)
+            {
+                TempData["info"] = "PassPhrase not correct";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             timesheet.Status = Timesheet.SUBMITTED_NOT_APPROVED;
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
+
+            //if (newpass != pass)
+            //{
+            //    TempData["info"] = "PassPhrase not correct";
+            //    return Redirect(Request.Headers["Referer"].ToString());
+            //}
+            //else
+            //{
+            //    timesheet.Status = Timesheet.SUBMITTED_NOT_APPROVED;
+            //    await _context.SaveChangesAsync();
+            //    return Redirect(Request.Headers["Referer"].ToString());
+            //}
         }
 
         // POST: Timesheets/Retract/5(timesheetid)
