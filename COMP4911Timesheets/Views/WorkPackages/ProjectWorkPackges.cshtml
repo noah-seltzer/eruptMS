@@ -14,15 +14,14 @@
         <a asp-action="ClosedWorkPackageInfo">Closed WorkPackage Info</a>
     </p>
 }
-<div class="row">
-
+<div class="row well bs-component">
     <div class="col-xs-1">
         @Html.DisplayNameFor(model => model.WorkPackageCode)
     </div>
     <div class="col-xs-1">
         @Html.DisplayNameFor(model => model.Name)
     </div>
-    <div class="col-xs-1">
+    <div class="col-2">
         @Html.DisplayNameFor(model => model.Description)
     </div>
     <div class="col-xs-1">
@@ -48,15 +47,15 @@
 
         @if (item.WorkPackageCode.Length == 5)
         {
-            <div class="collapsed row hoverBg" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+            <div class="collapsed row hoverBg wpRow" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
 
-                <div class="col-xs-1">
+                <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info" : "") ">
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </div>
                 <div class="col-xs-1">
                     @Html.DisplayFor(modelItem => item.Name)
                 </div>
-                <div class="col-xs-1">
+                <div class="col-2">
                     @Html.DisplayFor(modelItem => item.Description)
                 </div>
                 <div class="col-xs-1">
@@ -85,7 +84,6 @@
                     @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
                 </div>
             </div>
-
             <div>
 
                 <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
@@ -99,14 +97,16 @@
         }
         @if (item.WorkPackageCode.Length != 5)
         {
-            <div class="row collapse hoverBg w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
-                <div class="col-xs-1">
+            <div class="row collapse hoverBg wpRow w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)"
+                 data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
+
+                <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info" : "")">
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </div>
                 <div class="col-xs-1">
                     @Html.DisplayFor(modelItem => item.Name)
                 </div>
-                <div class="col-xs-1">
+                <div class="col-2">
                     @Html.DisplayFor(modelItem => item.Description)
                 </div>
                 <div class="col-xs-1">
@@ -143,18 +143,17 @@
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
                 <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
             </div>
-
         }
     }
 
 }
-
+<br />
 @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "RE")))
 {
     @foreach (var item in Model)
     {
 
-        <div class="row" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+        <div class="row wpRow" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
 
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.WorkPackageCode)
@@ -162,7 +161,7 @@
             <div class="col-xs-1">
                 @Html.DisplayFor(modelItem => item.Name)
             </div>
-            <div class="col-xs-1">
+            <div class="col-2">
                 @Html.DisplayFor(modelItem => item.Description)
             </div>
             <div class="col-xs-1">
@@ -195,7 +194,6 @@
         <div>
             <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
         </div>
-
 
     }
 
