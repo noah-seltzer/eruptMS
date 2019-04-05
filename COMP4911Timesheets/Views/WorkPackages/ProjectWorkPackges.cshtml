@@ -4,15 +4,15 @@
     ViewData["PageTitle"] = "Index";
 }
 
-<h1>WorkPackage - @ViewData["projectName"] @ViewData["projectCode"]</h1>
+<h1>Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
 <h4>@TempData["info"]</h4>
 
 @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
 {
     <p>
-        <a asp-action="CreateWorkPackage">Create New WorkPackage</a> &nbsp|&nbsp
+        <a asp-action="CreateWorkPackage">Create New Work Package</a> &nbsp|&nbsp
 
-        <a asp-action="ClosedWorkPackageInfo">Closed WorkPackage Info</a>
+        <a asp-action="ClosedWorkPackageInfo">Closed Work Package Info</a>
     </p>
 }
 <div class="row well bs-component">
@@ -48,7 +48,8 @@
 
         @if (item.WorkPackageCode.Length == 5)
         {
-            <div class="collapsed row hoverBg wpRow" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+            <div class="collapsed row wpRow @(item.ChildWorkPackages != null ? "hoverBg" : "") " 
+                 data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
 
                 <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info" : "") ">
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
@@ -87,9 +88,9 @@
             </div>
             <div>
 
-                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
-                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> &nbsp|&nbsp
-                <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
+                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Work Package </a> &nbsp|&nbsp
+                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a> &nbsp|&nbsp
+                <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp|&nbsp
                 <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
                 <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
@@ -98,7 +99,7 @@
         }
         @if (item.WorkPackageCode.Length != 5)
         {
-            <div class="row collapse hoverBg wpRow w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)"
+            <div class="row collapse wpRow @(item.ChildWorkPackages != null ? "hoverBg" : "") w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)"
                  data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
 
                 <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info" : "")">
@@ -137,9 +138,9 @@
             </div>
             <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
 
-                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Workpackage </a> &nbsp|&nbsp
-                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM budget Plan </a> &nbsp|&nbsp
-                <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE budget Plan </a> &nbsp|&nbsp
+                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Work Package </a> &nbsp|&nbsp
+                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a> &nbsp|&nbsp
+                <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp|&nbsp
                 <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
                 <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
