@@ -360,7 +360,7 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
 
-            if (User.IsInRole(role: "RE"))
+            if (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
                     .Where(u => u.EmployeeId == users.Id && u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
