@@ -338,7 +338,7 @@ namespace COMP4911Timesheets.Controllers
         {
 
             projectId = id;
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefault();
             var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var projectEmployee = _context.ProjectEmployees
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
