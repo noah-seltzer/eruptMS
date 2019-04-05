@@ -2,6 +2,7 @@
 
 @{
     ViewData["PageTitle"] = "Edit";
+    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0, earn = 0;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -10,16 +11,34 @@
     <hr />
     <dl class="row col-lg-6 well bs-component">
         <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekEnding)
+        </dt>
+        <dd class="col-sm-8">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FlexTime)
         </dt>
         <dd class="col-sm-8">
             @Html.DisplayFor(model => model.FlexTime)
         </dd>
         <dt class="col-sm-4">
+            Emp FlexTime
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.Statuses[Model.Status])
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
         </dd>
         <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Employee)
@@ -27,6 +46,13 @@
         <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Employee.LastName)
         </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+
     </dl>
 </div>
 
@@ -40,17 +66,17 @@
         <input type="hidden" asp-for="Status" />
         <input type="hidden" asp-for="FlexTime" />
 
-        <div class="form-group col-sm-4">
-            <label asp-for="WeekEnding" class="control-label"></label>
-            <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays"></select>
-            <span asp-validation-for="WeekEnding" class="text-danger"></span>
-        </div>
 
-        <p>
-            @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, null)
-        </p>
+        @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" || COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+        {
+            <p>
+                @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+            </p>
+        }
 
-        <table class="table well bs-component">
+
+
+        <table class="table well bs-component table-responsive-sm">
             <thead>
                 <tr>
                     <th>
@@ -81,10 +107,11 @@
                         Fri
                     </th>
                     <th>
+                        Total
+                    </th>
+                    <th>
                         Notes
                     </th>
-
-                    <th></th>
                     <th></th>
                 </tr>
             </thead>
@@ -102,62 +129,206 @@
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.SatHour)
+                                @{sat += item.SatHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.SunHour)
+                                @{ sun += item.SunHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.MonHour)
+                                @{ mon += item.MonHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.TueHour)
+                                @{ tue += item.TueHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.WedHour)
+                                @{ wed += item.WedHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.ThuHour)
+                                @{ thu += item.ThuHour;}
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.FriHour)
+                                @{fri += item.FriHour;}
+                            </td>
+                            <td>
+                                @(item.SatHour + item.SunHour + item.MonHour + item.TueHour + item.WedHour + item.ThuHour + item.FriHour)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
-                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
-                                }                            </td>
+                                    @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
+                                        new { @class = "btn btn-primary", @role = "button" })
+                                }
+                            </td>
                             <td>
-                                @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
-                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId }, new { @class = "btn btn-primary", @role = "button" })
+                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
+                                        new { @class = "btn btn-danger", @role = "button" })
                                 }
                             </td>
                         </tr>
                     }
                 }
+
+
+                <tr>
+                    <td></td>
+                    <td>
+                        Total
+                    </td>
+                    <td>
+                        @sat
+                    </td>
+                    <td>
+                        @sun
+                    </td>
+                    <td>
+                        @mon
+                    </td>
+                    <td>
+                        @tue
+                    </td>
+                    <td>
+                        @wed
+                    </td>
+                    <td>
+                        @thu
+                    </td>
+                    <td>
+                        @fri
+                    </td>
+                    <td>
+                        @(mon + tue + wed + thu + fri + sat + sun)
+                    </td>
+                    <td></td>
+
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td>
+                        Flex Hour Earned
+                    </td>
+                    <td>
+                        @if (sat > 8)
+                        {
+                            earn += sat - 8;
+                            @(sat - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (sun > 8)
+                        {
+                            earn += sun - 8;
+                            @(sun - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (mon > 8)
+                        {
+                            earn += (mon - 8);
+                            @(mon - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (tue > 8)
+                        {
+                            earn += (tue - 8);
+                            @(tue - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (wed > 8)
+                        {
+                            earn += (wed - 8);
+                            @(wed - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (thu > 8)
+                        {
+                            earn += (thu - 8);
+                            @(thu - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @if (fri > 8)
+                        {
+                            earn += (fri - 8);
+                            @(fri - 8)
+                        }
+                        else
+                        {
+                            @(0)
+                        }
+                    </td>
+                    <td>
+                        @earn
+                    </td>
+                    <td></td>
+
+                </tr>
+
             </tbody>
         </table>
 
-            @if (Model.Statuses[Model.Status] == "Not Submitted & Not Approved" || Model.Statuses[Model.Status] == "Rejected & Need Resubmission")
-            {
-                @Html.ActionLink("Submit", "Submit", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
-            }
-            @if (Model.Statuses[Model.Status] == "Submitted & Not Approved")
-            {
-                @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
-            }
-        </form>
-    </div>
+        @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" || COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+        {
+
+            @("Signature") <input type="text" name="pf" id="pf" value="" />
+            <a class="btn btn-primary" onclick="location.href='/Timesheets/Submit/'+@(Model.TimesheetId)+'?pass='+document.getElementById('pf').value;">Submit</a>
+            <p class="text-danger">@TempData["info"]</p>
+        }
+        @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved")
+        {
+            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger", @role = "button" })
+        }
+    </form>
 </div>
+
 <br />
-
-
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

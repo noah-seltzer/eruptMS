@@ -9,10 +9,12 @@ namespace COMP4911Timesheets.Data
 {
     public class ApplicationDbContext : IdentityDbContext<Employee, ApplicationRole, string>
     {
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -49,10 +51,6 @@ namespace COMP4911Timesheets.Data
                 .HasOne(pe => pe.Project)
                 .WithMany(p => p.ProjectEmployees)
                 .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<WorkPackageEmployee>()
-                .HasOne(wpe => wpe.Employee)
-                .WithMany(e => e.WorkPackageEmployees)
-                .OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Timesheet>()
                 .HasOne(t => t.Employee)
                 .WithMany(e => e.Timesheets)
@@ -64,6 +62,10 @@ namespace COMP4911Timesheets.Data
             modelBuilder.Entity<ProjectRequest>()
                 .HasOne(pr => pr.PayGrade)
                 .WithMany(pg => pg.ProjectRequests)
+                .OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ProjectEmployee>()
+                .HasOne(pe => pe.WorkPackage)
+                .WithMany(wp => wp.ProjectEmployees)
                 .OnDelete(DeleteBehavior.SetNull);
         }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
@@ -78,7 +80,7 @@ namespace COMP4911Timesheets.Data
         public DbSet<WorkPackage> WorkPackages { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<WorkPackageReport> WorkPackageReports { get; set; }
-        public DbSet<WorkPackageEmployee> WorkPackageEmployees { get; set; }
+        public DbSet<ResponsibleEngineerReport> ResponsibleEngineerReport { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
         public DbSet<TimesheetRow> TimesheetRows { get; set; }
     }

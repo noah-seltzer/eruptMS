@@ -52,6 +52,8 @@ namespace COMP4911Timesheets.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+            user.ApproverId = user.ApproverId == null ? "" : user.ApproverId;
+            user.SupervisorId = user.SupervisorId == null ? "" : user.SupervisorId;
             var approver = await _userManager.FindByIdAsync(user.ApproverId);
             var supervisor = await _userManager.FindByIdAsync(user.SupervisorId);
 

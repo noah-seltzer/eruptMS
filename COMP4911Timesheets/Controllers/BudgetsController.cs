@@ -53,7 +53,7 @@ namespace COMP4911Timesheets.Controllers
         {
             workpackageId = id;
 
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
             if (workPackages == null) {
                 var tempWorkpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
 
@@ -62,8 +62,10 @@ namespace COMP4911Timesheets.Controllers
                 if (tempWorkpackage.ParentWorkPackageId != null) {
                     parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
                 }
-                ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId");
-                ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
+                var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+
+                ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
+
                 return View();
             }
 
@@ -78,10 +80,10 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BudgetId,Hour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
+        public async Task<IActionResult> Create([Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
         {
             budget.WorkPackageId = workpackageId;
-
+            budget.Status = 1;
             var rmBudgets = await _context.Budgets.Where(a => a.WorkPackageId == parentWorkpackageId).ToListAsync();
             foreach (Budget rmBudget in rmBudgets) { 
                 _context.Budgets.Remove(rmBudget);
@@ -89,6 +91,14 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId); ;
+            //check if paygrade id already exist
+            var tempBudgets = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
+
+            if (tempBudgets != null) {
+                ViewData["projectId"] = workpackage.ProjectId;
+                TempData["budgetInfo"] = "You can not add same pay grade for same workpackage";
+                return View();
+            }
 
             if (ModelState.IsValid)
             {
@@ -96,9 +106,83 @@ namespace COMP4911Timesheets.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = workpackage.ProjectId });
             }
+
+            TempData["budgetInfo"] = "Add budget plan failed please try again";
             ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId", budget.PayGradeId);
             ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", budget.WorkPackageId);
-            return View(budget);
+            return View();
+        }
+
+
+        // GET: Budgets/CreateRE/5
+        public async Task<IActionResult> CreateRE(int? id)
+        {
+            workpackageId = id;
+
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
+            var tempBudget = await _context.Budgets.FirstOrDefaultAsync(b => b.WorkPackageId == id);
+
+
+            if (workPackages == null && tempBudget != null)
+            {
+                var tempWorkpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+
+                ViewData["projectId"] = tempWorkpackage.ProjectId;
+
+                if (tempWorkpackage.ParentWorkPackageId != null)
+                {
+                    parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
+                }
+
+                var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+
+                ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
+
+                return View();
+            }
+            if (tempBudget == null) {
+                TempData["info"] = "Please a project manager budget plan first";
+            }
+            else { 
+                TempData["info"] = "Budget plan only can be added into leaf workpackages";
+            }
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
+            return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
+
+        }
+
+        // POST: Budgets/CreateRE
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateRE([Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
+        {
+
+            //check if paygrade id already exist
+            var theBudget = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
+            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
+
+            if (theBudget == null)
+            {
+                TempData["budgetInfo"] = "Project Manager Budget should be created first";
+                var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+                ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
+                return View();
+            }
+
+            theBudget.REHour = budget.REHour;
+            if (ModelState.IsValid)
+            {
+                _context.Update(theBudget);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = workpackage.ProjectId });
+            }
+
+            TempData["budgetInfo"] = "Add budget plan failed please try again";
+            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId", budget.PayGradeId);
+            ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", budget.WorkPackageId);
+            return View();
         }
 
         // GET: Budgets/Edit/5

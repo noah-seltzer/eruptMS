@@ -1,20 +1,20 @@
 ﻿@model COMP4911Timesheets.Models.WorkPackage
 
 @{
-    ViewData["Title"] = "Create Work Package";
+    ViewData["PageTitle"] = "Create Work Package";
 }
 
-<h1>Create</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
-<h4>WorkPackage</h4>
+<h4>Work Package</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 col-lg-6 well bs-component">
         <form asp-action="CreateChildWorkPackage">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" required/>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -48,7 +48,7 @@
                 <span asp-validation-for="Activity" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create Child WorkPackage" class="btn btn-primary" />
+                <input type="submit" value="Create Child Work Package" class="btn btn-primary btn-raised" />
             </div>
         </form>
     </div>

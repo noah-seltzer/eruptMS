@@ -1,4 +1,7 @@
+# IMPORTANT (for developers)
+
 # IMPORTANT 
+
 
 change the default connection in COMP4911Timesheets/appsettings.json
 
@@ -8,54 +11,42 @@ FROM
 
 TO
 
-"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
+
+"DefaultConnection": "Server=(localdb)\\\\mssqllocaldb;Database=4911;Trusted_Connection=True;MultipleActiveResultSets=true"
+Edmund is using "Server=tcp:127.0.0.1,1433;Database=Erupt;UID=sa;PWD=Password123;"
+
 
 # comp4911timesheets
 
 [Code Conventions](/docs/conventions.md)
 [Database Setup](/docs/dbsetup.md)
 
-#### To deploy on docker with live compiling (windows tested only)
+# Environments
 
-1. navigate to project folder (outer folder)
-2. run ```docker-compose -f run.yml up --build```
-   - on mac ```docker-compose -f mac_run.yml up --build```
-3. point browser to localhost:5000 (NOT https://localhost:5000)
+http://deimos.edu.bcit.ca -> TEST
 
-#### To build and run a production docker container
-1.  navigate to project folder
-2.  run `docker-compose -f build.yml up --build`
-3.  point browser to localhost:5000
+http://deimos.edu.bcit.ca:5000 -> STAGE
 
-##### To run in background
+http://deimos.edu.bcit.ca:5001 -> UAT (not initilized, builds will fail for the time being)
 
-append `-d` to the end of the docker-compose command
+http://deimos.edu.bcit.ca:5001 -> JENKINS (noah's branch)
 
-`docker-compose -f run.yml up --build -d`
+#### Production Deployment Instructions
 
-##### visual studio
+Pre-install: 
+- Create an mssql database which can be accessed by the intended host
+- install docker on the users host
 
-To debug, set solution configuration (drop down on toolbar) to debug and . this will activate break points and other debug features (will not recompile live)
+Stage 1: configure environment
 
-To build and run a production container set solution configuration to realease. 
+1. Replace CONNECTION_STRING in /COMP4911Timesheets/appsettings.json with a valid connection string. 
+NOTE: as this is a docker depoyment, localhost, 127.0.0.1 and 0.0.0.0 will not function the way you may expect.
+2. (optional) In build.yml, Customize the container name from eruptTEST to something more appropriet to your configuration
+3. (optional) In build.yml Customize the outgoing port from 5000 to another port
 
-##### Important docker commands
-these commands are compatible with powershell and bash
+Stage 2: build container
 
-- stop all docker containers `docker stop $(docker ps -a -q)`
-- remove all stopped docker containers `docker rm $(docker ps -a -q)`
-- list docker images `docker images`
-- list docker containers which are running `docker ps`
-  - `docker ps -a` to list stopped containers as well
-- to open a bash console inside of the container `docker exec -i -t container_name /bin/bash` 
-- list docker images `docker images`
+1. from the outermost project folder, which contains build.yml, run the console command 
+`docker-compose -f build.yml up --build -d`
+(optional) remove -d if you'd like to keep the kestrel web server's output
 
-Troubleshooting:
-
-Restart docker for windows!
-
-##Branches
-Master > UAT > STAGE > TEST
-Master is protected, requiring 2 code reviewers	
-UAT & STAGE are unprotected, requiring 1 code reviewer	
-TEST is unprotected. please branch off from this.

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Collections;
 using System.Security.Claims;
 using COMP4911Timesheets.ViewModels;
+using System.Data.SqlClient;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -19,11 +20,14 @@ namespace COMP4911Timesheets.Controllers
     public class AdminsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Employee> _userManager;
 
         public AdminsController(
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            UserManager<Employee> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET
@@ -38,9 +42,18 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Restore()
+        public async Task<IActionResult> Restore()
         {
             Utility.RestoreDatabase();
+            try
+            {
+                await _userManager.GetUserAsync(User);
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.ToString());
+                return RedirectToAction(nameof(Index));
+            }
             return RedirectToAction(nameof(Index));
         }
     }

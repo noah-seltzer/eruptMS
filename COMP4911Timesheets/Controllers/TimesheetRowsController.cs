@@ -32,7 +32,7 @@ namespace COMP4911Timesheets.Controllers
                 TimesheetId = id
             };
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee.ProjectEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -41,7 +41,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            var wpes = timesheet.Employee.ProjectEmployees.OrderBy(wpee => wpee.WorkPackageId)
                   .Select(s => new SelectListItem
                   {
                       Value = s.WorkPackageId.ToString(),
@@ -67,7 +67,7 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee.ProjectEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -77,12 +77,12 @@ namespace COMP4911Timesheets.Controllers
 
 
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-                  .Select(s => new SelectListItem
-                  {
-                      Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                  });
+            var wpes = timesheet.Employee.ProjectEmployees.OrderBy(pe => pe.WorkPackageId)
+                .Select(s => new SelectListItem
+                {
+                    Value = s.WorkPackageId.ToString(),
+                    Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+                });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
@@ -105,7 +105,10 @@ namespace COMP4911Timesheets.Controllers
 
 
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee).Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
+            var timesheet = await _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.Employee.ProjectEmployees)
+                .FirstOrDefaultAsync(t => t.TimesheetId == timesheetRow.TimesheetId);
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -113,15 +116,14 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-                  .Select(s => new SelectListItem
-                  {
-                      Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                  });
-            ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
+            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            //      .Select(s => new SelectListItem
+            //      {
+            //          Value = s.WorkPackageId.ToString(),
+            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+            //      });
+            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 
@@ -161,7 +163,10 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction("Edit", "Timesheets", new { id = timesheetRow.TimesheetId });
             }
             var projects = await _context.Projects.ToListAsync();
-            var timesheet = await _context.Timesheets.Include(t => t.Employee).Include(t => t.Employee.WorkPackageEmployees).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheet = await _context.Timesheets
+                .Include(t => t.Employee)
+                .Include(t => t.Employee.ProjectEmployees)
+                .FirstOrDefaultAsync(t => t.TimesheetId == id);
 
             //authorization
             if (timesheet.Employee.Id != _userManager.GetUserId(HttpContext.User))
@@ -171,13 +176,13 @@ namespace COMP4911Timesheets.Controllers
 
 
             var packages = await _context.WorkPackages.ToListAsync();
-            var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
-                  .Select(s => new SelectListItem
-                  {
-                      Value = s.WorkPackageId.ToString(),
-                      Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
-                  });
-            ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
+            //var wpes = timesheet.Employee.WorkPackageEmployees.OrderBy(wpee => wpee.WorkPackageId)
+            //      .Select(s => new SelectListItem
+            //      {
+            //          Value = s.WorkPackageId.ToString(),
+            //          Text = s.WorkPackage.Project.Name + " --- " + s.WorkPackage.Name
+            //      });
+            //ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
             return View(timesheetRow);
         }
 

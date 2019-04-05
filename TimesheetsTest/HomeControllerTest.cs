@@ -6,11 +6,6 @@ using Xunit;
 namespace TimesheetsTest
 {
     public class HomeControllerTest
-    {
-        [Fact]
-        public void Test1()
-        {
-
-        }
+    {     
     }
 }

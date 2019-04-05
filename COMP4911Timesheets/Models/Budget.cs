@@ -12,13 +12,13 @@ namespace COMP4911Timesheets.Models
         public static readonly int ESTIMATE = 10;
         public static readonly int ACTUAL = 20;
 
-        public readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
             {0, "Invalid"},
             {1, "valid"}
         };
 
-        public readonly Dictionary<int, string> Types = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Types = new Dictionary<int, string>
         {
             {10, "Estimates"},
             {20, "Actuals"}
@@ -30,6 +30,8 @@ namespace COMP4911Timesheets.Models
         public int BudgetId { get; set; }
 
         public double Hour { get; set; }
+
+        public double REHour { get; set; }
 
         public int Status { get; set; }
 

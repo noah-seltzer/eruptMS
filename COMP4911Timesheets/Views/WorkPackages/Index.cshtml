@@ -1,15 +1,23 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["PageTitle"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+@using (Html.BeginForm())
+{
+    <p>
+        Find by WP or project: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+        <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+    </p>
+}
+<table class="table well bs-component">
     <thead>
         <tr>
             <th>
@@ -46,44 +54,45 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.WorkPackageCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Contractor)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Purpose)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Input)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Output)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Activity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Project.ProjectCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contractor)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Purpose)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Input)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Output)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Activity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
