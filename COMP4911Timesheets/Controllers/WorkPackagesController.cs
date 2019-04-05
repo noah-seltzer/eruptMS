@@ -9,6 +9,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -17,6 +18,7 @@ namespace COMP4911Timesheets.Controllers
         private readonly ApplicationDbContext _context;
         private static int? projectId;
         private static int? parentWorkPKId;
+        private static int? workPackageId;
         public static int PROJECT_CODE_LENGTH = 4;
         private readonly UserManager<Employee> _userManager;
 
@@ -502,6 +504,115 @@ namespace COMP4911Timesheets.Controllers
         private bool WorkPackageExists(int id)
         {
             return _context.WorkPackages.Any(e => e.WorkPackageId == id);
+        }
+
+
+        // GET: WorkPackages/CreateChildWorkPackage/6
+        public async Task<IActionResult> AssignEmployee(int? id)
+        {
+            workPackageId = id;
+            ViewData["projectId"] = WorkPackagesController.projectId;
+            var workPackages = _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefault();
+            if (workPackages != null)
+            {
+                TempData["info"] = "Workpackage report only can be created on leaf workpackages";
+                var wpTemp = _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefault();
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
+            }
+
+            var projectEmployees = new List<ProjectEmployee>();
+
+
+            projectEmployees = await _context.ProjectEmployees
+                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING && e.ProjectId == WorkPackagesController.projectId)
+                .Include(e => e.Employee)
+                .OrderBy(s => s.EmployeeId).ToListAsync();
+
+
+            var employeeManagements = new List<EmployeeManagement>();
+            foreach (var projectEmployee in projectEmployees)
+            {
+                employeeManagements.Add
+                (
+                    new EmployeeManagement
+                    {
+                        Role = projectEmployee.Role,
+                        Employee = projectEmployee.Employee,
+                        EmployeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == projectEmployee.Employee.Id).Where(ep => ep.Status == EmployeePay.VALID).Include(ep => ep.PayGrade).FirstOrDefaultAsync()
+                    }
+                );
+            }
+
+            return View(employeeManagements);
+        }
+
+        // GET: WorkPackages/AssignRE/6
+        public async Task<IActionResult> AssignRE(string EmployeeId, string name) {
+            ProjectEmployee projectEmployee = new ProjectEmployee();
+            projectEmployee.Status = ProjectEmployee.CURRENTLY_WORKING;
+            projectEmployee.ProjectId = WorkPackagesController.projectId;
+            projectEmployee.Role = ProjectEmployee.RESPONSIBLE_ENGINEER;
+            projectEmployee.WorkPackageId = WorkPackagesController.workPackageId;
+            projectEmployee.EmployeeId = EmployeeId;
+            ViewData["projectId"] = WorkPackagesController.projectId;
+
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId 
+                            && ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER 
+                            && ep.WorkPackageId == WorkPackagesController.workPackageId)
+                           .FirstOrDefault();
+
+            if (tempPE != null)
+            {
+                TempData["Info"] = "The employee already is RESPONSIBLE ENGINEER";
+                return RedirectToAction("AssignEmployee", "WorkPackages", new { id = WorkPackagesController.workPackageId });
+            }
+
+            tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
+                            && ep.WorkPackageId == WorkPackagesController.workPackageId)
+                           .FirstOrDefault();
+
+            TempData["Info"] = "Add employee " + name + " as RESPONSIBLE ENGINEER";
+
+            if (tempPE != null)
+            {
+                _context.ProjectEmployees.Remove(tempPE);
+                await _context.SaveChangesAsync();
+                TempData["Info"] = "Change RESPONSIBLE ENGINEER to " + name;
+            }
+
+            _context.Add(projectEmployee);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = WorkPackagesController.workPackageId });
+        }
+
+        // GET: WorkPackages/AssignRE/6
+        public async Task<IActionResult> AssignEm(string EmployeeId, string name)
+        {
+            ProjectEmployee projectEmployee = new ProjectEmployee();
+            projectEmployee.Status = ProjectEmployee.CURRENTLY_WORKING;
+            projectEmployee.ProjectId = WorkPackagesController.projectId;
+            projectEmployee.Role = ProjectEmployee.EMPLOYEE;
+            projectEmployee.WorkPackageId = WorkPackagesController.workPackageId;
+            projectEmployee.EmployeeId = EmployeeId;
+            ViewData["projectId"] = WorkPackagesController.projectId;
+
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                            && ep.Role == ProjectEmployee.EMPLOYEE
+                            && ep.WorkPackageId == WorkPackagesController.workPackageId)
+                           .FirstOrDefault();
+
+            if (tempPE != null)
+            {
+                TempData["Info"] = "The employee " + name + " already is EMPLOYEE";
+                return RedirectToAction("AssignEmployee", "WorkPackages", new { id = WorkPackagesController.workPackageId });
+            }
+
+            _context.Add(projectEmployee);
+            await _context.SaveChangesAsync();
+            TempData["Info"] = "Add employee " + name +" as EMPLOYEE";
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = WorkPackagesController.workPackageId });
         }
     }
 }
