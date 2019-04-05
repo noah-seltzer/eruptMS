@@ -221,8 +221,8 @@ namespace COMP4911Timesheets
                 .FirstOrDefault();
 
             //Check authorization to edit
-            var uid = (await _usermgr.GetUserAsync(HttpContext.User)).Id;
-            if (manager.EmployeeId != uid && assistant.EmployeeId != uid && !User.IsInRole("AD"))
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
                 return RedirectToAction(nameof(Index));
 
             //We get the ProjectEmployees separately so we can Include the Employee of each 
