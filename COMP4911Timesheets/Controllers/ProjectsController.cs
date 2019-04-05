@@ -103,6 +103,7 @@ namespace COMP4911Timesheets
             {
                 if (input.ProjectCode.ToString().Length != 4)
                 {
+                    ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
                     ViewBag.CodeError = "Project code must be four digits long.";
                     return View(input);
                 }
@@ -112,6 +113,7 @@ namespace COMP4911Timesheets
                                                  .FirstOrDefault() != null;
                 if (projectCodeExists)
                 {
+                    ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
                     ViewBag.CodeError = "Project with code " + input.ProjectCode + " aleady exists!";
                     return View(input);
                 }
