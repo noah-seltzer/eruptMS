@@ -51,6 +51,7 @@ namespace COMP4911Timesheets.Controllers
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e.ToString());
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(Index));
