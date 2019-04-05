@@ -162,7 +162,9 @@ namespace COMP4911Timesheets.Controllers
 
                 if (sign==null)
                 {
-                    TempData["info"] = "No available signature";
+                    TempData["Link"] = "Signature";
+                    TempData["begin"] = "Fill in a ";
+                    TempData["end"] = " pass phrase in your profile first";
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
 

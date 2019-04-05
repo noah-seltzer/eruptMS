@@ -17,18 +17,18 @@ namespace COMP4911Timesheets.Controllers
     public class ProjectSumReportController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<Employee> _usermgr;
+        private readonly UserManager<Employee> _usermanager;
 
         public ProjectSumReportController(ApplicationDbContext context, UserManager<Employee> mgr)
         {
             _context = context;
-            _usermgr = mgr;
+            _usermanager = mgr;
         }
 
         // GET: ProjectSumReport
         public async Task<IActionResult> Index()
         {
-            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            var uid = (await _usermanager.GetUserAsync(User)).Id;
             List<Project> managedProjects;
 
             if (User.IsInRole("AD"))
@@ -58,8 +58,25 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.ProjectId == id);
+            var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
+            var users = _usermanager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var projectEmployee = _context.ProjectEmployees
+                .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+
+            if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "PA") && !User.IsInRole(role: "AD"))
+            {
+                TempData["info"] = "Please login with AD, PM OR PA";
+                return RedirectToAction("Index", "ProjectSumReport");
+            }
+
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            {
+                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+                return RedirectToAction("Index", "ProjectSumReport");
+            }
+
+
+
 
             if (project == null)
             {
@@ -75,7 +92,7 @@ namespace COMP4911Timesheets.Controllers
                 .FirstOrDefault();
 
             //Check authorization to see report
-            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            var uid = (await _usermanager.GetUserAsync(User)).Id;
             if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
                 return RedirectToAction(nameof(Index));
 

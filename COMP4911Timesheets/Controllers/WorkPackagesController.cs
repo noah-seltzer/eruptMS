@@ -338,10 +338,11 @@ namespace COMP4911Timesheets.Controllers
         {
 
             projectId = id;
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefault();
             var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var projectEmployee = _context.ProjectEmployees
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+
 
             if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
             {
@@ -360,7 +361,7 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
 
-            if (User.IsInRole(role: "RE"))
+            if (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
                     .Where(u => u.EmployeeId == users.Id && u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER).ToListAsync();

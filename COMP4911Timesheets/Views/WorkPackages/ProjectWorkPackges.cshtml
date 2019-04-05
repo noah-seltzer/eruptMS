@@ -152,7 +152,7 @@
 
 <br />
 
-@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "RE")))
+@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM")))
 {
     @foreach (var item in Model)
     {

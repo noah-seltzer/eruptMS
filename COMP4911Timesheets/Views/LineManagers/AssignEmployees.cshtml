@@ -22,6 +22,7 @@
                 <input type="hidden" asp-for="ProjectRequest.PayGradeId" />
                 <input type="hidden" asp-for="ProjectRequest.PayGrade.PayLevel" />
                 <input type="hidden" asp-for="ProjectRequest.AmountRequested" />
+                <input type="hidden" asp-for="ProjectRequest.ProjectId" />
                 <input type="submit" value="Assign" class="btn btn-primary btn-raised" />
             </div>
         </form>
@@ -29,7 +30,7 @@
 </div>
 
 <div>
-    <a asp-action="ProjectIndex">Back to List</a>
+    <a asp-action="ViewRequests" asp-route-id="@Model.ProjectRequest.ProjectId">Back to List</a>
 </div>
 
 @section Scripts {
