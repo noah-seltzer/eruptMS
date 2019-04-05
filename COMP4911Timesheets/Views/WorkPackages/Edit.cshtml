@@ -80,8 +80,10 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-controller="Projects" asp-route-id="@Model.ProjectId">Back to Project</a><br />
+    <a asp-action="Index">Back to all Work Packages</a>
 </div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

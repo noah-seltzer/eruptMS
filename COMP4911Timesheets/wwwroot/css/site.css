@@ -126,9 +126,13 @@ body {
     padding-bottom: 8px;
 }
 
+.wpRow {
+    padding: 5px 19px;
+}
+    
+
 /* Splash page styles
 -------------------------------------------------- */
-
 .small-box {
     border-radius: 2px;
     position: relative;
