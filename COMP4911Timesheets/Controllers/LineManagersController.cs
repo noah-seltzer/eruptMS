@@ -30,28 +30,52 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             List<Employee> employees;
             if (User.IsInRole(role: "AD"))
             {
-                employees = await _context.Employees
-                    .Include(e => e.Approver)
-                    .Include(e => e.Supervisor)
-                    .Include(e => e.ProjectEmployees)
-                    .OrderBy(s => s.EmployeeId)
-                    .ToListAsync();
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    employees = await _context.Employees
+                        .Where(s => s.LastName.Contains(searchString)
+                                           || s.FirstName.Contains(searchString))
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .OrderBy(s => s.EmployeeId).ToListAsync();
+                }
+                else
+                {
+                    employees = await _context.Employees
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId)
+                        .ToListAsync();
+                }
             }
             else
             {
-                employees = await _context.Employees
-                    .Include(e => e.Approver)
-                    .Include(e => e.Supervisor)
-                    .Include(e => e.ProjectEmployees)
-                    .OrderBy(s => s.EmployeeId)
-                    .Where(e => e.SupervisorId == currentUser.Id)
-                    .ToListAsync();
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    employees = await _context.Employees
+                        .Where(s => s.LastName.Contains(searchString)
+                                           || s.FirstName.Contains(searchString))
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .OrderBy(s => s.EmployeeId).ToListAsync();
+                }
+                else
+                {
+                    employees = await _context.Employees
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId)
+                        .Where(e => e.SupervisorId == currentUser.Id)
+                        .ToListAsync();
+                }
             }
 
             var lineManagerManagements = new List<LineManagerManagement>();
