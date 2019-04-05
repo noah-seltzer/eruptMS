@@ -34,14 +34,17 @@ namespace COMP4911Timesheets.Controllers
         {
             var currentUser = await _userManager.GetUserAsync(User);
             List<Employee> employees;
-            if (User.IsInRole(role: "AD")) {
+            if (User.IsInRole(role: "AD"))
+            {
                 employees = await _context.Employees
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .Include(e => e.ProjectEmployees)
                     .OrderBy(s => s.EmployeeId)
                     .ToListAsync();
-            } else {
+            }
+            else
+            {
                 employees = await _context.Employees
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
@@ -295,7 +298,7 @@ namespace COMP4911Timesheets.Controllers
                         EmployeeId = id,
                         ProjectId = projectRequest.ProjectId,
                         Status = ProjectEmployee.CURRENTLY_WORKING,
-                        Role = ProjectEmployee.EMPLOYEE
+                        Role = ProjectEmployee.NOT_ASSIGNED
                     });
                 }
                 await _context.ProjectEmployees.AddRangeAsync(projectEmployees);
