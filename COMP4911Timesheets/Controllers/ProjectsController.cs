@@ -287,20 +287,46 @@ namespace COMP4911Timesheets
             if (assistant != null)
                 model.managersAssistant = assistant.EmployeeId;
 
-            List<Employee> employees = _context.Employees
-                .Where(e => e.Id != manager.EmployeeId)
+            List<Employee> mgrList = new List<Employee>();
+            List<Employee> assList = new List<Employee>();
+
+            ViewBag.Assistant = false;
+
+            if (User.IsInRole("AD"))    //Admin
+            {
+                mgrList = _context.Employees
                 .ToList();
 
-            List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
-            empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
-            empItemsNoManager.Insert(0, new SelectListItem { Text = "None", Value = "" });
-            ViewBag.EmployeesA = empItemsNoManager;
+                assList = mgrList;
+            }
+            else if (manager.EmployeeId == uid) // Project Manager
+            {
+                var list = _context.ProjectEmployees
+                    .Where(pe => pe.ProjectId == id)
+                    .Include(pe => pe.Employee)
+                    .ToList();
 
-            List<SelectListItem> empItemsAll = new List<SelectListItem>();
-            empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
-            var managerObj = _context.Employees.Find(model.projectManager);
-            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
-            ViewBag.EmployeesM = empItemsAll;
+                foreach (var pe in list)
+                    mgrList.Add(pe.Employee);
+
+                assList = mgrList;
+            }
+            else // Assistant
+            {
+                mgrList.Add(_context.Employees.Find(manager.EmployeeId));
+                assList.Add(_context.Employees.Find(assistant.EmployeeId));
+                ViewBag.Assistant = true;
+            }
+
+            List<SelectListItem> mgrItems = new List<SelectListItem>();
+            mgrItems.AddRange(new SelectList(mgrList, "Id", "Email"));
+
+            List<SelectListItem> assItems = new List<SelectListItem>();
+            assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
+            assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+
+            ViewBag.EmployeesM = mgrItems;
+            ViewBag.EmployeesA = assItems;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
             ViewBag.WPs = new SelectList(_context.WorkPackages.Where(w => w.ProjectId == project.ProjectId).ToList()
@@ -321,6 +347,9 @@ namespace COMP4911Timesheets
             {
                 return NotFound();
             }
+
+            if (model.projectManager == model.managersAssistant)
+                model.managersAssistant = null;
 
             if (ModelState.IsValid)
             {
