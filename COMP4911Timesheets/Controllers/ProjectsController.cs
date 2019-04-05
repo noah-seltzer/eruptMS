@@ -42,58 +42,26 @@ namespace COMP4911Timesheets
             if (!String.IsNullOrEmpty(searchString))
             {
                 model.managedProjects = await _context.ProjectEmployees
-                .Where(pe => pe.EmployeeId == uid
-                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
-                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                .Where(pe => pe.EmployeeId == uid     
+                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
                         (pe, p) => p)
-                        .Where(p => p.Name.Contains(searchString)
-                                    || p.ProjectCode.Contains(searchString))
+                        .Where(p => p.Name.Contains(searchString) || p.ProjectCode.Contains(searchString))
                 .ToListAsync();
             }
             else
             {
                 model.managedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
-                          && (pe.Role == ProjectEmployee.PROJECT_MANAGER
-                              || pe.Role == ProjectEmployee.PROJECT_ASSISTANT))
+                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
                         (pe, p) => p)
                 .ToListAsync();
             }
-
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                model.assignedProjects = await _context.ProjectEmployees
-                    .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
-                        && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
-                        && pe.EmployeeId == uid)
-                    .Join(_context.Projects,
-                        p => p.ProjectId,
-                        pe => pe.ProjectId,
-                        (pe, p) => p)
-                    .Where(p => p.Name.Contains(searchString)
-                        || p.ProjectCode.Contains(searchString))
-                .ToListAsync();
-            }
-            else
-            {
-                model.assignedProjects = await _context.ProjectEmployees
-                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER
-                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
-                          && pe.EmployeeId == uid)
-                .Join(_context.Projects,
-                      p => p.ProjectId,
-                      pe => pe.ProjectId,
-                      (pe, p) => p)
-                .Distinct()
-                .ToListAsync();
-            }
-
             return View(model);
         }
 
@@ -167,6 +135,7 @@ namespace COMP4911Timesheets
                     Role = ProjectEmployee.PROJECT_MANAGER,
                     ProjectId = pId,
                     EmployeeId = input.ProjectManager,
+                    WorkPackageId = null
                 };
                 _context.Add(manager);
 
@@ -213,13 +182,13 @@ namespace COMP4911Timesheets
             if (project == null) return NotFound();
 
             //We get the ProjectEmployees separately so we can Include the Employee of each 
-            var emps = _context.ProjectEmployees
+            var mgmtAndUnasigned = _context.ProjectEmployees
                 .Include(e => e.Employee)
-                .Where(e => e.ProjectId == id)
-                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING)
-                .Where(e => e.Role == ProjectEmployee.PROJECT_MANAGER
+                .Where(e => e.ProjectId == id 
+                    && e.Status == ProjectEmployee.CURRENTLY_WORKING
+                    &&(e.Role == ProjectEmployee.PROJECT_MANAGER
                     || e.Role == ProjectEmployee.PROJECT_ASSISTANT
-                    || e.Role == ProjectEmployee.NOT_ASSIGNED)
+                    || e.Role == ProjectEmployee.NOT_ASSIGNED))
                 .Distinct()
                 .ToList();
 
@@ -276,23 +245,25 @@ namespace COMP4911Timesheets
 
             ManageProject model = new ManageProject();
             model.project = project;
-            model.project.ProjectEmployees = emps;
+            model.project.ProjectEmployees = mgmtAndUnasigned;
             model.requests = reqs;
             model.projectManager = manager.EmployeeId;
             if (assistant != null)
                 model.managersAssistant = assistant.EmployeeId;
 
-            List<Employee> employees = emps.Select(pe => pe.Employee).ToList();
+            List<Employee> employees = _context.Employees
+                .Where(e => e.Id != manager.EmployeeId)
+                .ToList();
 
             List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
-            empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
+            empItemsNoManager.AddRange(new SelectList(employees , "Id", "Email"));
             empItemsNoManager.Insert(0, new SelectListItem { Text = "None", Value = "" });
             ViewBag.EmployeesA = empItemsNoManager;
 
             List<SelectListItem> empItemsAll = new List<SelectListItem>();
             empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
             var managerObj = _context.Employees.Find(model.projectManager);
-            // empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
+            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
             ViewBag.EmployeesM = empItemsAll;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
@@ -304,7 +275,7 @@ namespace COMP4911Timesheets
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [Authorize(Roles = "PM,PA")]
+        [Authorize(Roles = "PM,PA,AD")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ManageProject model)
         {
@@ -351,37 +322,27 @@ namespace COMP4911Timesheets
                     {
                         if (assistantPE == null)                        //if the project doesnt have an assitant already
                         {
-                            assistantPE = _context.ProjectEmployees     //get the new assistants PE entry
-                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
-                                .FirstOrDefault();
-
-                            if (assistantPE == null)                     //if the new PA wasnt already on the project (no PE entry)
+                            assistantPE = new ProjectEmployee       //add them to the project as the PA 
                             {
-                                assistantPE = new ProjectEmployee       //add them to the project as the PA 
-                                {
-                                    EmployeeId = model.managersAssistant,
-                                    ProjectId = id,
-                                    Role = ProjectEmployee.PROJECT_ASSISTANT,
-                                    Status = ProjectEmployee.CURRENTLY_WORKING
-                                };
-                                _context.Add(assistantPE);
-                            }
-                            else                                        //if they were on the project, just update PE to have PA
-                            {
-                                assistantPE.Role = ProjectEmployee.PROJECT_ASSISTANT;
-                                _context.Update(assistantPE);
-                            }
-
+                                EmployeeId = model.managersAssistant,
+                                ProjectId = id,
+                                Role = ProjectEmployee.PROJECT_ASSISTANT,
+                                Status = ProjectEmployee.CURRENTLY_WORKING,
+                                WorkPackageId = null
+                            };
+                            _context.Add(assistantPE);
                         }
                         else if (model.managersAssistant != assistantPE.EmployeeId) //if the project already had a PA and this one is NEW
                         {
-                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
-                            var emp = _context.ProjectEmployees
-                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
-                                .FirstOrDefault();
-                            emp.Role = ProjectEmployee.PROJECT_ASSISTANT;
-                            _context.Update(assistantPE);
-                            _context.Update(emp);
+                            _context.Remove(assistantPE);
+                            _context.Update(new ProjectEmployee      
+                            {
+                                EmployeeId = model.managersAssistant,
+                                ProjectId = id,
+                                Role = ProjectEmployee.PROJECT_ASSISTANT,
+                                Status = ProjectEmployee.CURRENTLY_WORKING,
+                                WorkPackageId = null
+                            });
                             Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
                             await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
                         }
@@ -393,11 +354,10 @@ namespace COMP4911Timesheets
                     else
                     {                                   // if we are clearing the PA
                         if (assistantPE != null)
-                        {
-                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
-                            _context.Update(assistantPE);
+                        { 
                             Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
                             await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
+                            _context.Remove(assistantPE);
                         }
                     }
 
