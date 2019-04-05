@@ -6,9 +6,12 @@
 
 <h1>@ViewData["PageTitle"]</h1>
 <h4>@TempData["info"]</h4>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if(User.IsInRole("AD"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 @using (Html.BeginForm())
 {
 <p>

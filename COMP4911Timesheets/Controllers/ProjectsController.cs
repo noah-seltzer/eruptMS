@@ -115,6 +115,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Create
+        [Authorize (Roles = "AD")]
         public IActionResult Create()
         {
             ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
@@ -125,11 +126,27 @@ namespace COMP4911Timesheets
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "AD")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProjectCode,Name,Description,ProjectManager")] NewProject input)
         {
             if (ModelState.IsValid)
             {
+                if (input.ProjectCode.ToString().Length != 4)
+                {
+                    ViewBag.CodeError = "Project code must be four digits long.";
+                    return View(input);
+                }
+
+                bool projectCodeExists = _context.Projects
+                                                 .Where(p => p.ProjectCode == input.ProjectCode)
+                                                 .FirstOrDefault() != null;
+                if (projectCodeExists)
+                {
+                    ViewBag.CodeError = "Project with code " + input.ProjectCode + " aleady exists!";
+                    return View(input);
+                }
+
                 Project project = new Project
                 {
                     ProjectCode = input.ProjectCode,
@@ -152,13 +169,16 @@ namespace COMP4911Timesheets
                 };
                 _context.Add(manager);
 
+                Employee mgr = _context.Employees.Find(manager.EmployeeId);
+                await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+
                 WorkPackage mgmt = new WorkPackage
                 {
                     ProjectId = pId,
                     WorkPackageCode = "00000",
                     ParentWorkPackageId = null,
                     Name = "Management",
-                    Description = ""
+                    Description = "",
                 };
                 _context.Add(mgmt);
 
@@ -180,6 +200,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Edit/5
+        [Authorize(Roles = "PM,PA")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -255,11 +276,19 @@ namespace COMP4911Timesheets
             if (assistant != null)
                 model.managersAssistant = assistant.EmployeeId;
 
-            List<SelectListItem> empList = new List<SelectListItem>();
-            empList.AddRange(new SelectList(_context.Employees, "Id", "Email"));
-            ViewBag.EmployeesM = empList;
-            empList.Insert(0, new SelectListItem { Text = "None", Value = "" });
-            ViewBag.EmployeesA = empList;
+            List<Employee> employees = _context.Employees.Where(e => e.Id != model.projectManager).ToList();
+
+            List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
+            empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
+            empItemsNoManager.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            ViewBag.EmployeesA = empItemsNoManager;
+
+            List<SelectListItem> empItemsAll = new List<SelectListItem>();
+            empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
+            var managerObj = _context.Employees.Find(model.projectManager);
+            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id});
+            ViewBag.EmployeesM = empItemsAll;
+
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
 
             return View(model);
@@ -269,6 +298,7 @@ namespace COMP4911Timesheets
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "PM,PA")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ManageProject model)
         {
@@ -291,24 +321,78 @@ namespace COMP4911Timesheets
                         updateReq.AmountRequested = req.AmountRequested;
                     }
 
-                    var manager = _context.ProjectEmployees
+                    var managerPE = _context.ProjectEmployees
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
                         .FirstOrDefault();
 
-                    if (model.projectManager != manager.EmployeeId)
+                    if (model.projectManager != managerPE.EmployeeId)
                     {
-                        manager.EmployeeId = model.projectManager;
-                        _context.Update(manager);
+                        Employee oldmgr = _context.Employees.Find(managerPE.EmployeeId);
+                        await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.PM);
+
+                        Employee mgr = _context.Employees.Find(managerPE.EmployeeId);
+                        await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+
+                        managerPE.EmployeeId = model.projectManager;
+                        _context.Update(managerPE);
                     }
 
-                    var assistant = _context.ProjectEmployees
+                    var assistantPE = _context.ProjectEmployees
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                         .FirstOrDefault();
 
-                    if (model.managersAssistant != assistant.EmployeeId)
+                    if (!String.IsNullOrEmpty(model.managersAssistant)) //if we are setting an assistant
                     {
-                        assistant.EmployeeId = model.managersAssistant;
-                        _context.Update(assistant);
+                        if (assistantPE == null)                        //if the project doesnt have an assitant already
+                        {
+                            assistantPE = _context.ProjectEmployees     //get the new assistants PE entry
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            
+                            if(assistantPE == null)                     //if the new PA wasnt already on the project (no PE entry)
+                            {
+                                assistantPE = new ProjectEmployee       //add them to the project as the PA 
+                                {
+                                    EmployeeId = model.managersAssistant,
+                                    ProjectId = id,
+                                    Role = ProjectEmployee.PROJECT_ASSISTANT,
+                                    Status = ProjectEmployee.CURRENTLY_WORKING
+                                };
+                                _context.Add(assistantPE);
+                            }
+                            else                                        //if they were on the project, just update PE to have PA
+                            {
+                                assistantPE.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                                _context.Update(assistantPE);
+                            }
+
+                        }
+                        else if (model.managersAssistant != assistantPE.EmployeeId) //if the project already had a PA and this one is NEW
+                        {
+                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
+                            var emp = _context.ProjectEmployees
+                                .Where(e => e.ProjectId == id && e.EmployeeId == model.managersAssistant)
+                                .FirstOrDefault();
+                            emp.Role = ProjectEmployee.PROJECT_ASSISTANT;
+                            _context.Update(assistantPE);
+                            _context.Update(emp);
+                            Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
+                            await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
+                        }
+
+                        Employee assistant = _context.Employees.Find(assistantPE.EmployeeId);
+                        await _usermgr.AddToRoleAsync(assistant, ApplicationRole.PA);
+
+                    }
+                    else
+                    {                                   // if we are clearing the PA
+                        if (assistantPE != null)
+                        {
+                            assistantPE.Role = ProjectEmployee.EMPLOYEE;
+                            _context.Update(assistantPE);
+                            Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
+                            await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
+                        }
                     }
 
                     await _context.SaveChangesAsync();
@@ -330,6 +414,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects/Delete/5
+        [Authorize(Roles = "AD")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -349,6 +434,7 @@ namespace COMP4911Timesheets
 
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "AD")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
