@@ -4,11 +4,11 @@
     ViewData["PageTitle"] = "Projects";
 }
 
-<h1>@ViewData["PageTitle"]</h1>
-
 <p>
-    <a asp-action="Index">Employees</a>
+    <a asp-action="Index" class="btn btn-primary project-button btn-lg">Employees</a>
 </p>
+
+<h1>@ViewData["PageTitle"]</h1>
 
 <table class="table well bs-component">
     <thead>
