@@ -12,16 +12,17 @@
             <input type="hidden" asp-for="Project.ProjectId" />
             @foreach (var projectRequest in Model.Project.ProjectRequests)
             {
-            <div class="form-group">
-                <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
-                <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly />
-                <span class="badge">
-                    @if (((Dictionary<int, int>)ViewBag.num).ContainsKey(projectRequest.PayGrade.PayGradeId)) {
-                        @(((Dictionary<int, int>)ViewBag.num)[projectRequest.PayGrade.PayGradeId])
-                    }
-                </span>
-                <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
-            </div>
+                bool available = ((Dictionary<int, int>)ViewBag.num).ContainsKey(projectRequest.PayGrade.PayGradeId);
+                <div class="form-group">
+                    <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
+                    <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly />
+                    <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
+                    <div style="@(available ? "" : "display:none" ) ">
+                        <span class="badge badge-success">
+                            @(available ? (((Dictionary<int, int>)ViewBag.num)[projectRequest.PayGrade.PayGradeId] + " Available") : "" )
+                        </span>
+                    </div>
+                </div>
             }
         </div>
     </div>
