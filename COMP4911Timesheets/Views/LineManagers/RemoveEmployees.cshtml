@@ -7,6 +7,7 @@
 <h1>@ViewData["PageTitle"]</h1>
 
 <table class="table well bs-component">
+    <input type="hidden" asp-for="Project.ProjectId" />
     <thead>
         <tr>
             <th>
@@ -43,7 +44,7 @@
                 <td>
                     @{
                         if (item.Role != COMP4911Timesheets.Models.ProjectEmployee.PROJECT_MANAGER) {
-                            <a asp-action="RemoveEmployee" asp-route-id="@item.EmployeeId">Remove Employees</a>
+                            <a asp-action="RemoveEmployee" asp-route-id="@item.EmployeeId" asp-route-projectId="@item.ProjectId">Remove Employees</a>
                         }
                     }
                 </td>
