@@ -115,6 +115,11 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (_context.Employees.Where(e => e.Email == employeeManagement.Employee.Email).FirstOrDefault() != null)
+                {
+                    ViewBag.ErrorMessage = "There is an employee already with the email you entered.";
+                    return await Create();
+                }
                 employeeManagement.Employee.Status = Employee.CURRENTLY_EMPLOYEED;
                 employeeManagement.Employee.CreatedTime = DateTime.Now;
                 employeeManagement.Employee.UserName = employeeManagement.Employee.Email;
