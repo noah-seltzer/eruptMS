@@ -526,7 +526,7 @@ namespace COMP4911Timesheets.Controllers
             projectEmployees = await _context.ProjectEmployees
                 .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING 
                 && e.ProjectId == WorkPackagesController.projectId
-                && e.WorkPackageId == id)
+                && (e.Role == ProjectEmployee.NOT_ASSIGNED || e.WorkPackageId == id || e.WorkPackageId == null))
                 .Include(e => e.Employee)
                 .OrderBy(s => s.EmployeeId).ToListAsync();
 
@@ -569,12 +569,15 @@ namespace COMP4911Timesheets.Controllers
             ViewData["projectId"] = WorkPackagesController.projectId;
 
 
-            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
-                            && ep.WorkPackageId == WorkPackagesController.workPackageId
-                            && ep.ProjectId == WorkPackagesController.projectId)
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER                          
+                            && ep.ProjectId == WorkPackagesController.projectId
+                            && (ep.WorkPackageId == WorkPackagesController.workPackageId 
+                                || ep.WorkPackageId == null))
                            .FirstOrDefault();
 
-
+            //Operator old Assigned Employee 
+            //1. if only one row left update the row. 
+            //2. if more than one row, remove thw row
             if (tempPE != null)
             {
                 Employee oldtempRE = _context.Employees.Find(tempPE.EmployeeId);
@@ -593,14 +596,16 @@ namespace COMP4911Timesheets.Controllers
                 }
                 else {
                     oldTempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                    oldTempPE.WorkPackageId = null;
                     _context.Update(oldTempPE);
                     await _context.SaveChangesAsync();
                 }
             }
 
             var currentTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
-                                && ep.WorkPackageId == WorkPackagesController.workPackageId
-                                && ep.ProjectId == WorkPackagesController.projectId).FirstOrDefault();
+                                && ep.ProjectId == WorkPackagesController.projectId
+                                && (ep.WorkPackageId == WorkPackagesController.workPackageId
+                                    || ep.WorkPackageId == null)).FirstOrDefault();
 
             if (currentTempPE.Role == ProjectEmployee.NOT_ASSIGNED)
             {
@@ -618,7 +623,7 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction("AssignEmployee", "WorkPackages", new { id = WorkPackagesController.workPackageId });
         }
 
-        // GET: WorkPackages/AssignRE/6
+        // GET: WorkPackages/AssignEm/6
         public async Task<IActionResult> AssignEm(string EmployeeId, string name)
         {
             ProjectEmployee projectEmployee = new ProjectEmployee();
@@ -633,8 +638,9 @@ namespace COMP4911Timesheets.Controllers
             await _userManager.AddToRoleAsync(tempRE, ApplicationRole.EM);
 
             var currentTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
-                    && ep.WorkPackageId == WorkPackagesController.workPackageId
-                    && ep.ProjectId == WorkPackagesController.projectId).FirstOrDefault();
+                    && ep.ProjectId == WorkPackagesController.projectId
+                    && (ep.WorkPackageId == WorkPackagesController.workPackageId 
+                                || ep.WorkPackageId == null)).FirstOrDefault();
 
             if (currentTempPE.Role == ProjectEmployee.NOT_ASSIGNED)
             {
@@ -658,7 +664,7 @@ namespace COMP4911Timesheets.Controllers
                            .FirstOrDefault();
 
             var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId 
-                && ep.WorkPackageId == WorkPackagesController.workPackageId).ToList();
+                && (ep.WorkPackageId == WorkPackagesController.workPackageId || ep.WorkPackageId == null)).ToList();
 
             if (countTempPE.Count != 1)
             {
@@ -667,6 +673,7 @@ namespace COMP4911Timesheets.Controllers
             }
             else {
                 tempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                tempPE.WorkPackageId = null;
                 _context.Update(tempPE);
                 await _context.SaveChangesAsync();
             }
@@ -687,9 +694,9 @@ namespace COMP4911Timesheets.Controllers
                             && ep.ProjectId == WorkPackagesController.projectId)
                            .FirstOrDefault();
 
-            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
-                && ep.WorkPackageId == WorkPackagesController.workPackageId
-                && ep.ProjectId == WorkPackagesController.projectId).ToList();
+            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId                
+                && ep.ProjectId == WorkPackagesController.projectId
+                && (ep.WorkPackageId == WorkPackagesController.workPackageId || ep.WorkPackageId == null)).ToList();
 
             if (countTempPE.Count != 1)
             {
@@ -699,6 +706,7 @@ namespace COMP4911Timesheets.Controllers
             else
             {
                 tempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                tempPE.WorkPackageId = null;
                 _context.Update(tempPE);
                 await _context.SaveChangesAsync();
             }
