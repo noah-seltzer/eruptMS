@@ -6,13 +6,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize(Roles = "LM,AD")]
+    [Authorize(Roles = "LM,AD,TA")]
     public class LineManagersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,13 +28,83 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, string approverSearch)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             List<Employee> employees;
+            List<Employee> approvalList;
+
             if (User.IsInRole(role: "AD"))
             {
-                employees = await _context.Employees
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    employees = await _context.Employees
+                        .Where(s => s.LastName.Contains(searchString)
+                                           || s.FirstName.Contains(searchString))
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId).ToListAsync();
+                }
+                else
+                {
+                    employees = await _context.Employees
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId)
+                        .ToListAsync();
+                }
+            }
+            else
+            {
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    employees = await _context.Employees
+                        .Where(e => e.SupervisorId == currentUser.Id)
+                        .Where(s => s.LastName.Contains(searchString)
+                                           || s.FirstName.Contains(searchString))
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId).ToListAsync();
+                }
+                else
+                {
+                    employees = await _context.Employees
+                        .Include(e => e.Approver)
+                        .Include(e => e.Supervisor)
+                        .Include(e => e.ProjectEmployees)
+                        .OrderBy(s => s.EmployeeId)
+                        .Where(e => e.SupervisorId == currentUser.Id)
+                        .ToListAsync();
+                }
+            }
+
+            var lineManagerManagements = new List<LineManagerManagement>();
+            foreach (var employee in employees)
+            {
+                var timesheets = await _context.Timesheets
+                    .Where(t => t.EmployeeId == employee.Id)
+                    .Where(t => t.Status == Timesheet.SUBMITTED_NOT_APPROVED)
+                    .ToListAsync();
+                employee.Timesheets = timesheets;
+                lineManagerManagements.Add
+                (
+                    new LineManagerManagement
+                    {
+                        Employee = employee
+                    }
+                );
+            }
+
+
+            if (!String.IsNullOrEmpty(approverSearch))
+            {
+                approvalList = await _context.Employees
+                    .Where(e => e.SupervisorId != currentUser.Id && e.ApproverId == currentUser.Id)
+                    .Where(s => s.LastName.Contains(approverSearch)
+                                       || s.FirstName.Contains(approverSearch))
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .Include(e => e.ProjectEmployees)
@@ -42,17 +113,18 @@ namespace COMP4911Timesheets.Controllers
             }
             else
             {
-                employees = await _context.Employees
+                approvalList = await _context.Employees
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .Include(e => e.ProjectEmployees)
                     .OrderBy(s => s.EmployeeId)
-                    .Where(e => e.SupervisorId == currentUser.Id)
+                    .Where(e => e.SupervisorId != currentUser.Id && e.ApproverId == currentUser.Id)
                     .ToListAsync();
             }
 
-            var lineManagerManagements = new List<LineManagerManagement>();
-            foreach (var employee in employees)
+
+            var approverManagements = new List<LineManagerManagement>();
+            foreach (var employee in approvalList)
             {
                 var timesheets = await _context.Timesheets
                     .Where(t => t.EmployeeId == employee.Id)
@@ -64,7 +136,7 @@ namespace COMP4911Timesheets.Controllers
                     .Include(ep => ep.PayGrade)
                     .FirstOrDefaultAsync();
                 employee.Timesheets = timesheets;
-                lineManagerManagements.Add
+                approverManagements.Add
                 (
                     new LineManagerManagement
                     {
@@ -73,6 +145,8 @@ namespace COMP4911Timesheets.Controllers
                     }
                 );
             }
+            ViewData["ApproverList"] = approverManagements;
+
             return View(lineManagerManagements);
         }
 
