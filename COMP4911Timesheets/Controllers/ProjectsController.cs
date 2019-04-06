@@ -43,7 +43,8 @@ namespace COMP4911Timesheets
             {
                 model.managedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
-                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+                          && pe.WorkPackageId == null
+                          && pe.Role != ProjectEmployee.NOT_ASSIGNED) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -55,7 +56,8 @@ namespace COMP4911Timesheets
             {
                 model.managedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
-                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+                          && pe.WorkPackageId == null
+                          && pe.Role != ProjectEmployee.NOT_ASSIGNED) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -70,7 +72,8 @@ namespace COMP4911Timesheets
                 model.assignedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
                           && pe.WorkPackageId == null
-                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                          && pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -83,7 +86,8 @@ namespace COMP4911Timesheets
                 model.assignedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
                           && pe.WorkPackageId == null
-                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                          && pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
