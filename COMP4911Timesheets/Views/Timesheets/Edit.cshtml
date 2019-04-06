@@ -72,6 +72,7 @@
             <p>
                 @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
             </p>
+            <p class="text-danger">@TempData["info2"]</p>
         }
 
 
@@ -163,7 +164,7 @@
                             </td>
                             <td>
                                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                 COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
                                         new { @class = "btn btn-primary", @role = "button" })
@@ -171,7 +172,7 @@
                             </td>
                             <td>
                                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                 COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
                                         new { @class = "btn btn-danger", @role = "button" })
