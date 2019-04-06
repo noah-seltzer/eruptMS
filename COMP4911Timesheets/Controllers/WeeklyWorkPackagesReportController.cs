@@ -22,8 +22,15 @@ namespace COMP4911Timesheets.Controllers
         // GET: WeeklyWorkPackagesReport
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.WorkPackages.Include(w => w.ParentWorkPackage).Include(w => w.Project);
-            return View(await applicationDbContext.ToListAsync());
+            var WorkPackage = _context.WorkPackages
+                .Include(w => w.ParentWorkPackage)
+                .Include(w => w.Project)
+                .Include(w => w.ChildWorkPackages)
+                .Include(w => w.Budgets)
+                .Include(w => w.WorkPackageEmployees)
+                .Include(w => w.TimesheetRows);
+
+            return View(await WorkPackage.ToListAsync());
         }
 
         // GET: WeeklyWorkPackagesReport/Details/5
@@ -34,129 +41,24 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var workPackage = await _context.WorkPackages
+            var WorkPackage = await _context.WorkPackages
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
+                .Include(w => w.ChildWorkPackages)
+                .Include(w => w.Budgets)
+                .Include(w => w.WorkPackageEmployees)
+                .Include(w => w.TimesheetRows)
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
-            if (workPackage == null)
+            if (WorkPackage == null)
             {
                 return NotFound();
             }
 
-            return View(workPackage);
+            return View(WorkPackage);
         }
 
         // GET: WeeklyWorkPackagesReport/Create
-        public IActionResult Create()
-        {
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId");
-            return View();
-        }
-
-        // POST: WeeklyWorkPackagesReport/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(workPackage);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
-            return View(workPackage);
-        }
-
-        // GET: WeeklyWorkPackagesReport/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var workPackage = await _context.WorkPackages.FindAsync(id);
-            if (workPackage == null)
-            {
-                return NotFound();
-            }
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
-            return View(workPackage);
-        }
-
-        // POST: WeeklyWorkPackagesReport/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
-        {
-            if (id != workPackage.WorkPackageId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(workPackage);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!WorkPackageExists(workPackage.WorkPackageId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
-            return View(workPackage);
-        }
-
-        // GET: WeeklyWorkPackagesReport/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var workPackage = await _context.WorkPackages
-                .Include(w => w.ParentWorkPackage)
-                .Include(w => w.Project)
-                .FirstOrDefaultAsync(m => m.WorkPackageId == id);
-            if (workPackage == null)
-            {
-                return NotFound();
-            }
-
-            return View(workPackage);
-        }
-
-        // POST: WeeklyWorkPackagesReport/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var workPackage = await _context.WorkPackages.FindAsync(id);
-            _context.WorkPackages.Remove(workPackage);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        
 
         private bool WorkPackageExists(int id)
         {
