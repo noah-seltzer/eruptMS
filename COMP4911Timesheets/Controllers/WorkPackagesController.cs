@@ -584,8 +584,9 @@ namespace COMP4911Timesheets.Controllers
                 await _userManager.RemoveFromRoleAsync(oldtempRE, ApplicationRole.RE);
 
                 var countOldTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == tempPE.EmployeeId
-                                && ep.WorkPackageId == WorkPackagesController.workPackageId
-                                && ep.ProjectId == WorkPackagesController.projectId).ToList();
+                                && ep.ProjectId == WorkPackagesController.projectId
+                                && (ep.WorkPackageId == WorkPackagesController.workPackageId
+                                || ep.WorkPackageId == null)).ToList();
 
                 var oldTempPE = countOldTempPE.FirstOrDefault();
 
