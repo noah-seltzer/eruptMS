@@ -38,7 +38,7 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> wpl = new List<WorkPackage>();
             foreach (ProjectEmployee pe in pes)
             {
-                if (pe.ProjectId != null && pe.WorkPackageId != null)
+                if (pe.ProjectId != null && pe.WorkPackageId != null && pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                 {
                     bool exist = false;
                     foreach (TimesheetRow tr in timesheetrows)
