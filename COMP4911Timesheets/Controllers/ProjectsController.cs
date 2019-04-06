@@ -448,12 +448,19 @@ namespace COMP4911Timesheets
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, ActionName("Close")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Close(int id)
         {
             var project = await _context.Projects.FindAsync(id);
             project.Status = Project.CLOSED;
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Reopen(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            project.Status = Project.ONGOING;
             _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
