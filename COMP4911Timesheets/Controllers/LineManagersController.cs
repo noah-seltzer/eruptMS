@@ -238,6 +238,7 @@ namespace COMP4911Timesheets.Controllers
                 var projectEmployee = await _context.ProjectEmployees
                     .Where(pe => pe.EmployeeId == employeePay.EmployeeId)
                     .Where(pe => pe.ProjectId == projectRequest.ProjectId)
+                    .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                     .FirstOrDefaultAsync();
                 if (employeePay.Employee.SupervisorId == currentUser.Id && projectEmployee == null)
                 {
@@ -279,6 +280,7 @@ namespace COMP4911Timesheets.Controllers
                     var projectEmployee = await _context.ProjectEmployees
                         .Where(pe => pe.EmployeeId == employeePay.EmployeeId)
                         .Where(pe => pe.ProjectId == projectRequest.ProjectId)
+                        .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                         .FirstOrDefaultAsync();
                     if (employeePay.Employee.SupervisorId == currentUser.Id && projectEmployee == null)
                     {
@@ -376,11 +378,12 @@ namespace COMP4911Timesheets.Controllers
             return View(lineManagerManagement);
         }
 
-        public async Task<IActionResult> RemoveEmployee(string id, LineManagerManagement lineManagerManagement)
+        public async Task<IActionResult> RemoveEmployee(string id, int projectId, LineManagerManagement lineManagerManagement)
         {
             var projectEmployees = await _context.ProjectEmployees
                 .Include(pe => pe.Employee)
                 .Where(pe => pe.EmployeeId == id)
+                .Where(pe => pe.ProjectId == projectId)
                 .ToListAsync();
             lineManagerManagement.ProjectEmployee = new ProjectEmployee();
             if (ModelState.IsValid)
