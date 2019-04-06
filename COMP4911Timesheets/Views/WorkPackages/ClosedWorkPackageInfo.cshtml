@@ -39,7 +39,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr class="row" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+            <tr id="@item.WorkPackageCode" name="@item.WorkPackageCode">
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </td>
@@ -72,4 +72,4 @@
     </tbody>
 </table>
 
-<a asp-action="CreateInternalWorkPackage" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
+<a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
