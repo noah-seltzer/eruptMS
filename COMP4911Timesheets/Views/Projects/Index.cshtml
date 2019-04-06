@@ -74,7 +74,7 @@
                             <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">Work Packages</a><br />
                             <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage</a> <br />
                         }
-                        @if(User.IsInRole("AD,PM")) {
+                        @if(User.IsInRole("AD") || User.IsInRole("PM")) {
                             @if(item.Status==Project.CLOSED) {
                                 <a asp-action="Reopen" asp-route-id="@item.ProjectId" asp-controller="Projects">Reopen</a><br/>
                             } else {
