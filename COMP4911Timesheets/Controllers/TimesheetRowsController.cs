@@ -38,18 +38,21 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> wpl = new List<WorkPackage>();
             foreach (ProjectEmployee pe in pes)
             {
-                bool exist = false;
-                foreach (TimesheetRow tr in timesheetrows)
+                if (pe.ProjectId != null && pe.WorkPackageId != null)
                 {
-                    if (tr.WorkPackageId == pe.WorkPackageId)
+                    bool exist = false;
+                    foreach (TimesheetRow tr in timesheetrows)
                     {
-                        exist = true;
+                        if (tr.WorkPackageId == pe.WorkPackageId)
+                        {
+                            exist = true;
+                        }
                     }
-                }
-                if (!exist)
-                {
-                    var wp = await _context.WorkPackages.Include(wpp => wpp.Project).FirstOrDefaultAsync(wpp => wpp.WorkPackageId == pe.WorkPackageId);
-                    wpl.Add(wp);
+                    if (!exist)
+                    {
+                        var wp = await _context.WorkPackages.Include(wpp => wpp.Project).FirstOrDefaultAsync(wpp => wpp.WorkPackageId == pe.WorkPackageId);
+                        wpl.Add(wp);
+                    }
                 }
             }
 
@@ -75,35 +78,35 @@ namespace COMP4911Timesheets.Controllers
                   });
             ViewData["WorkPackageId"] = new SelectList(wpes, "Value", "Text");
 
-//            string uid = (await _userManager.GetUserAsync(User)).Id;
+            //            string uid = (await _userManager.GetUserAsync(User)).Id;
 
-//            var listInfo = _context.ProjectEmployees
-//                .Where(pe => pe.EmployeeId == uid 
-//                          && pe.Status == ProjectEmployee.CURRENTLY_WORKING)
-//                .Join(_context.WorkPackages,
-//                pe => pe.ProjectId,
-//                wp => wp.ProjectId,
-//                (pe, wp) => new { PE = pe, WP = wp })
-//                .Join(_context.Projects,
-//                i => i.PE.ProjectId,
-//                p => p.ProjectId,
-//                (i, p) => new { WorkPackgeInfo = i.WP, ProjectInfo = p })
-//                .Distinct()
-//                .ToList();
+            //            var listInfo = _context.ProjectEmployees
+            //                .Where(pe => pe.EmployeeId == uid 
+            //                          && pe.Status == ProjectEmployee.CURRENTLY_WORKING)
+            //                .Join(_context.WorkPackages,
+            //                pe => pe.ProjectId,
+            //                wp => wp.ProjectId,
+            //                (pe, wp) => new { PE = pe, WP = wp })
+            //                .Join(_context.Projects,
+            //                i => i.PE.ProjectId,
+            //                p => p.ProjectId,
+            //                (i, p) => new { WorkPackgeInfo = i.WP, ProjectInfo = p })
+            //                .Distinct()
+            //                .ToList();
 
-//            var list = new List<SelectListItem>();
-//            foreach(var info in listInfo)
-//            {
-//                list.Add(new SelectListItem
-//                {
-//                    Value = info.WorkPackgeInfo.WorkPackageId.ToString(),
-//                    Text = info.ProjectInfo.Name + "---" + info.WorkPackgeInfo.Name
-//                });   
-//            }
+            //            var list = new List<SelectListItem>();
+            //            foreach(var info in listInfo)
+            //            {
+            //                list.Add(new SelectListItem
+            //                {
+            //                    Value = info.WorkPackgeInfo.WorkPackageId.ToString(),
+            //                    Text = info.ProjectInfo.Name + "---" + info.WorkPackgeInfo.Name
+            //                });   
+            //            }
 
 
-//            ViewData["WorkPackageId"] = new SelectList(list, "Value", "Text");
-//>>>>>>> origin/TEST
+            //            ViewData["WorkPackageId"] = new SelectList(list, "Value", "Text");
+            //>>>>>>> origin/TEST
             return View(model);
         }
 
