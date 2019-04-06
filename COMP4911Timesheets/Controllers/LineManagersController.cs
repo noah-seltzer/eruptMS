@@ -61,12 +61,18 @@ namespace COMP4911Timesheets.Controllers
                     .Where(t => t.EmployeeId == employee.Id)
                     .Where(t => t.Status == Timesheet.SUBMITTED_NOT_APPROVED)
                     .ToListAsync();
+                var employeePay = await _context.EmployeePays
+                    .Where(ep => ep.EmployeeId == employee.Id)
+                    .Where(ep => ep.Status == EmployeePay.VALID)
+                    .Include(ep => ep.PayGrade)
+                    .FirstOrDefaultAsync();
                 employee.Timesheets = timesheets;
                 lineManagerManagements.Add
                 (
                     new LineManagerManagement
                     {
-                        Employee = employee
+                        Employee = employee,
+                        EmployeePay = employeePay
                     }
                 );
             }

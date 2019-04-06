@@ -31,6 +31,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Employee.Timesheets)
             </th>
+            <th>
+                PLevel
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -57,6 +60,9 @@
                     <a asp-action="Details" asp-route-id="@item.Employee.Id">
                         @item.Employee.Timesheets.Count
                     </a>
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
                 </td>
                 <td>
                     <a asp-action="ChangeTA" asp-route-id="@item.Employee.Id">Change TA</a>
