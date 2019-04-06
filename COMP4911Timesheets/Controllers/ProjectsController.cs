@@ -195,6 +195,12 @@ namespace COMP4911Timesheets
 
                 await _context.SaveChangesAsync();
 
+                //add workpackageid to ProjectEmployees table
+                var currentTempPE = _context.WorkPackages.Where(ep => ep.ProjectId == pId && ep.WorkPackageCode == "00000").FirstOrDefault();
+                manager.WorkPackageId = currentTempPE.WorkPackageId;
+                _context.ProjectEmployees.Update(manager);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(input);
