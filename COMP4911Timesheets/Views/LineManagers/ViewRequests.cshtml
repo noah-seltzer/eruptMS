@@ -6,22 +6,24 @@
 <h1>@ViewData["PageTitle"]</h1>
 
 <form asp-action="HandleRequests">
-    <div class="row well bs-component">
-        <div class="col-md-6">
+    <div class="col-md-8 col-lg-6 row well bs-component">
+        <div class="col-8">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Project.ProjectId" />
-            @foreach (var projectRequest in Model.Project.ProjectRequests) 
+            @foreach (var projectRequest in Model.Project.ProjectRequests)
             {
-                <div class="form-group">
-                    <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
-                    <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly/>
-                    <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
-                </div>
+            <div class="form-group">
+                <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
+                <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly />
+                <span class="badge">
+                    @if (((Dictionary<int, int>)ViewBag.num).ContainsKey(projectRequest.PayGrade.PayGradeId)) {
+                        @(((Dictionary<int, int>)ViewBag.num)[projectRequest.PayGrade.PayGradeId])
+                    }
+                </span>
+                <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
+            </div>
             }
         </div>
-        <div class="col-md-6">
-        </div>
-
     </div>
 </form>
 <div>

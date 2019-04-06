@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using COMP4911Timesheets.Data;
+using COMP4911Timesheets.Models;
+using COMP4911Timesheets.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using COMP4911Timesheets.Data;
-using COMP4911Timesheets.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using System.Collections;
-using System.Security.Claims;
-using COMP4911Timesheets.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -209,6 +206,35 @@ namespace COMP4911Timesheets.Controllers
                 .Include(pr => pr.PayGrade)
                 .Include(pr => pr.Project)
                 .ToListAsync();
+
+            // Calculate how many employees are under current user's supervision and pass into ViewData
+            var currentUser = await _userManager.GetUserAsync(User);
+            var employeePays = await _context.EmployeePays
+               .Include(e => e.Employee)
+               .Include(e => e.PayGrade)
+               .Where(ep => ep.Status == EmployeePay.VALID)
+               .ToListAsync();
+            var employeeNum = new Dictionary<int, int>();
+            foreach (var employeePay in employeePays)
+            {
+                var count = _context.ProjectEmployees
+                    .Where(pe => pe.EmployeeId == employeePay.EmployeeId)
+                    .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
+                    .Count();
+                if (employeePay.Employee.SupervisorId == currentUser.Id && count != 0)
+                {
+                    if (employeeNum.ContainsKey(employeePay.PayGrade.PayGradeId))
+                    {
+                        employeeNum[employeePay.PayGrade.PayGradeId] += 1;
+                    }
+                    else
+                    {
+                        employeeNum.Add(employeePay.PayGrade.PayGradeId, 1);
+                    }
+                }
+            }
+            ViewData["num"] = employeeNum;
+
             project.ProjectRequests = projectRequests;
             LineManagerManagement lineManagerManagement = new LineManagerManagement
             {
@@ -253,7 +279,6 @@ namespace COMP4911Timesheets.Controllers
                 {
                     new Employee
                     {
-
                     }
                 }
             };
@@ -390,7 +415,6 @@ namespace COMP4911Timesheets.Controllers
             {
                 foreach (ProjectEmployee projectEmployee in projectEmployees)
                 {
-
                     if (projectEmployee.Role == ProjectEmployee.PROJECT_MANAGER)
                     {
                         await _userManager.RemoveFromRoleAsync(projectEmployee.Employee, ApplicationRole.PM);
@@ -408,6 +432,5 @@ namespace COMP4911Timesheets.Controllers
             }
             return RedirectToAction(nameof(RemoveEmployees), new { id = lineManagerManagement.ProjectEmployee.ProjectId });
         }
-
     }
 }
