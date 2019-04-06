@@ -24,10 +24,18 @@ namespace COMP4911Timesheets.Controllers
             _userManager = userManager;
         }
         [Authorize]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var currentUserId = _userManager.GetUserId(this.User);
-            var rejectedSheets = _context.Timesheets.Where(t => t.Status == Timesheet.REJECTED_NEED_RESUBMISSION).Where(t => t.EmployeeId == currentUserId).Count();
+            var rejectedSheets = await _context.Timesheets.Where(t => t.Status == Timesheet.REJECTED_NEED_RESUBMISSION).Where(t => t.EmployeeId == currentUserId).CountAsync();
+
+            var employeeApprovalNeeded = await _context.Employees.Where(e => e.ApproverId == currentUserId).ToListAsync();
+
+            int timesheetsNeeded = 0;
+            foreach (var employee in employeeApprovalNeeded) {
+                timesheetsNeeded += await _context.Timesheets.Where(t => t.EmployeeId == employee.Id).Where(ts => ts.Status == Timesheet.SUBMITTED_NOT_APPROVED).CountAsync();
+            }
+            ViewData["TimesheetsNeeded"] = timesheetsNeeded;
             ViewData["RejectedSheets"] = rejectedSheets;
             return View();
         }

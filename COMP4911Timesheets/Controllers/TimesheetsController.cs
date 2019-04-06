@@ -37,7 +37,8 @@ namespace COMP4911Timesheets.Controllers
                 .Where(t => t.WeekEnding.ToString("yyyy/MM/dd").Contains(searchString))
                 .OrderByDescending(t => t.WeekNumber)
                 .ToListAsync();
-            } else
+            }
+            else
             {
                 timesheets = await _context.Timesheets
                 .Include(t => t.Employee)
@@ -58,12 +59,14 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-            var projects = await _context.Projects.ToListAsync();
-            var workpackages = await _context.WorkPackages.ToListAsync();
-            var timesheet = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.TimesheetRows)
-                .FirstOrDefaultAsync(m => m.TimesheetId == id);
+
+            var timesheet = await _context.Timesheets.Include(t=>t.Employee).FirstOrDefaultAsync(t=>t.TimesheetId==id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            foreach (TimesheetRow tr in timesheetrows)
+            {
+                var package = _context.WorkPackages.Find(tr.WorkPackageId);
+                var project = _context.Projects.Find(package.ProjectId);
+            }
 
             if (timesheet == null)
             {
@@ -110,7 +113,7 @@ namespace COMP4911Timesheets.Controllers
             //Add Fridays in previous month
             for (int i = 4; i > 0; i--)
             {
-                var oldfriday = friday.AddDays(- i * 7);
+                var oldfriday = friday.AddDays(-i * 7);
                 //Check if timesheet for this week exist
                 bool exist = false;
                 foreach (Timesheet t in timesheets)
@@ -152,22 +155,31 @@ namespace COMP4911Timesheets.Controllers
 
 
                 //select the valid employee pay
-                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
+                var emppay = await _context.EmployeePays.FirstOrDefaultAsync(ep => ep.EmployeeId == timesheet.EmployeeId && ep.Status == EmployeePay.VALID);
                 timesheet.EmployeePay = emppay;
                 timesheet.EmployeePayId = emppay.EmployeePayId;
 
                 //select valid
-                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Timesheet.NOT_SUBMITTED_NOT_APPROVED);
+                var sign = await _context.Signatures.FirstOrDefaultAsync(s => s.EmployeeId == timesheet.EmployeeId && s.Status == Signature.VALID);
+
+                if (sign == null)
+                {
+                    TempData["Link"] = "Signature";
+                    TempData["begin"] = "Fill in a ";
+                    TempData["end"] = " pass phrase in your profile first";
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 timesheet.Signature = sign;
                 timesheet.SignatureId = sign.SignatureId;
 
-                timesheet.FlexTime = 40;
+                timesheet.FlexTime = 0;
 
                 _context.Add(timesheet);
 
                 //add HR reserved rows
                 var wp1 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "SICK");
-                TimesheetRow tr1 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp1};
+                TimesheetRow tr1 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp1 };
                 _context.Add(tr1);
                 var wp2 = _context.WorkPackages.FirstOrDefault(wp => wp.WorkPackageCode == "VACN");
                 TimesheetRow tr2 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp2 };
@@ -192,31 +204,64 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
-            var projects = await _context.Projects.ToListAsync();
-            var workpackages = await _context.WorkPackages.ToListAsync();
-            var timesheet = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.TimesheetRows)
-                .FirstOrDefaultAsync(m => m.TimesheetId == id);
 
-            DateTime friday = Utility.GetNextWeekday(DateTime.Today, DayOfWeek.Friday);
-            Timesheet model = new Timesheet()
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(t => t.TimesheetId == id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            foreach (TimesheetRow tr in timesheetrows)
             {
-                //default this Friday
-                WeekEnding = friday
-            };
-            List<DateTime> fridays = new List<DateTime>();
-            for (int i = 0; i < 30; i++)
-            {
-                fridays.Add(friday.AddDays(i * 7));
+                var package = _context.WorkPackages.Find(tr.WorkPackageId);
+                var project = _context.Projects.Find(package.ProjectId);
             }
-            var fridayslist = fridays.Select(s => new SelectListItem
-            {
-                Value = s.Date.ToString(),
-                Text = s.Date.ToString("yyyy/MM/dd")
-            });
-            ViewData["fridays"] = new SelectList(fridayslist, "Value", "Text");
 
+            string uid = (await _userManager.GetUserAsync(User)).Id;
+
+            var hr_work_pkgs = _context.ProjectEmployees
+                    .Where(p => p.EmployeeId == uid
+                        && p.ProjectId == 1)
+                    .Join(_context.WorkPackages,
+                    w => w.WorkPackageId,
+                    p => p.WorkPackageId,
+                    (p, w) => w)
+                    .Include(wp => wp.Project)
+                    .ToList();
+
+            if(hr_work_pkgs.Count < 4)
+            {//missing hr work packages
+                var newPEs = new List<ProjectEmployee>();
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 1
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 2
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 3
+                });
+                newPEs.Add(new ProjectEmployee
+                {
+                    EmployeeId = uid,
+                    ProjectId = 1,
+                    Role = ProjectEmployee.EMPLOYEE,
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    WorkPackageId = 4
+                });
+                await _context.SaveChangesAsync();
+            }
 
             if (timesheet == null)
             {
@@ -231,14 +276,34 @@ namespace COMP4911Timesheets.Controllers
             }
 
             //calculate flex time
-            timesheet.FlexTime = 40;
+            timesheet.FlexTime = 0;
             if (timesheet.TimesheetRows != null)
             {
+                double sat = 0, sun = 0, mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, flexused = 0;
                 foreach (TimesheetRow tr in timesheet.TimesheetRows)
                 {
-                    timesheet.FlexTime = timesheet.FlexTime - tr.SatHour - tr.SunHour - tr.MonHour - tr.TueHour - tr.WedHour - tr.ThuHour - tr.FriHour;
+                    if (tr.WorkPackage.WorkPackageCode == "FLEX")
+                    {
+                        flexused += tr.SatHour + tr.SunHour + tr.MonHour + tr.TueHour + tr.WedHour + tr.ThuHour + tr.FriHour;
+                    }
+                    sat += tr.SatHour;
+                    sun += tr.SunHour;
+                    mon += tr.MonHour;
+                    tue += tr.TueHour;
+                    wed += tr.WedHour;
+                    thu += tr.ThuHour;
+                    fri += tr.FriHour;
                 }
+                if (sat > 8) timesheet.FlexTime += sat - 8;
+                if (sun > 8) timesheet.FlexTime += sun - 8;
+                if (mon > 8) timesheet.FlexTime += mon - 8;
+                if (tue > 8) timesheet.FlexTime += tue - 8;
+                if (wed > 8) timesheet.FlexTime += wed - 8;
+                if (thu > 8) timesheet.FlexTime += thu - 8;
+                if (fri > 8) timesheet.FlexTime += fri - 8;
+                timesheet.FlexTime -= flexused;
             }
+
             try
             {
                 _context.Update(timesheet);
@@ -259,61 +324,22 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        // POST: Timesheets/Edit/5(timesheetid)
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("TimesheetId,WeekEnding,WeekNumber,SignatureId,FlexTime,Status,EmployeeId,EmployeePayId")] Timesheet timesheet)
-        //{
-        //    if (id != timesheet.TimesheetId)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    //authorization
-        //    if (timesheet.EmployeeId != _userManager.GetUserId(HttpContext.User))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            
-        //            _context.Update(timesheet);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!TimesheetExists(timesheet.TimesheetId))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(timesheet);
-        //}
-
         // GET: Timesheets/Delete/5(timesheetid)
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            var projects = await _context.Projects.ToListAsync();
-            var workpackages = await _context.WorkPackages.ToListAsync();
-            var timesheet = await _context.Timesheets
-                .Include(t => t.Employee)
-                .Include(t => t.TimesheetRows)
-                .FirstOrDefaultAsync(m => m.TimesheetId == id);
+
+            var timesheet = _context.Timesheets.Find(id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            foreach (TimesheetRow tr in timesheetrows)
+            {
+                var package = _context.WorkPackages.Find(tr.WorkPackageId);
+                var project = _context.Projects.Find(package.ProjectId);
+            }
+
             if (timesheet == null)
             {
                 return NotFound();
@@ -365,12 +391,21 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // POST: Timesheets/Submit/5(timesheetid)
-        public async Task<IActionResult> Submit(int id)
+
+        public async Task<IActionResult> Submit(int id, string pass)
         {
             var timesheet = await _context.Timesheets.FindAsync(id);
+            var oldSignature = _context.Signatures.Where(s => s.EmployeeId == _userManager.GetUserId(HttpContext.User)).Where(s => s.Status == Signature.VALID).FirstOrDefault();
+            var decryptedOldSignature = Utility.HashDecrypt(oldSignature.HashedSignature);
+            if (pass + oldSignature.CreatedTime != decryptedOldSignature)
+            {
+                TempData["info"] = "PassPhrase not correct";
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             timesheet.Status = Timesheet.SUBMITTED_NOT_APPROVED;
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
+
         }
 
         // POST: Timesheets/Retract/5(timesheetid)

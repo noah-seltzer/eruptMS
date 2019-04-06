@@ -15,13 +15,15 @@
             <output># of @Model.ProjectRequest.PayGrade.PayLevel Requests: @Model.ProjectRequest.AmountRequested</output>
             <div class="form-group">
                 <label asp-for="Employee.Email" class="control-label"></label>
-                <select asp-for="EmployeeIds" multiple="multiple" class="form-control searchDropDown multi-select" asp-items="ViewBag.Employees"></select>
+                <select asp-for="EmployeeIds" multiple="multiple" class="form-control searchDropDown multi-select" asp-items="ViewBag.Employees" required></select>
+                <span asp-validation-for="EmployeeIds" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="hidden" asp-for="ProjectRequest.ProjectRequestId" />
                 <input type="hidden" asp-for="ProjectRequest.PayGradeId" />
                 <input type="hidden" asp-for="ProjectRequest.PayGrade.PayLevel" />
                 <input type="hidden" asp-for="ProjectRequest.AmountRequested" />
+                <input type="hidden" asp-for="ProjectRequest.ProjectId" />
                 <input type="submit" value="Assign" class="btn btn-primary btn-raised" />
             </div>
         </form>
@@ -29,7 +31,7 @@
 </div>
 
 <div>
-    <a asp-action="ProjectIndex">Back to List</a>
+    <a asp-action="ViewRequests" asp-route-id="@Model.ProjectRequest.ProjectId">Back to List</a>
 </div>
 
 @section Scripts {

@@ -11,6 +11,7 @@ using System.IO;
 using System.Globalization;
 using System.Data.SqlClient;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -95,7 +96,16 @@ namespace COMP4911Timesheets.Controllers
 
         public static void BackupDatabase()
         {
-            string databaseName = "Erupt";
+            var matchCollections = Regex.Matches(Utility.ConnectionString, @"(Database=\w+)");
+            var matches = matchCollections.Cast<Match>().Select(match => match.Value).ToList();
+            if (matches.Count == 0)
+            {
+                return;
+            }
+            string connectionDbName = matches.ElementAt(0);
+            string toBeSearched = "Database=";
+            string databaseName = connectionDbName.Substring(connectionDbName.IndexOf(toBeSearched) + toBeSearched.Length);
+
             string backupPath = @"./erupt.bak";
             string commandText = $@"BACKUP DATABASE [{databaseName}] TO DISK = N'{backupPath}' WITH NOFORMAT, INIT, NAME = N'{databaseName}-Full Database Backup', SKIP, NOREWIND, NOUNLOAD,  STATS = 10";
 
@@ -118,7 +128,16 @@ namespace COMP4911Timesheets.Controllers
 
         public static void RestoreDatabase()
         {
-            string databaseName = "Erupt";
+            var matchCollections = Regex.Matches(Utility.ConnectionString, @"(Database=\w+)");
+            var matches = matchCollections.Cast<Match>().Select(match => match.Value).ToList();
+            if (matches.Count == 0)
+            {
+                return;
+            }
+            string connectionDbName = matches.ElementAt(0);
+            string toBeSearched = "Database=";
+            string databaseName = connectionDbName.Substring(connectionDbName.IndexOf(toBeSearched) + toBeSearched.Length);
+
             string backupPath = @"./erupt.bak";
             string commandText = $@"USE [master];ALTER DATABASE [{databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE [{databaseName}] FROM DISK = N'{backupPath}' WITH FILE = 1, NOUNLOAD, REPLACE, STATS = 5; ALTER DATABASE [{databaseName}] SET MULTI_USER;";
 

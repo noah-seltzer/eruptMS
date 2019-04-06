@@ -33,13 +33,27 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var employees = await _context.Employees
-                .Include(e => e.Approver)
-                .Include(e => e.Supervisor)
-                .Include(e => e.ProjectEmployees)
-                .OrderBy(s => s.EmployeeId)
-                .Where(e => e.SupervisorId == currentUser.Id)
-                .ToListAsync();
+            List<Employee> employees;
+            if (User.IsInRole(role: "AD"))
+            {
+                employees = await _context.Employees
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .Include(e => e.ProjectEmployees)
+                    .OrderBy(s => s.EmployeeId)
+                    .ToListAsync();
+            }
+            else
+            {
+                employees = await _context.Employees
+                    .Include(e => e.Approver)
+                    .Include(e => e.Supervisor)
+                    .Include(e => e.ProjectEmployees)
+                    .OrderBy(s => s.EmployeeId)
+                    .Where(e => e.SupervisorId == currentUser.Id)
+                    .ToListAsync();
+            }
+
             var lineManagerManagements = new List<LineManagerManagement>();
             foreach (var employee in employees)
             {
@@ -47,12 +61,18 @@ namespace COMP4911Timesheets.Controllers
                     .Where(t => t.EmployeeId == employee.Id)
                     .Where(t => t.Status == Timesheet.SUBMITTED_NOT_APPROVED)
                     .ToListAsync();
+                var employeePay = await _context.EmployeePays
+                    .Where(ep => ep.EmployeeId == employee.Id)
+                    .Where(ep => ep.Status == EmployeePay.VALID)
+                    .Include(ep => ep.PayGrade)
+                    .FirstOrDefaultAsync();
                 employee.Timesheets = timesheets;
                 lineManagerManagements.Add
                 (
                     new LineManagerManagement
                     {
-                        Employee = employee
+                        Employee = employee,
+                        EmployeePay = employeePay
                     }
                 );
             }
@@ -284,7 +304,7 @@ namespace COMP4911Timesheets.Controllers
                         EmployeeId = id,
                         ProjectId = projectRequest.ProjectId,
                         Status = ProjectEmployee.CURRENTLY_WORKING,
-                        Role = ProjectEmployee.EMPLOYEE
+                        Role = ProjectEmployee.NOT_ASSIGNED
                     });
                 }
                 await _context.ProjectEmployees.AddRangeAsync(projectEmployees);
@@ -293,7 +313,7 @@ namespace COMP4911Timesheets.Controllers
                 _context.ProjectRequests.Update(projectRequest);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(ProjectIndex));
+            return RedirectToAction(nameof(ViewRequests), new { id = lineManagerManagement.ProjectRequest.ProjectId });
         }
 
         public async Task<IActionResult> ChangeTA(string id)
@@ -339,8 +359,13 @@ namespace COMP4911Timesheets.Controllers
             var projectEmployees = await _context.ProjectEmployees
                 .Where(pe => pe.ProjectId == id)
                 .Where(pe => pe.Employee.SupervisorId == _userManager.GetUserId(User))
+                .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
+                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER)
                 .Include(pe => pe.Employee)
                 .Include(pe => pe.Project)
+                .OrderBy(pe => pe.Role)
+                .GroupBy(pe => pe.EmployeeId)
+                .Select(pe => pe.FirstOrDefault())
                 .ToListAsync();
             var project = await _context.Projects.FindAsync(id);
             LineManagerManagement lineManagerManagement = new LineManagerManagement
@@ -351,25 +376,34 @@ namespace COMP4911Timesheets.Controllers
             return View(lineManagerManagement);
         }
 
-        public async Task<IActionResult> RemoveEmployee(int id, LineManagerManagement lineManagerManagement)
+        public async Task<IActionResult> RemoveEmployee(string id, LineManagerManagement lineManagerManagement)
         {
-            var projectEmployee = await _context.ProjectEmployees
+            var projectEmployees = await _context.ProjectEmployees
                 .Include(pe => pe.Employee)
-                .FirstOrDefaultAsync(pe => pe.ProjectEmployeeId == id);
+                .Where(pe => pe.EmployeeId == id)
+                .ToListAsync();
+            lineManagerManagement.ProjectEmployee = new ProjectEmployee();
             if (ModelState.IsValid)
             {
-                if (projectEmployee.Role == ProjectEmployee.PROJECT_MANAGER)
+                foreach (ProjectEmployee projectEmployee in projectEmployees)
                 {
-                    await _userManager.RemoveFromRoleAsync(projectEmployee.Employee, ApplicationRole.PM);
+
+                    if (projectEmployee.Role == ProjectEmployee.PROJECT_MANAGER)
+                    {
+                        await _userManager.RemoveFromRoleAsync(projectEmployee.Employee, ApplicationRole.PM);
+                    }
+                    if (projectEmployee.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                    {
+                        await _userManager.RemoveFromRoleAsync(projectEmployee.Employee, ApplicationRole.PA);
+                    }
+                    projectEmployee.Role = ProjectEmployee.NOT_ASSIGNED;
+                    projectEmployee.Status = ProjectEmployee.NOT_WORKING;
+                    lineManagerManagement.ProjectEmployee.ProjectId = projectEmployee.ProjectId;
+                    _context.Update(projectEmployee);
+                    await _context.SaveChangesAsync();
                 }
-                if (projectEmployee.Role == ProjectEmployee.PROJECT_ASSISTANT)
-                {
-                    await _userManager.RemoveFromRoleAsync(projectEmployee.Employee, ApplicationRole.PA);
-                }
-                _context.Remove(projectEmployee);
-                await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(RemoveEmployees), new { id = projectEmployee.ProjectId });
+            return RedirectToAction(nameof(RemoveEmployees), new { id = lineManagerManagement.ProjectEmployee.ProjectId });
         }
 
     }

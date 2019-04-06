@@ -43,14 +43,15 @@ namespace COMP4911Timesheets.Controllers
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .OrderBy(s => s.EmployeeId).ToListAsync();
-            } else
+            }
+            else
             {
                 employees = await _context.Employees
                     .Include(e => e.Approver)
                     .Include(e => e.Supervisor)
                     .OrderBy(s => s.EmployeeId).ToListAsync();
             }
-            
+
             var employeeManagements = new List<EmployeeManagement>();
             foreach (var employee in employees)
             {
@@ -114,6 +115,11 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (_context.Employees.Where(e => e.Email == employeeManagement.Employee.Email).FirstOrDefault() != null)
+                {
+                    ViewBag.ErrorMessage = "There is an employee already with the email you entered.";
+                    return await Create();
+                }
                 employeeManagement.Employee.Status = Employee.CURRENTLY_EMPLOYEED;
                 employeeManagement.Employee.CreatedTime = DateTime.Now;
                 employeeManagement.Employee.UserName = employeeManagement.Employee.Email;
@@ -132,6 +138,32 @@ namespace COMP4911Timesheets.Controllers
                 if (employeeManagement.Employee.Title == Employee.ADMIN)
                 {
                     await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.AD);
+                }
+
+                var internalProjects = await _context.Projects
+                    .Where(p => p.Status == Project.INTERNAL)
+                    .Include(p => p.WorkPackages)
+                    .ToListAsync();
+                foreach (Project internalProject in internalProjects)
+                {
+                    var workPackages = internalProject.WorkPackages;
+                    foreach (WorkPackage workPackage in workPackages)
+                    {
+                        if (workPackage.WorkPackageCode == "00000")
+                        {
+                            continue;
+                        }
+                        var projectEmployee = new ProjectEmployee
+                        {
+                            EmployeeId = employeeManagement.Employee.Id,
+                            ProjectId = internalProject.ProjectId,
+                            WorkPackageId = workPackage.WorkPackageId,
+                            Status = ProjectEmployee.CURRENTLY_WORKING,
+                            Role = ProjectEmployee.EMPLOYEE
+                        };
+                        _context.Add(projectEmployee);
+                        await _context.SaveChangesAsync();
+                    }
                 }
 
                 var supervisor = _context.Employees.Find(employeeManagement.Employee.SupervisorId);
@@ -200,6 +232,13 @@ namespace COMP4911Timesheets.Controllers
             {
                 try
                 {
+                    var something = _userManager.GetUserId(this.User);
+                    if (id == _userManager.GetUserId(this.User) && employeeManagement.Employee.Title == Employee.ADMIN)
+                    {
+                        ViewBag.ErrorMessage = "You cannot assign yourself to admin";
+                        return await Edit(id);
+                    }
+
                     var oldEmployee = await _context.Employees.FindAsync(id);
                     if (oldEmployee != null)
                     {

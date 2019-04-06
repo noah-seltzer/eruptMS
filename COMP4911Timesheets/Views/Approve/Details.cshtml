@@ -64,14 +64,11 @@
         </tr>
     </thead>
     <tbody>
-        @{ int a = 10;
+        @{ 
             foreach (var item in Model.Timesheets)
             {
-                //only show submitted and not approved sheets
-                @if (Timesheet.Statuses[item.Status] == "Submitted & Not Approved")
-                {
-                    <tr>
 
+                    <tr>
                         <td>
                             @{string date = item.WeekEnding.ToString("yyyy/MM/dd");}
                             @Html.DisplayFor(modelItem => date)
@@ -90,7 +87,7 @@
                             <a asp-action="TimesheetView" asp-route-id="@item.TimesheetId" class="btn btn-primary btn-raised">View</a>
                         </td>
                     </tr>
-                }
+                
 
 
             }

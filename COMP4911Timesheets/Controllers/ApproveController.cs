@@ -7,45 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class ApproveController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<Employee> _userManager;
-        private static int INVALID = 0;
-        private static int NOT_SUBMITTED_NOT_APPROVED = 1;
-        private static int SUBMITTED_NOT_APPROVED = 2;
         private static int SUBMITTED_APPROVED = 3;
         private static int REJECTED_NEED_RESUBMISSION = 4;
 
-        public ApproveController(ApplicationDbContext context, UserManager<Employee> userManager)
+        public ApproveController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
 
         // GET: Approve
         public async Task<IActionResult> Index()
         {
             var Employees = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor).Include(e => e.Timesheets);
-            List<Employee> temp = await Employees.ToListAsync();
-            List<Employee> supervisedEmployee = new List<Employee>();
-            //if (_context.Employees.Find(_userManager.GetUserAsync(this.User)) == Employee.ADMIN)
-            if(_context.Employees.Find(_userManager.GetUserId(this.User)).Title == Employee.ADMIN)
-            {
-                return View(await Employees.ToListAsync());
-            }
-            foreach (Employee e in temp)
-            {
-                if (e.ApproverId == _userManager.GetUserId(this.User))
-                {
-                    supervisedEmployee.Add(e);
-                }
-            }
-            return View(supervisedEmployee);
+            return View(await Employees.ToListAsync());
         }
 
         // GET: Approve/Details/5
@@ -66,10 +46,17 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            var timesheets = await _context.Timesheets
+                .Where(ts => ts.Status == Timesheet.SUBMITTED_NOT_APPROVED)
+                .Where(ts => ts.EmployeeId == id)
+                .ToListAsync();
+
+            employee.Timesheets = timesheets;
+
             return View(employee);
         }
-        
-        
+
+
         // POST: Approve/Delete/5
         public async Task<IActionResult> TimesheetView(int id)
         {
@@ -81,11 +68,21 @@ namespace COMP4911Timesheets.Controllers
             int x = 0;
             Int32.TryParse(id, out x);
             */
-            var timesheet = await _context.Timesheets
-                .Include(e => e.TimesheetRows)
-                .FirstOrDefaultAsync(m => m.TimesheetId == id);
-            var projects = await _context.Projects.ToListAsync();
-            var packages = await _context.WorkPackages.ToListAsync();
+            //var timesheet = await _context.Timesheets
+            //    .Include(e => e.TimesheetRows)
+            //    .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            //var projects = await _context.Projects.ToListAsync();
+            //var packages = await _context.WorkPackages.ToListAsync();
+
+            var timesheet = _context.Timesheets.Find(id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            foreach (TimesheetRow tr in timesheetrows)
+            {
+                var package = _context.WorkPackages.Find(tr.WorkPackageId);
+                var project = _context.Projects.Find(package.ProjectId);
+            }
+
+
             if (timesheet == null)
             {
                 return NotFound();
@@ -94,15 +91,19 @@ namespace COMP4911Timesheets.Controllers
             return View(timesheet);
         }
 
-        
+
         public async Task<IActionResult> Approval(int id)
         {
             if (id == 0)
             {
                 return RedirectToAction(nameof(Index));
             }
-            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Include(t => t.Employee).FirstOrDefaultAsync(m => m.TimesheetId == id);
             timesheet.Status = SUBMITTED_APPROVED;
+
+            //add flex hours to employee
+            timesheet.Employee.FlexTime += timesheet.FlexTime;
+
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));

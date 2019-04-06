@@ -10,11 +10,16 @@
 <hr />
 <div class="row">
     <div class="col-md-8 col-lg-6 well bs-component">
-        <form asp-action="CreateChildWorkPackage">
+        <form asp-action="CreateInternalWorkPackage">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="WorkPackageCode" class="control-label"></label>
+                <input asp-for="WorkPackageCode" class="form-control" required />
+                <span asp-validation-for="WorkPackageCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" required/>
+                <input asp-for="Name" class="form-control" required />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -48,7 +53,7 @@
                 <span asp-validation-for="Activity" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create Child Work Package" class="btn btn-primary btn-raised" />
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
             </div>
         </form>
     </div>

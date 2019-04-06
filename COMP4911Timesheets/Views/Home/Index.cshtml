@@ -10,9 +10,10 @@
 <br/>
 
 <section class="content align-content-center">
+
+    <div class="row">
     @if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
     {
-    <div class="row">
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-aqua">
                 <div class="inner">
@@ -41,6 +42,8 @@
                 </a>
             </div>
         </div>
+        @if (User.IsInRole(role: "AD"))
+        {
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-yellow">
                 <div class="inner">
@@ -55,10 +58,8 @@
                 </a>
             </div>
         </div>
-        
-    </div>
+        }
     }
-    <div class="row">
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-orange">
                 <div class="inner">
@@ -91,7 +92,7 @@
             <div class="small-box bg-purple">
                 <div class="inner">
                     <h4>Rejected</h4>
-                    <p>@ViewData["RejectedSheets"]</p>
+                    <p>@ViewData["RejectedSheets"] - Need action</p>
                 </div>
                 <div class="icon">
                     <i class="material-icons">assignment_late</i>
@@ -101,6 +102,55 @@
                 </a>
             </div>
         </div>
+
+        @if(User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "AD"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-olive">
+                <div class="inner">
+                    <h4>Projects</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assessment</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Projects" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        }
+        @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD") || User.IsInRole(role: "TA"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-blue">
+                <div class="inner">
+                    <h4>Line Managers</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">content_paste</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="LineManagers" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-navy">
+                <div class="inner">
+                    <h4>Approve</h4>
+                    <p>@ViewData["TimesheetsNeeded"] - Need approval</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assignment_turned_in</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Approve" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        }
     </div>
 </section>
 

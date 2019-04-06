@@ -39,7 +39,8 @@ namespace COMP4911Timesheets.Controllers
                     .Where(w => w.Project.ProjectCode.Contains(searchString)
                             || w.WorkPackageCode.Contains(searchString))
                     .ToListAsync();
-            } else
+            }
+            else
             {
                 workPackages = await _context.WorkPackages
                     .Include(w => w.ParentWorkPackage)
@@ -80,6 +81,37 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
+        // GET: WorkPackages/CreateInternalWorkPackage
+        public IActionResult CreateInternalWorkPackage()
+        {
+            TempData["projectId"] = projectId;
+            return View();
+        }
+
+
+        // POST: WorkPackages/CreateInternalWorkPackage
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateInternalWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        {
+           
+            workPackage.ProjectId = projectId;
+            workPackage.Status = WorkPackage.OPENED;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackage);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+            }
+            //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
+            //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
+            return View(workPackage);
+        }
+
+
         // GET: WorkPackages/CreateWorkPackage
         public IActionResult CreateWorkPackage()
         {
@@ -95,31 +127,38 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
             int[] workpackageCode = new int[10];
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++)
+            {
                 workpackageCode[i] = -1;
             }
             workPackage.ProjectId = projectId;
-            workPackage.Status = WorkPackage.OPENED; 
+            workPackage.Status = WorkPackage.OPENED;
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
-
+            int workPackageLength = 0;
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
-                
-                if (tempWorkPackage.WorkPackageCode.Length == PROJECT_CODE_LENGTH + 1) {
+
+                if (tempWorkPackage.WorkPackageCode.Length == PROJECT_CODE_LENGTH + 1)
+                {
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(PROJECT_CODE_LENGTH, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
 
             string theWorkpackageCode = null;
 
-            for (int i = 0; i < 10; i++) {
-                if (workpackageCode[i] == -1 && i != 0) {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+            for (int i = 0; i < 10; i++)
+            {
+                if (workpackageCode[i] == -1 && i != 0)
+                {
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
-                if (workpackageCode[i] == -1 && i == 0) {
+                if (workpackageCode[i] == -1 && i == 0)
+                {
                     theWorkpackageCode = project.ProjectCode + "0";
                     break;
                 }
@@ -162,12 +201,15 @@ namespace COMP4911Timesheets.Controllers
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
             var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            int workPackageLength = 0;
+
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
 
                 if (tempWorkPackage.ParentWorkPackageId == parentWorkPackage.WorkPackageId)
                 {
-                   // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
+                    // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
                     workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(parentWorkPackage.WorkPackageCode.Length, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
                 }
             }
@@ -178,7 +220,8 @@ namespace COMP4911Timesheets.Controllers
             {
                 if (workpackageCode[i] == -1 && i != 0)
                 {
-                    theWorkpackageCode = (workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
                     break;
                 }
 
@@ -188,7 +231,7 @@ namespace COMP4911Timesheets.Controllers
                     break;
                 }
             }
-             
+
             workPackage.ParentWorkPackageId = parentWorkPKId;
             workPackage.WorkPackageCode = theWorkpackageCode;
             if (ModelState.IsValid)
@@ -206,7 +249,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/CreateWorkPackage/6
         public async Task<IActionResult> CreateWorkPackageReport(int? id)
         {
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id &&  m.Status != WorkPackage.CLOSED);
+            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
             if (workPackages == null)
             {
                 var theWorkPackage = await _context.WorkPackages.FindAsync(id);
@@ -221,7 +264,7 @@ namespace COMP4911Timesheets.Controllers
             TempData["info"] = "Workpackage report only can be created on leaf workpackages";
             var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
-     
+
         }
 
         // POST: WorkPackageReports/CreateWorkPackageReport
@@ -297,7 +340,8 @@ namespace COMP4911Timesheets.Controllers
                             }
                         }
                     }
-                    else {
+                    else
+                    {
                         _context.Update(workPackage);
                         await _context.SaveChangesAsync();
                     }
@@ -319,16 +363,23 @@ namespace COMP4911Timesheets.Controllers
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
         }
-        
+
         //GET: ProjectWorkPackges/WorkPackages/5
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {
-            if (User.IsInRole("RE")) {
-
-            }            
 
             projectId = id;
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefault();
+            var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var projectEmployee = _context.ProjectEmployees
+                .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+
+
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            {
+                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+                return RedirectToAction("Index", "Projects");
+            }
 
             ViewData["projectCode"] = project.ProjectCode;
             ViewData["projectName"] = project.Name;
@@ -338,17 +389,42 @@ namespace COMP4911Timesheets.Controllers
                 return NotFound();
             }
 
+            List<WorkPackage> workPackages = new List<WorkPackage>();
 
-            var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
-            //order the workpackages
+
+            if (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM"))
+            {
+                var REWorkPackages = await _context.ProjectEmployees
+                    .Where(u => u.EmployeeId == users.Id && u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
+
+                foreach (ProjectEmployee temp in REWorkPackages)
+                {
+                    WorkPackage tempwp = _context.WorkPackages
+                        .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
+                    workPackages.Add(tempwp);
+                }
+                return View(workPackages);
+            }
+            else
+            {
+                workPackages = await _context.WorkPackages
+                    .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
+            }
+
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
+            if (project.Status == Project.INTERNAL) {
+                return View("InternalProjectWorkPackges", workPackages);
+            }
+            //order the workpackages
+
             int maxWorkPackageCodeLength = 0;
-            
+
             //get the max length of the workpackage code
-            foreach (WorkPackage tempWorkPackage in workPackages) {
-                if (tempWorkPackage.WorkPackageCode.Length > maxWorkPackageCodeLength) {
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {
+                if (tempWorkPackage.WorkPackageCode.Length > maxWorkPackageCodeLength)
+                {
                     maxWorkPackageCodeLength = tempWorkPackage.WorkPackageCode.Length;
                 }
             }
@@ -365,25 +441,29 @@ namespace COMP4911Timesheets.Controllers
             }
 
             //put children workpackages under parents workpackages          
-            for (int i = 0; i < maxWorkPackageCodeLength - PROJECT_CODE_LENGTH - 1; i++) {
+            for (int i = 0; i < maxWorkPackageCodeLength - PROJECT_CODE_LENGTH - 1; i++)
+            {
 
                 for (int n = 0; n < workPackages.Count; n++)
                 {
                     //checkout the children workpackages
-                    if (workPackages[n].WorkPackageCode.Length == PROJECT_CODE_LENGTH + i + 2) {
+                    if (workPackages[n].WorkPackageCode.Length == PROJECT_CODE_LENGTH + i + 2)
+                    {
                         //compare children workpackagecode with other possible parents workpackagecode
-                        for (int m = 0; m < tempWorkPackages.Count; m++) {
+                        for (int m = 0; m < tempWorkPackages.Count; m++)
+                        {
                             string tempCode1 = tempWorkPackages[m].WorkPackageCode;
                             string tempCode2 = workPackages[n].WorkPackageCode.Substring(0, PROJECT_CODE_LENGTH + i + 1);
-                           
-                            if (tempCode1.Equals(tempCode2)) {
+
+                            if (tempCode1.Equals(tempCode2))
+                            {
                                 tempWorkPackages.Insert(m + 1, workPackages[n]);
-                            }                           
+                            }
                         }
                     }
                 }
             }
-            
+
             workPackages = tempWorkPackages;
 
             //ViewData["NestedLevel"] = maxWorkPackageCodeLength - PROJECT_CODE_LENGTH;
