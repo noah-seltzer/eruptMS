@@ -379,3 +379,7 @@ body {
     opacity: .65;
     filter: alpha(opacity=65)
 }
+
+.badge {
+    font-size: 85% !important;
+}
