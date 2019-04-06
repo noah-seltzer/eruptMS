@@ -405,3 +405,6 @@ body {
   .project-button {
       float: right;
   }
+.badge {
+    font-size: 85% !important;
+}

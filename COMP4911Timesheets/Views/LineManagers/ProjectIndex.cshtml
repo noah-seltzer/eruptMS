@@ -36,7 +36,13 @@
                     @Html.DisplayFor(modelItem => item.Project.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Project.ProjectRequests.Count)
+                    @{
+                        int sum = 0;
+                        foreach (var projectRequest in item.Project.ProjectRequests) {
+                            sum += projectRequest.AmountRequested;
+                        }
+                    }
+                    @Html.DisplayFor(modelItem => sum)
                 </td>
                 <td>
                     <a asp-action="ViewRequests" asp-route-id="@item.Project.ProjectId">View Requests</a> |

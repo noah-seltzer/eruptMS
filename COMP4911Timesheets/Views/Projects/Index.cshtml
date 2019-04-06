@@ -70,8 +70,17 @@
                         @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
                     </td>
                     <td>
-                        <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">Work Packages</a><br />
-                        <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage</a> <br />
+                        @if(item.Status != Project.CLOSED) {
+                            <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">Work Packages</a><br />
+                            <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage</a> <br />
+                        }
+                        @if(User.IsInRole("AD") || User.IsInRole("PM")) {
+                            @if(item.Status==Project.CLOSED) {
+                                <a asp-action="Reopen" asp-route-id="@item.ProjectId" asp-controller="Projects">Reopen</a><br/>
+                            } else {
+                                <a asp-action="Close" asp-route-id="@item.ProjectId" asp-controller="Projects">Archive</a><br/>
+                            }
+                        }
                     </td>
                 </tr>
             }

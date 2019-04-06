@@ -43,7 +43,8 @@ namespace COMP4911Timesheets
             {
                 model.managedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
-                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+                          && pe.WorkPackageId == null
+                          && pe.Role != ProjectEmployee.NOT_ASSIGNED) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -55,7 +56,8 @@ namespace COMP4911Timesheets
             {
                 model.managedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
-                          && pe.WorkPackageId == null) // null WP is marker for mgmt roles
+                          && pe.WorkPackageId == null
+                          && pe.Role != ProjectEmployee.NOT_ASSIGNED) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -70,7 +72,9 @@ namespace COMP4911Timesheets
                 model.assignedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
                           && pe.WorkPackageId == null
-                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                          && pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.Status == ProjectEmployee.CURRENTLY_WORKING) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -83,7 +87,9 @@ namespace COMP4911Timesheets
                 model.assignedProjects = await _context.ProjectEmployees
                 .Where(pe => pe.EmployeeId == uid
                           && pe.WorkPackageId == null
-                          && pe.Role == ProjectEmployee.PROJECT_ASSISTANT) // null WP is marker for mgmt roles
+                          && pe.Role != ProjectEmployee.PROJECT_MANAGER
+                          && pe.Role != ProjectEmployee.PROJECT_ASSISTANT
+                          && pe.Status == ProjectEmployee.CURRENTLY_WORKING) // null WP is marker for mgmt roles
                 .Join(_context.Projects,
                         p => p.ProjectId,
                         pe => pe.ProjectId,
@@ -287,20 +293,46 @@ namespace COMP4911Timesheets
             if (assistant != null)
                 model.managersAssistant = assistant.EmployeeId;
 
-            List<Employee> employees = _context.Employees
-                .Where(e => e.Id != manager.EmployeeId)
+            List<Employee> mgrList = new List<Employee>();
+            List<Employee> assList = new List<Employee>();
+
+            ViewBag.Assistant = false;
+
+            if (User.IsInRole("AD"))    //Admin
+            {
+                mgrList = _context.Employees
                 .ToList();
 
-            List<SelectListItem> empItemsNoManager = new List<SelectListItem>();
-            empItemsNoManager.AddRange(new SelectList(employees, "Id", "Email"));
-            empItemsNoManager.Insert(0, new SelectListItem { Text = "None", Value = "" });
-            ViewBag.EmployeesA = empItemsNoManager;
+                assList = mgrList;
+            }
+            else if (manager.EmployeeId == uid) // Project Manager
+            {
+                var list = _context.ProjectEmployees
+                    .Where(pe => pe.ProjectId == id)
+                    .Include(pe => pe.Employee)
+                    .ToList();
 
-            List<SelectListItem> empItemsAll = new List<SelectListItem>();
-            empItemsAll.AddRange(new SelectList(employees, "Id", "Email"));
-            var managerObj = _context.Employees.Find(model.projectManager);
-            empItemsAll.Insert(0, new SelectListItem { Text = managerObj.Email, Value = managerObj.Id });
-            ViewBag.EmployeesM = empItemsAll;
+                foreach (var pe in list)
+                    mgrList.Add(pe.Employee);
+
+                assList = mgrList;
+            }
+            else // Assistant
+            {
+                mgrList.Add(_context.Employees.Find(manager.EmployeeId));
+                assList.Add(_context.Employees.Find(assistant.EmployeeId));
+                ViewBag.Assistant = true;
+            }
+
+            List<SelectListItem> mgrItems = new List<SelectListItem>();
+            mgrItems.AddRange(new SelectList(mgrList, "Id", "Email"));
+
+            List<SelectListItem> assItems = new List<SelectListItem>();
+            assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
+            assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+
+            ViewBag.EmployeesM = mgrItems;
+            ViewBag.EmployeesA = assItems;
 
             ViewBag.Status = new SelectList(Project.Statuses.ToList(), "Key", "Value", project.Status);
             ViewBag.WPs = new SelectList(_context.WorkPackages.Where(w => w.ProjectId == project.ProjectId).ToList()
@@ -320,6 +352,11 @@ namespace COMP4911Timesheets
             if (id != model.project.ProjectId)
             {
                 return NotFound();
+            }
+
+            if (model.projectManager == model.managersAssistant) {
+                ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
+                return await Edit(id);
             }
 
             if (ModelState.IsValid)
@@ -448,12 +485,19 @@ namespace COMP4911Timesheets
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, ActionName("Close")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Close(int id)
         {
             var project = await _context.Projects.FindAsync(id);
             project.Status = Project.CLOSED;
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Reopen(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            project.Status = Project.ONGOING;
             _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
