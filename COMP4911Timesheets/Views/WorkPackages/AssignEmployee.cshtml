@@ -23,77 +23,101 @@
                 @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
             </th>
             <th class="priority-2">
-                Roles
-            </th>
-            <th class="priority-2">
                 @Html.DisplayNameFor(model => model.Employee.Status)
             </th>
+            <th class="priority-2">
+                Roles
+            </th>
+            <th></th>
             <th></th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Employee.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
-                </td>
-                @if (item.Role == 100)
+            {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Employee.Status])
+            </td>
+            <td>
+                @foreach (var role in item.Role)
                 {
-                    <td>
-                        PROJECT MANAGER
-                    </td>
-                }
 
-                @if (item.Role == 110)
-                {
-                    <td>
-                        PROJECT ASSISTANT
-                    </td>
+                    @if (role == ProjectEmployee.PROJECT_MANAGER)
+                    {
+                        <p>
+                            PROJECT MANAGER
+                        </p>
+                    }
+
+                    @if (role == ProjectEmployee.PROJECT_ASSISTANT)
+                    {
+                        <p>
+                            PROJECT ASSISTANT
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.RESPONSIBLE_ENGINEER)
+                    {
+                        <p>
+                            RESPONSIBLE ENGINEER
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.EMPLOYEE)
+                    {
+                        <p>
+                            EMPLOYEE
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.NOT_ASSIGNED)
+                    {
+                        <p>
+                            NOT ASSIGNED
+                        </p>
+                    }
                 }
-                @if (item.Role == 200)
-                {
-                    <td>
-                        RESPONSIBLE ENGINEER
-                    </td>
-                }
-                @if (item.Role == 300)
-                {
-                    <td>
-                        EMPLOYEE
-                    </td>
-                }
-                @if (item.Role == 900)
-                {
-                    <td>
-                        NOT ASSIGNED
-                    </td>
-                }
-                <td class="priority-2">
-                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Employee.Title])
-                </td>
-                <td class="priority-2">
-                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Employee.Status])
-                </td>
+            </td>
+            @if (!item.Role.Contains(ProjectEmployee.RESPONSIBLE_ENGINEER))
+            {
                 <td>
-                    @Html.ActionLink("AssignRE", "AssignRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName},
-                        new { @class = "btn btn-primary btn-block", @role = "button" })
+                    @Html.ActionLink("AssignRE", "AssignRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName },
+                         new { @class = "btn btn-primary btn-block", @role = "button" })
                 </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("RemoveRE", "RemoveRE", "WorkPackages", new { EmployeeId = item.Employee.Id},
+                         new { @class = "btn btn-primary btn-block", @role = "button" })
+                </td>
+            }
+            @if (!item.Role.Contains(ProjectEmployee.EMPLOYEE))
+            {
                 <td>
                     @Html.ActionLink("AssignEm", "AssignEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
                         new { @class = "btn btn-primary btn-block", @role = "button" })
                 </td>
-            </tr>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("RemoveEm", "RemoveEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
+                        new { @class = "btn btn-primary btn-block", @role = "button" })
+                </td>
+            }
+        </tr>
         }
     </tbody>
 </table>
