@@ -515,7 +515,7 @@ namespace COMP4911Timesheets.Controllers
             var workPackages = _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefault();
             if (workPackages != null)
             {
-                TempData["info"] = "Workpackage report only can be created on leaf workpackages";
+                TempData["info"] = "Employee can only be assigned to a leaf workpackage";
                 var wpTemp = _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefault();
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
             }
@@ -525,7 +525,8 @@ namespace COMP4911Timesheets.Controllers
 
             projectEmployees = await _context.ProjectEmployees
                 .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING 
-                && e.ProjectId == WorkPackagesController.projectId)
+                && e.ProjectId == WorkPackagesController.projectId
+                && e.WorkPackageId == id)
                 .Include(e => e.Employee)
                 .OrderBy(s => s.EmployeeId).ToListAsync();
 
