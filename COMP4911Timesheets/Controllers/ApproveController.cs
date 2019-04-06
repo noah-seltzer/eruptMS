@@ -7,24 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
     public class ApproveController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext  _context;
+        private readonly UserManager<Employee> _usermgr;
+
         private static int SUBMITTED_APPROVED = 3;
         private static int REJECTED_NEED_RESUBMISSION = 4;
 
-        public ApproveController(ApplicationDbContext context)
+        public ApproveController(ApplicationDbContext context, UserManager<Employee> usermgr)
         {
             _context = context;
+            _usermgr = usermgr;
         }
 
         // GET: Approve
         public async Task<IActionResult> Index()
         {
-            var Employees = _context.Employees.Include(e => e.Approver).Include(e => e.Supervisor).Include(e => e.Timesheets);
+            if (User.IsInRole("AD"))
+            {
+
+            }
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            var Employees = _context.Employees
+                .Where(e => e.SupervisorId == uid)
+                .Include(e => e.Approver)
+                .Include(e => e.Supervisor)
+                .Include(e => e.Timesheets);
             return View(await Employees.ToListAsync());
         }
 
