@@ -240,7 +240,7 @@ namespace COMP4911Timesheets.Controllers
                     .Where(pe => pe.ProjectId == projectRequest.ProjectId)
                     .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                     .FirstOrDefaultAsync();
-                if (employeePay.Employee.SupervisorId == currentUser.Id && projectEmployee == null)
+                if ((employeePay.Employee.SupervisorId == currentUser.Id || User.IsInRole("AD")) && projectEmployee == null)
                 {
                     employees.Add(employeePay.Employee);
                 }
