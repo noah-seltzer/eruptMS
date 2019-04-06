@@ -24,7 +24,9 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-raised" />
             </div>
-            <p class="text-danger">@TempData["info"]</p>
+            <p class="text-danger">@TempData["begin"] <a class="font-weight-bold font-italic" asp-area="Identity" 
+                asp-page="/Account/Manage/Signature" title="Go to profile" style="text-decoration:underline">@TempData["Link"]</a>@TempData["end"]
+            </p>
         </form>
     </div>
 </div>

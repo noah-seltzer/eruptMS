@@ -68,11 +68,21 @@ namespace COMP4911Timesheets.Controllers
             int x = 0;
             Int32.TryParse(id, out x);
             */
-            var timesheet = await _context.Timesheets
-                .Include(e => e.TimesheetRows)
-                .FirstOrDefaultAsync(m => m.TimesheetId == id);
-            var projects = await _context.Projects.ToListAsync();
-            var packages = await _context.WorkPackages.ToListAsync();
+            //var timesheet = await _context.Timesheets
+            //    .Include(e => e.TimesheetRows)
+            //    .FirstOrDefaultAsync(m => m.TimesheetId == id);
+            //var projects = await _context.Projects.ToListAsync();
+            //var packages = await _context.WorkPackages.ToListAsync();
+
+            var timesheet = _context.Timesheets.Find(id);
+            var timesheetrows = _context.TimesheetRows.Where(t => t.TimesheetId == id);
+            foreach (TimesheetRow tr in timesheetrows)
+            {
+                var package = _context.WorkPackages.Find(tr.WorkPackageId);
+                var project = _context.Projects.Find(package.ProjectId);
+            }
+
+
             if (timesheet == null)
             {
                 return NotFound();
