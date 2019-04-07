@@ -540,7 +540,10 @@ namespace COMP4911Timesheets.Controllers
                     {
                         Role = new List<int>(),
                         Employee = projectEmployee.Employee,
-                        EmployeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == projectEmployee.Employee.Id).Where(ep => ep.Status == EmployeePay.VALID).Include(ep => ep.PayGrade).FirstOrDefaultAsync()
+                        EmployeePay = await _context.EmployeePays
+                            .Where(ep => ep.EmployeeId == projectEmployee.Employee.Id)
+                            .Where(ep => ep.Status == EmployeePay.VALID)
+                            .Include(ep => ep.PayGrade).FirstOrDefaultAsync()
                     };
                     tempEm.Role.Add(projectEmployee.Role);
                     employeeManagements.Add(tempEm);

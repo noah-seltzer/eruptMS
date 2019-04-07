@@ -59,32 +59,32 @@
                     @if (role == ProjectEmployee.PROJECT_MANAGER)
                     {
                         <p>
-                            PROJECT MANAGER
+                            Project Manager
                         </p>
                     }
 
                     @if (role == ProjectEmployee.PROJECT_ASSISTANT)
                     {
                         <p>
-                            PROJECT ASSISTANT
+                            Project Assistant
                         </p>
                     }
                     @if (role == ProjectEmployee.RESPONSIBLE_ENGINEER)
                     {
                         <p>
-                            RESPONSIBLE ENGINEER
+                            Responsible Engineer
                         </p>
                     }
                     @if (role == ProjectEmployee.EMPLOYEE)
                     {
                         <p>
-                            EMPLOYEE
+                            Employee
                         </p>
                     }
                     @if (role == ProjectEmployee.NOT_ASSIGNED)
                     {
                         <p>
-                            NOT ASSIGNED
+                            Not Assigned
                         </p>
                     }
                 }
@@ -92,29 +92,29 @@
             @if (!item.Role.Contains(ProjectEmployee.RESPONSIBLE_ENGINEER))
             {
                 <td>
-                    @Html.ActionLink("AssignRE", "AssignRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName },
-                         new { @class = "btn btn-primary btn-block", @role = "button" })
+                    @Html.ActionLink("Assign RE", "AssignRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName },
+                         new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
                 </td>
             }
             else
             {
                 <td>
-                    @Html.ActionLink("RemoveRE", "RemoveRE", "WorkPackages", new { EmployeeId = item.Employee.Id},
-                         new { @class = "btn btn-primary btn-block", @role = "button" })
+                    @Html.ActionLink("Remove RE", "RemoveRE", "WorkPackages", new { EmployeeId = item.Employee.Id},
+                         new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
                 </td>
             }
             @if (!item.Role.Contains(ProjectEmployee.EMPLOYEE))
             {
                 <td>
-                    @Html.ActionLink("AssignEm", "AssignEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
-                        new { @class = "btn btn-primary btn-block", @role = "button" })
+                    @Html.ActionLink("Assign Em", "AssignEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
+                        new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
                 </td>
             }
             else
             {
                 <td>
-                    @Html.ActionLink("RemoveEm", "RemoveEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
-                        new { @class = "btn btn-primary btn-block", @role = "button" })
+                    @Html.ActionLink("Remove Em", "RemoveEm", "WorkPackages", new { EmployeeId = item.Employee.Id },
+                        new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
                 </td>
             }
         </tr>

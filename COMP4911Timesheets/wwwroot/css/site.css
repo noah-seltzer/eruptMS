@@ -388,8 +388,9 @@ body {
 
 .multiple-roles {
     position: relative;
-    height: 325px;
+    max-height: 325px;
     overflow: auto;
+    margin-bottom: 12px;
   }
 
   .table-wrapper-scroll-y {
