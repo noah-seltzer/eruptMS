@@ -7,30 +7,52 @@ using System.Threading.Tasks;
 using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace COMP4911Timesheets.Controllers
 {
+    public sealed class WorkPackagesMap : ClassMap<WorkPackage>
+    {
+        public WorkPackagesMap()
+        {
+            Map(m => m.Name).Name("Name");
+            Map(m => m.Description).Name("Description");
+            Map(m => m.Contractor).Name("Contractor");
+            Map(m => m.Purpose).Name("Purpose");
+            Map(m => m.Input).Name("Input");
+            Map(m => m.Output).Name("Output");
+            Map(m => m.Activity).Name("Activity");
+            Map(m => m.Status).Name("Status");
+            Map(m => m.ParentWorkPackageId).Name("ParentWorkPackage");
+            
+        }
+    }
     public class UploadsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileProvider fileProvider;
         private readonly IHostingEnvironment hostingEnvironment;
         private String fileContents;
+        private readonly UserManager<Employee> _userManager;
 
         public UploadsController(
             ApplicationDbContext context, 
             IFileProvider fileProvider, 
-            IHostingEnvironment environment)
+            IHostingEnvironment environment,
+            UserManager<Employee> userManager)
         {
             this._context = context;
             this.fileProvider = fileProvider;
             this.hostingEnvironment = environment;
+            this._userManager = userManager;
         }
         public IActionResult Index()
         {
@@ -40,7 +62,7 @@ namespace COMP4911Timesheets.Controllers
 
         
         [HttpPost]
-        public IActionResult UploadFile(IFormFile file)
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
@@ -53,7 +75,8 @@ namespace COMP4911Timesheets.Controllers
                 guid + Path.GetFileName(file.FileName);    // added guid to filename
             var path = Path.Combine(
                   hostingEnvironment.WebRootPath, "workpackages.csv");
-
+            var failedList = new List<String>();
+            var WPcontroller = new WorkPackagesController(_context, _userManager);
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 file.CopyTo(stream);
@@ -63,40 +86,81 @@ namespace COMP4911Timesheets.Controllers
             {
                 using (var csv = new CsvReader(stream))
                 {
-                    //var temporaryPackage = new WorkPackage();
-                    //var records = csv.EnumerateRecords(temporaryPackage);
-                    //foreach(var package in records)
-                    //{
-                    //    if (package.ParentWorkPackageId == Null)
-                    //    {
-
-                    //    }
-
-                    //}
+                    //csvreader will substitute a null value instead of throwing an exception
                     csv.Configuration.MissingFieldFound = null;
                     csv.Read();
                     csv.ReadHeader();
-                    while(csv.Read())
+                    while (csv.Read())
                     {
-                        
-                        var id = csv.GetField<int>("Id");
-                        var field = csv.GetField("Name") ?? "none";
+                        String[] fieldArray = new String[]
+                                             { "ProjectCode", "Name", "Description", "Contractor",
+                                                 "Purpose", "Input", "Output", "Activity", "ParentWorkPackageCode"};
+                        var workPackageData =
+                            new Dictionary<String, String>();
+                        foreach(var field in fieldArray)
+                        {
+                            workPackageData.Add(field, csv.GetField(field) ?? "");
+                        }
+                        //If whoever's code reviewing know's a cleaner way to do this, please let me know
+                        if ( workPackageData["ProjectCode"] != null 
+                            && _context.Projects.Any(m => 
+                                m.ProjectCode.Equals(workPackageData["ProjectCode"])))
+                        {
+                            var parentProject = await _context.Projects.Include(w => w.WorkPackages)
+                                .FirstOrDefaultAsync(m => 
+                                                m.ProjectCode == workPackageData["ProjectCode"]);
 
-
+                            var package = new WorkPackage()
+                            {
+                                Name = workPackageData["Name"] ?? "",
+                                Description = workPackageData["Description"] ?? "",
+                                Contractor = workPackageData["Contractor"] ?? "",
+                                Purpose = workPackageData["Description"] ?? "",
+                                Input = workPackageData["Input"] ?? "",
+                                Output = workPackageData["Output"] ?? "",
+                                Activity = workPackageData["Activity"] ?? "",
+                                Status = WorkPackage.OPENED,
+                                ProjectId = parentProject.ProjectId
+                            };
+                            if (workPackageData["ParentWorkPackageCode"] != null && !workPackageData["ParentWorkPackageCode"].Equals(""))
+                            {
+                                //var parentWorkPackage = await _context.WorkPackages.FirstOrDefaultAsync(m =>
+                                //    m.WorkPackageCode.Equals(workPackageData["ProjectCode"])
+                                //        && m.ProjectId == parentProject.ProjectId);
+                                //package.ParentWorkPackage = parentWorkPackage;
+                                //package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
+                                //var projectWorkPackages = await _context.WorkPackages.Where(u => u.ProjectId == parentProject.ProjectId).ToListAsync();
+                                var parentWorkPackage = parentProject.WorkPackages
+                                    .Where(m =>
+                                        m.WorkPackageCode.Equals(workPackageData["ParentWorkPackageCode"]))
+                                    .FirstOrDefault();
+                                package.ParentWorkPackage = parentWorkPackage;
+                                package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
+                                package.WorkPackageCode = await generateChildWorkPackageCode(parentWorkPackage);
+                            }
+                            else
+                            {
+                                package.WorkPackageCode = await generateNonChildWorkPackageCode(parentProject);
+                            }
+                            if (ModelState.IsValid)
+                            {
+                                _context.Add(package);
+                                await _context.SaveChangesAsync();
+                            } else
+                            {
+                                failedList.Add(workPackageData["Name"]);
+                            }
+                        }
+                        else
+                        {
+                            failedList.Add(workPackageData["Name"]);
+                        }
                     }
-                    
                 }
             }
-
-            //var workPackages = parseCsvFromString( (String) ViewData["fileContents"]);
+            ViewData["failedPackages"] = String.Join(",", failedList);
             return View("Success");
         }
-
-        //public Object parseCsvFromString(String csvData)
-        //{
-
-        //    return null;
-        //}
 
         public IActionResult Files()
         {
@@ -119,14 +183,92 @@ namespace COMP4911Timesheets.Controllers
                 {".doc", "application/vnd.ms-word"},
                 {".docx", "application/vnd.ms-word"},
                 {".xls", "application/vnd.ms-excel"},
-                {".xlsx",
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                {".xlsx","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
                 {".png", "image/png"},
                 {".jpg", "image/jpeg"},
                 {".jpeg", "image/jpeg"},
                 {".gif", "image/gif"},
                 {".csv", "text/csv"}
             };
+        }
+        private async Task<String> generateChildWorkPackageCode(WorkPackage parentWorkPackage)
+        {
+            int[] workpackageCode = new int[10];
+            for (int i = 0; i < 10; i++)
+            {
+                workpackageCode[i] = -1;
+            }
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == parentWorkPackage.ProjectId).ToListAsync();
+            int workPackageLength = 0;
+
+            foreach (WorkPackage tempWorkPackage in workPackages)
+            {
+
+                if (tempWorkPackage.ParentWorkPackageId == parentWorkPackage.WorkPackageId)
+                {
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
+                    // Debug.WriteLine("tempWorkPackage.WorkPackageCode----------" + tempWorkPackage.WorkPackageCode);
+                    workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(parentWorkPackage.WorkPackageCode.Length, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
+                }
+            }
+
+            string theWorkpackageCode = null;
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (workpackageCode[i] == -1 && i != 0)
+                {
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
+                    break;
+                }
+
+                if (workpackageCode[i] == -1 && i == 0)
+                {
+                    theWorkpackageCode = parentWorkPackage.WorkPackageCode + "0";
+                    break;
+                }
+            }
+
+            return theWorkpackageCode;
+        }
+        private async Task<String> generateNonChildWorkPackageCode( Project parentProject)
+        {
+            int[] workpackageCode = new int[10];
+            for (int i = 0; i < 10; i++)
+            {
+                workpackageCode[i] = -1;
+            }
+            int workPackageLength = 0;
+            var projectPackages = parentProject.WorkPackages;
+            foreach (WorkPackage tempWorkPackage in projectPackages)
+            {
+
+                if (tempWorkPackage.WorkPackageCode.Length == WorkPackagesController.PROJECT_CODE_LENGTH + 1)
+                {
+                    workPackageLength = tempWorkPackage.WorkPackageCode.Length;
+                    workpackageCode[Int32.Parse(tempWorkPackage.WorkPackageCode.Substring(WorkPackagesController.PROJECT_CODE_LENGTH, 1))] = Int32.Parse(tempWorkPackage.WorkPackageCode);
+                }
+            }
+            string theWorkpackageCode = null;
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (workpackageCode[i] == -1 && i != 0)
+                {
+                    theWorkpackageCode = ((Math.Pow(10, workPackageLength)) + workpackageCode[i - 1] + 1).ToString();
+                    theWorkpackageCode = theWorkpackageCode.Substring(1);
+                    break;
+                }
+
+                if (workpackageCode[i] == -1 && i == 0)
+                {
+                    theWorkpackageCode = parentProject.ProjectCode + "0";
+                    break;
+                }
+            }
+
+            return theWorkpackageCode;
         }
     }
 }
