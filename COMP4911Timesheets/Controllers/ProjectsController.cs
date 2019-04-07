@@ -336,7 +336,6 @@ namespace COMP4911Timesheets
             }
             else
             {
-                
                 assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
                 assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
             }
