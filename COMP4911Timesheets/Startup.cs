@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using COMP4911Timesheets.Models;
 using COMP4911Timesheets.Controllers;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace COMP4911Timesheets
 {
@@ -30,6 +32,10 @@ namespace COMP4911Timesheets
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IFileProvider>(
+                new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
