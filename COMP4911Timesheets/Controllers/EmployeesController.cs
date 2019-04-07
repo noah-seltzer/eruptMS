@@ -94,6 +94,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Create
         public async Task<IActionResult> Create()
         {
+            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var employees = await _context.Employees.ToListAsync();
             var jobTitles = Employee.JobTitles.ToList();
             var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
@@ -179,6 +180,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
+            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             if (id == null)
             {
                 return NotFound();
@@ -205,7 +207,7 @@ namespace COMP4911Timesheets.Controllers
             var employeeManagement = new EmployeeManagement
             {
                 Employee = employee,
-                EmployeePay = employeePay
+                EmployeePay = employeePay,
             };
 
             return View(employeeManagement);
@@ -274,6 +276,32 @@ namespace COMP4911Timesheets.Controllers
                     employeeToBeEdited.UserName = employeeManagement.Employee.Email;
                     employeeToBeEdited.Email = employeeManagement.Employee.Email;
                     employeeToBeEdited.PhoneNumber = employeeManagement.Employee.PhoneNumber;
+                    if (!string.IsNullOrEmpty(employeeManagement.passPhrase))
+                    {
+                        var datetime = DateTime.Now;
+                        var newSignature = new Signature
+                        {
+                            HashedSignature = Utility.HashEncrypt(employeeManagement.passPhrase + datetime),
+                            CreatedTime = datetime,
+                            Status = Signature.VALID,
+                            EmployeeId = id
+                        };
+
+                        var oldSig = _context.Signatures
+                            .Where(s => s.EmployeeId == id)
+                            .FirstOrDefault();
+
+                        if (oldSig == null)
+                            _context.Signatures.Add(newSignature);
+                        else
+                        {
+                            oldSig.CreatedTime = newSignature.CreatedTime;
+                            oldSig.HashedSignature = newSignature.HashedSignature;
+                            _context.Signatures.Update(oldSig);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
                     await _userManager.UpdateAsync(employeeToBeEdited);
 
                     var employeePayToBeDisabled = _context.EmployeePays.Find(employeeManagement.EmployeePay.EmployeePayId);

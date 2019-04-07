@@ -88,11 +88,12 @@
             </div>
             <div>
 
-                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Work Package </a> &nbsp|&nbsp
-                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a> &nbsp|&nbsp
+                <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Work Package </a>&nbsp|&nbsp
+                <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a>&nbsp|&nbsp
                 <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp|&nbsp
                 <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
+                <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId">Assign Employee</a> &nbsp|&nbsp
                 <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
             </div>
 
@@ -143,6 +144,7 @@
                 <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp|&nbsp
                 <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> &nbsp|&nbsp
+                <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId">Assign Employee</a> &nbsp|&nbsp
                 <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
             </div>
         }
@@ -152,7 +154,7 @@
 
 <br />
 
-@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM")))
+@if (User.Identity.IsAuthenticated && ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM")))
 {
     @foreach (var item in Model)
     {
