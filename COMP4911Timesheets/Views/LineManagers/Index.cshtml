@@ -8,12 +8,12 @@
     @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
     {
     <p>
-        <a asp-action="ProjectIndex" class="btn btn-primary project-button btn-lg">Projects</a>
+        <a asp-action="ProjectIndex" class="btn btn-info project-button btn-lg btn-raised">Projects</a>
     </p>
     }
     @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
     {
-    <h3 class="approval-heading">Under Supervision</h3>
+    <h3 class="approval-heading">Employees Under Supervision</h3>
     @using (Html.BeginForm())
     {
     <p>
@@ -95,7 +95,7 @@
     }
     @if(User.IsInRole(role: "TA"))
     {
-    <h3 class="approval-heading">For Approval</h3>
+    <h3 class="approval-heading">Timesheets For Approval</h3>
     @using (Html.BeginForm())
     {
     <p>
