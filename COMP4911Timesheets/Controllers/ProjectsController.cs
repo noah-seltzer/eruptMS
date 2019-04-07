@@ -223,6 +223,7 @@ namespace COMP4911Timesheets
                 .FirstOrDefault();
 
             var assistant = _context.ProjectEmployees
+                .Include(a => a.Employee)
                 .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
                 .FirstOrDefault();
 
@@ -327,9 +328,19 @@ namespace COMP4911Timesheets
             List<SelectListItem> mgrItems = new List<SelectListItem>();
             mgrItems.AddRange(new SelectList(mgrList, "Id", "Email"));
 
+
             List<SelectListItem> assItems = new List<SelectListItem>();
-            assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
-            assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            if (ViewBag.Assistant)
+            {
+                assItems.Insert(0, new SelectListItem { Text = assistant.Employee.Email, Value = assistant.EmployeeId });
+            }
+            else
+            {
+                
+                assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
+                assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            }
+                
 
             ViewBag.EmployeesM = mgrItems;
             ViewBag.EmployeesA = assItems;
