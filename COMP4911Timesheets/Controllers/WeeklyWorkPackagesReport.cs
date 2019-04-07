@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace COMP4911Timesheets.Controllers
 {
-    public class WeeklyWorkPackagesController : Controller
+    public class WeeklyWorkPackagesReportController : Controller
     {
         private readonly ApplicationDbContext _context;
         private static int? projectId;
@@ -20,7 +20,7 @@ namespace COMP4911Timesheets.Controllers
         public static int PROJECT_CODE_LENGTH = 4;
         private readonly UserManager<Employee> _userManager;
 
-        public WeeklyWorkPackagesController(ApplicationDbContext context, UserManager<Employee> userManager)
+        public WeeklyWorkPackagesReportController(ApplicationDbContext context, UserManager<Employee> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -53,6 +53,8 @@ namespace COMP4911Timesheets.Controllers
             var workPackage = await _context.WorkPackages
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
+                .Include(w => w.ProjectEmployees)
+                .Include("ProjectEmployees.Employee.EmployeePays")
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
 
             var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();

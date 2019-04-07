@@ -66,13 +66,17 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.WorkPackageEmployees)
+        @foreach (var item in Model.ProjectEmployees)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.WorkPackageEmployeeId)
-                </td>
-            </tr>
+            
+                var paygradelist = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
+                var paygrade = paygradelist[0].PayGradeId;
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProjectEmployeeId)
+                @paygrade
+            </td>
+        </tr>
         }
     </tbody>
 </table>

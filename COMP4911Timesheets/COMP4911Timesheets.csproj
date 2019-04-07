@@ -18,6 +18,12 @@
     <None Remove="Data\Migrations\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="Data\Migrations\20190406221526_InitialCreate.cs" />
+    <Compile Include="Data\Migrations\20190406221526_InitialCreate.Designer.cs" />
+    <Compile Include="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
