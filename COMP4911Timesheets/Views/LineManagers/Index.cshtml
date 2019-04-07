@@ -44,9 +44,9 @@
                 <th>
                     Reqs Approval
                 </th>
-                <th>
+                @*<th>
                     PLevel
-                </th>
+                </th>*@
                 <th></th>
             </tr>
         </thead>
@@ -74,9 +74,9 @@
                         @item.Employee.Timesheets.Count
                     </a>
                 </td>
-                <td class="priority-2">
+                @*<td class="priority-2">
                     @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
-                </td>
+                </td>*@
                 @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
                 {
                 <td>
