@@ -408,3 +408,11 @@ body {
 .badge {
     font-size: 85% !important;
 }
+
+.block {
+    display: block;
+}
+
+.none {
+    display: none;
+}
