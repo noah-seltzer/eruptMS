@@ -189,6 +189,18 @@ namespace COMP4911Timesheets
                 };
                 _context.Add(mgmt);
 
+                ProjectEmployee managerAsRE = new ProjectEmployee
+                {
+                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                    Role = ProjectEmployee.RESPONSIBLE_ENGINEER,
+                    ProjectId = pId,
+                    EmployeeId = input.ProjectManager,
+                    WorkPackageId = mgmt.WorkPackageId
+                };
+                _context.Add(managerAsRE);
+
+                await _usermgr.AddToRoleAsync(mgr, ApplicationRole.RE);
+
                 var pGrades = _context.PayGrades.ToList();
                 foreach (var g in pGrades)
                     _context.Add(new ProjectRequest
@@ -308,13 +320,14 @@ namespace COMP4911Timesheets
             }
             else if (manager.EmployeeId == uid) // Project Manager
             {
-                var list = _context.ProjectEmployees
+                mgrList = _context.ProjectEmployees
                     .Where(pe => pe.ProjectId == id)
-                    .Include(pe => pe.Employee)
+                    .Join(_context.Employees,
+                        pe => pe.EmployeeId,
+                        em => em.Id,
+                        (pe, em) => em)
+                    .Distinct()
                     .ToList();
-
-                foreach (var pe in list)
-                    mgrList.Add(pe.Employee);
 
                 assList = mgrList;
             }
@@ -383,19 +396,35 @@ namespace COMP4911Timesheets
                         updateReq.AmountRequested = req.AmountRequested;
                     }
 
-                    var managerPE = _context.ProjectEmployees
+                    ProjectEmployee managerPE = _context.ProjectEmployees
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
                         .FirstOrDefault();
 
                     if (model.projectManager != managerPE.EmployeeId)
                     {
+
+                        ProjectEmployee managerRE = _context.ProjectEmployees
+                            .Where(e => e.ProjectId == id
+                                     && e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER)
+                            .Join(_context.WorkPackages,
+                                wp => wp.WorkPackageId,
+                                pe => pe.WorkPackageId,
+                                (pe, wp) => new { wp, pe })
+                            .Where(join => join.wp.WorkPackageCode == "00000")
+                            .Select(join => join.pe)
+                            .FirstOrDefault();
+
                         Employee oldmgr = _context.Employees.Find(managerPE.EmployeeId);
                         await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.PM);
+                        await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.RE);
 
                         Employee mgr = _context.Employees.Find(model.projectManager);
                         await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+                        await _usermgr.AddToRoleAsync(mgr, ApplicationRole.RE);
 
                         managerPE.EmployeeId = model.projectManager;
+                        _context.Update(managerPE);
+                        managerRE.EmployeeId = model.projectManager;
                         _context.Update(managerPE);
                     }
 
