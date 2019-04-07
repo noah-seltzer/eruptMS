@@ -40,7 +40,7 @@
                     else
                     {
                         <select asp-for="projectManager" class="form-control searchDropDown" asp-items="ViewBag.EmployeesM"></select>
-                        
+
                     }
                 }
             </div>
@@ -85,6 +85,7 @@
                     <input type="hidden" asp-for="requests[i].PayGradeId" />
                     <input type="hidden" asp-for="requests[i].ProjectId" />
                     <input asp-for="requests[i].AmountRequested" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="requests[i].AmountRequested" class="text-danger"></span>
                 </div>
             }
         </div>
@@ -109,13 +110,13 @@
             <div class="form-group">
                 <label class="control-label">Work Packages</label>
                 <ul>
-                        @foreach (var w in Model.project.WorkPackages)
-                        {
-                            <li>
-                                @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
-                            </li>
-                        }
-                    </ul>
+                    @foreach (var w in Model.project.WorkPackages)
+                    {
+                        <li>
+                            @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
+                        </li>
+                    }
+                </ul>
                 @*<select asp-for="project.WorkPackages" class="form-control  wps" asp-items="ViewBag.WPs"></select>*@
             </div>
         </div>
