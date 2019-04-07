@@ -309,7 +309,7 @@
         }
         @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved")
         {
-            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger", @role = "button" })
+            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger btn-raised", @role = "button" })
         }
     </form>
 </div>
