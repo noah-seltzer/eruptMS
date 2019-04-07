@@ -379,7 +379,7 @@ namespace COMP4911Timesheets.Controllers
 
             if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
             {
-                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+                TempData["info"] = "You are not the project's PM or PA, Please choose the correct project";
                 return RedirectToAction("Index", "Projects");
             }
 
@@ -394,10 +394,11 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
 
-            if (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM"))
+            if ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
-                    .Where(u => u.EmployeeId == users.Id && u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
+                    .Where(u => u.EmployeeId == users.Id 
+                    && (u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER || u.Role == ProjectEmployee.EMPLOYEE)).ToListAsync();
 
                 foreach (ProjectEmployee temp in REWorkPackages)
                 {
