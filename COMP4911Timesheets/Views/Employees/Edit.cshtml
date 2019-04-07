@@ -16,12 +16,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Employee.FirstName" class="control-label"></label>
-                <input asp-for="Employee.FirstName" class="form-control" required/>
+                <input asp-for="Employee.FirstName" class="form-control" required />
                 <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Employee.LastName" class="control-label"></label>
-                <input asp-for="Employee.LastName" class="form-control" required/>
+                <input asp-for="Employee.LastName" class="form-control" required />
                 <span asp-validation-for="Employee.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -30,12 +30,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Employee.FlexTime" class="control-label"></label>
-                <input asp-for="Employee.FlexTime" class="form-control" type="number"/>
+                <input asp-for="Employee.FlexTime" class="form-control" type="number" />
                 <span asp-validation-for="Employee.FlexTime" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Employee.VacationTime" class="control-label"></label>
-                <input asp-for="Employee.VacationTime" class="form-control" type="number"/>
+                <input asp-for="Employee.VacationTime" class="form-control" type="number" />
                 <span asp-validation-for="Employee.VacationTime" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -61,8 +61,13 @@
             <input type="hidden" asp-for="EmployeePay.EmployeePayId" />
             <div class="form-group">
                 <label asp-for="Employee.Email" class="control-label"></label>
-                <input asp-for="Employee.Email" class="form-control" required/>
+                <input asp-for="Employee.Email" class="form-control" required />
                 <span asp-validation-for="Employee.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="passPhrase" class="control-label"></label>
+                <input asp-for="passPhrase" class="form-control" required />
+                <span asp-validation-for="passPhrase" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-raised" />

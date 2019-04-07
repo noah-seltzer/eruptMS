@@ -382,7 +382,7 @@ namespace COMP4911Timesheets
                         Employee oldmgr = _context.Employees.Find(managerPE.EmployeeId);
                         await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.PM);
 
-                        Employee mgr = _context.Employees.Find(managerPE.EmployeeId);
+                        Employee mgr = _context.Employees.Find(model.projectManager);
                         await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
 
                         managerPE.EmployeeId = model.projectManager;
