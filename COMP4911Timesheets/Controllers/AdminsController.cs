@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using COMP4911Timesheets.Data;
+﻿using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using System.Collections;
-using System.Security.Claims;
-using COMP4911Timesheets.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace COMP4911Timesheets.Controllers
 {
@@ -33,18 +26,42 @@ namespace COMP4911Timesheets.Controllers
         // GET
         public IActionResult Index()
         {
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
             return View();
         }
 
         public IActionResult Backup()
         {
-            Utility.BackupDatabase();
+            try
+            {
+                Utility.BackupDatabase();
+            }
+            catch (SqlException e)
+            {
+                TempData["ErrorMessage"] = "Database backup unsuccessful";
+                Console.WriteLine(e.ToString());
+                return RedirectToAction(nameof(Index));
+            }
+            TempData["Message"] = "Database backed up successfully";
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Restore()
         {
-            Utility.RestoreDatabase();
+            try
+            {
+                Utility.RestoreDatabase();
+            }
+            catch (SqlException e)
+            {
+                TempData["ErrorMessage"] = "Database restore unsuccessful";
+                Console.WriteLine(e.ToString());
+                return RedirectToAction(nameof(Index));
+            }
+
             try
             {
                 await _userManager.GetUserAsync(User);
@@ -54,6 +71,7 @@ namespace COMP4911Timesheets.Controllers
                 Console.WriteLine(e.ToString());
                 return RedirectToAction(nameof(Index));
             }
+            TempData["Message"] = "Database restored successfully";
             return RedirectToAction(nameof(Index));
         }
     }
