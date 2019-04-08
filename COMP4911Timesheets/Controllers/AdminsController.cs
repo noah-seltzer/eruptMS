@@ -33,12 +33,17 @@ namespace COMP4911Timesheets.Controllers
         // GET
         public IActionResult Index()
         {
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
             return View();
         }
 
         public IActionResult Backup()
         {
             Utility.BackupDatabase();
+            TempData["Message"] = "Database backed up successfully";
             return RedirectToAction(nameof(Index));
         }
 
@@ -51,9 +56,11 @@ namespace COMP4911Timesheets.Controllers
             }
             catch (SqlException e)
             {
+                TempData["ErrorMessage"] = "Database restore unsuccessful";
                 Console.WriteLine(e.ToString());
                 return RedirectToAction(nameof(Index));
             }
+            TempData["Message"] = "Database restored successfully";
             return RedirectToAction(nameof(Index));
         }
     }

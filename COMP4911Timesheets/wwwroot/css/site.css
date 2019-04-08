@@ -128,6 +128,7 @@ body {
 
 .wpRow {
     padding: 5px 19px;
+    overflow-wrap: break-word;
 }
     
 
