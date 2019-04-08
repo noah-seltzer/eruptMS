@@ -4,8 +4,6 @@
 COMP4911Timesheets/Data/Migrations/
 .vscode/
 COMP4911Timesheets/Migrations/
-COMP4911Timesheets/COMP4911Timesheets.csproj
-COMP4911Timesheets/appsettings.Development.json
 ##COMP4911Timesheets/appsettings.json
 
 # User-specific files
