@@ -2,6 +2,7 @@
 
 @{
     ViewData["PageTitle"] = "Assign Employees";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
 }
 
 <h1>@ViewData["PageTitle"]</h1>

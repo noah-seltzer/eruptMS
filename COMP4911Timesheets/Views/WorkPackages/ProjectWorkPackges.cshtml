@@ -2,10 +2,16 @@
 
 @{
     ViewData["PageTitle"] = "Index";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
 }
 
 <h1>Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
-<h4>@TempData["info"]</h4>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
 
 @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
 {
