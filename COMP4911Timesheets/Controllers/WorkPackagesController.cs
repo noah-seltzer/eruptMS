@@ -377,7 +377,7 @@ namespace COMP4911Timesheets.Controllers
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
 
-            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null && !User.IsInRole("AD"))
             {
                 ViewBag.ErrorMessage = "You are not the project's PM or PA, Please choose the correct project";
                 return RedirectToAction("Index", "Projects");
