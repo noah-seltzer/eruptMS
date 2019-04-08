@@ -94,7 +94,6 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var employees = await _context.Employees.ToListAsync();
             var jobTitles = Employee.JobTitles.ToList();
             var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
@@ -180,7 +179,6 @@ namespace COMP4911Timesheets.Controllers
         // GET: Employees/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             if (id == null)
             {
                 return NotFound();
@@ -227,7 +225,8 @@ namespace COMP4911Timesheets.Controllers
 
             if (employeeManagement.Employee.SupervisorId == id || employeeManagement.Employee.ApproverId == id)
             {
-                return BadRequest("Supervisor and Approver can't be themselves");
+                ViewBag.ErrorMessage = "Supervisor and Approver can't be themselves";
+                return await Edit(id);
             }
 
             if (ModelState.IsValid)

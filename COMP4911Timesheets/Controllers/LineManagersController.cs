@@ -320,7 +320,6 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> AssignEmployees(int id)
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var projectRequest = await _context.ProjectRequests
                 .Include(pr => pr.PayGrade)
                 .Include(pr => pr.Project)
@@ -420,7 +419,6 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> ChangeTA(string id)
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var employee = await _context.Employees.FindAsync(id);
             LineManagerManagement lineManagerManagement = new LineManagerManagement
             {
