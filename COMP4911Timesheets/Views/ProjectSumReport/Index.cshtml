@@ -53,7 +53,7 @@
                 @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
             </td>
             <td>
-                <a asp-action="Report" asp-route-id="@item.ProjectId">Report</a>
+                <a asp-action="Report" asp-route-id="@item.ProjectId" class="btn btn-primary btn-raised btn-sm">Report</a>
             </td>
         </tr>
         }

@@ -30,6 +30,10 @@ namespace COMP4911Timesheets.Controllers
             {
                 ViewBag.Message = TempData["Message"];
             }
+            if (TempData["ErrorMessage"] != null)
+            {
+                ViewBag.Message = TempData["ErrorMessage"];
+            }
             return View();
         }
 
