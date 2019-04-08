@@ -68,37 +68,38 @@
                 @paylevel.PayLevel
             </td>
             <td>
+                <!--Man days Inner Table-->
                 <table class="table">
                     <thead>
-                        <tr>
-                            @foreach (var week in Model.TimesheetRows)
-                            {
+                    
+                    <tr>
+                        <th>
+                            Weeks
+                        </th>
+                        @foreach (var week in Model.TimesheetRows)
+                        {
                             <th>
+                                Week 
                                 @week.Timesheet.WeekNumber
                             </th>
-                            }
-                        </tr>
+                        }
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach (var tt in Model.ProjectEmployees)
-                        {
-
-                            var paygradelist2 = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
-                            var paylevel2 = paygradelist[0].PayGrade;
-                            <tr>
+                        
+                        <tr>
+                            <th>
+                                Hours
+                            </th>
+                            @foreach (var week in Model.TimesheetRows)
+                            {
+                                var totalHour = week.SatHour + week.SunHour + week.MonHour + week.TueHour + week.WedHour + week.ThuHour + week.FriHour;
                                 <td>
-                                    @Html.DisplayFor(modelItem => tt.Role)
+                                    @totalHour
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => tt.Employee.LastName)
-                                    ,
-                                    @Html.DisplayFor(modelItem => tt.Employee.FirstName)
-                                </td>
-                                <td>
-                                    @paylevel2.PayLevel
-                                </td>
-                            </tr>
-                        }
+                            }
+                        </tr>
+                       
                     </tbody>
                 </table>
             </td>

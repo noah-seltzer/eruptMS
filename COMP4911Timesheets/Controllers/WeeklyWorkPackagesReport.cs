@@ -15,8 +15,6 @@ namespace COMP4911Timesheets.Controllers
     public class WeeklyWorkPackagesReportController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private static int? projectId;
-        private static int? parentWorkPKId;
         public static int PROJECT_CODE_LENGTH = 4;
         private readonly UserManager<Employee> _userManager;
 
