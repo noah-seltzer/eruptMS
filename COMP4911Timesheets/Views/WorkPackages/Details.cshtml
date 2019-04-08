@@ -12,7 +12,9 @@
     <hr />
     @if (Model.Status != WorkPackage.CLOSED)
     {
-        <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+        <p>
+            <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+        </p>
     }
     <dl class="row col-lg-6 well bs-component">
         <dt class="col-sm-4">
