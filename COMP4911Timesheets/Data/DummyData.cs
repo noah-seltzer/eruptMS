@@ -67,19 +67,26 @@ namespace COMP4911Timesheets.Data
                         await userManager.AddToRolesAsync(employee, new List<string>() {
                             "HR", "PM", "RE", "RE", "RE", "RE", "RE", "TA", "LM", "TA", "LM"
                         });
+                        await userManager.AddToRoleAsync(employee, "EM");
                     }
                     else if (employee.EmployeeId == 3)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
                             "TA", "LM", "TA", "LM", "TA", "LM", "TA", "LM"
                         });
+                        await userManager.AddToRoleAsync(employee, "EM");
                     }
                     else if (employee.EmployeeId == 4)
                     {
                         await userManager.AddToRolesAsync(employee, new List<string>() {
                             "PA", "TA", "LM", "TA", "LM", "TA", "LM", "TA", "LM", "TA", "LM"
                         });
+                        await userManager.AddToRoleAsync(employee, "EM");
                     }
+                    await userManager.AddToRoleAsync(employee, "EM");
+                    await userManager.AddToRoleAsync(employee, "EM");
+                    await userManager.AddToRoleAsync(employee, "EM");
+                    await userManager.AddToRoleAsync(employee, "EM");
                 }
 
                 var payGrades = GetPayGrades().ToArray();

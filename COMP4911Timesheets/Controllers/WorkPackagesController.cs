@@ -98,7 +98,7 @@ namespace COMP4911Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateInternalWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
-           
+
             workPackage.ProjectId = projectId;
             workPackage.Status = WorkPackage.OPENED;
 
@@ -263,7 +263,7 @@ namespace COMP4911Timesheets.Controllers
                 return View(workPackageReport);
             }
 
-            TempData["info"] = "Workpackage report only can be created on leaf workpackages";
+            ViewBag.ErrorMessage = "Workpackage report only can be created on leaf workpackages";
             var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
 
@@ -299,7 +299,7 @@ namespace COMP4911Timesheets.Controllers
 
             if (workPackage.Status == WorkPackage.CLOSED)
             {
-                TempData["info"] = "Workpackage already closed you can not change  work package info";
+                ViewBag.ErrorMessage = "Workpackage already closed you can not change  work package info";
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
             }
 
@@ -377,9 +377,9 @@ namespace COMP4911Timesheets.Controllers
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
 
-            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null && !User.IsInRole("AD"))
             {
-                TempData["info"] = "You are not the project's PM or PA, Please choose the correct project";
+                ViewBag.ErrorMessage = "You are not the project's PM or PA, Please choose the correct project";
                 return RedirectToAction("Index", "Projects");
             }
 
@@ -397,7 +397,7 @@ namespace COMP4911Timesheets.Controllers
             if ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
-                    .Where(u => u.EmployeeId == users.Id 
+                    .Where(u => u.EmployeeId == users.Id
                     && (u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER || u.Role == ProjectEmployee.EMPLOYEE)).ToListAsync();
 
                 foreach (ProjectEmployee temp in REWorkPackages)
@@ -416,7 +416,8 @@ namespace COMP4911Timesheets.Controllers
 
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
 
-            if (project.Status == Project.INTERNAL) {
+            if (project.Status == Project.INTERNAL)
+            {
                 return View("InternalProjectWorkPackges", workPackages);
             }
             //order the workpackages
@@ -517,7 +518,7 @@ namespace COMP4911Timesheets.Controllers
             var workPackages = _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefault();
             if (workPackages != null)
             {
-                TempData["info"] = "Employee can only be assigned to a leaf workpackage";
+                ViewBag.ErrorMessage = "Employee can only be assigned to a leaf workpackage";
                 var wpTemp = _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefault();
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
             }
@@ -525,7 +526,7 @@ namespace COMP4911Timesheets.Controllers
             var projectEmployees = new List<ProjectEmployee>();
             //get all currently working employee in the project 
             projectEmployees = await _context.ProjectEmployees
-                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING 
+                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING
                 && e.ProjectId == WorkPackagesController.projectId
                 && (e.Role == ProjectEmployee.NOT_ASSIGNED || e.WorkPackageId == id || e.WorkPackageId == null))
                 .Include(e => e.Employee)
@@ -554,7 +555,8 @@ namespace COMP4911Timesheets.Controllers
                     {
                         tempEm.Role.Remove(ProjectEmployee.NOT_ASSIGNED);
                     }
-                    else {
+                    else
+                    {
                         tempEm.Role.Add(projectEmployee.Role);
                     }
                     employeeManagements.Add(tempEm);
@@ -563,11 +565,14 @@ namespace COMP4911Timesheets.Controllers
                 // delete not assigned role for the employee (Do not touch the database here) 
                 else
                 {
-                    for (int i = 0; i < employeeManagements.Count; i++) {
-                        if (employeeManagements[i].Employee.Id == projectEmployee.Employee.Id) {
+                    for (int i = 0; i < employeeManagements.Count; i++)
+                    {
+                        if (employeeManagements[i].Employee.Id == projectEmployee.Employee.Id)
+                        {
                             employeeManagements[i].Role.Add(projectEmployee.Role);
 
-                            if (employeeManagements[i].Role.Contains(ProjectEmployee.NOT_ASSIGNED) ) {
+                            if (employeeManagements[i].Role.Contains(ProjectEmployee.NOT_ASSIGNED))
+                            {
                                 employeeManagements[i].Role.Remove(ProjectEmployee.NOT_ASSIGNED);
                             }
                             break;
@@ -580,7 +585,8 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/AssignRE/6
-        public async Task<IActionResult> AssignRE(string EmployeeId, string name) {
+        public async Task<IActionResult> AssignRE(string EmployeeId, string name)
+        {
 
             //create the ProjectEmployee object and assign the value to the object
             ProjectEmployee projectEmployee = new ProjectEmployee();
@@ -592,7 +598,7 @@ namespace COMP4911Timesheets.Controllers
             ViewData["projectId"] = WorkPackagesController.projectId;
 
             //get the RESPONSIBLE_ENGINEER of the workpackage
-            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER                          
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
                             && ep.ProjectId == WorkPackagesController.projectId
                             && ep.WorkPackageId == WorkPackagesController.workPackageId)
                            .FirstOrDefault();
@@ -611,13 +617,14 @@ namespace COMP4911Timesheets.Controllers
                                 || ep.WorkPackageId == null)).ToList();
 
                 var oldTempPE = countOldTempPE.FirstOrDefault();
-                
+
                 if (countOldTempPE.Count != 1)
                 {
                     _context.ProjectEmployees.Remove(tempPE);
                     await _context.SaveChangesAsync();
                 }
-                else {
+                else
+                {
                     oldTempPE.Role = ProjectEmployee.NOT_ASSIGNED;
                     oldTempPE.WorkPackageId = null;
                     _context.Update(oldTempPE);
@@ -636,7 +643,7 @@ namespace COMP4911Timesheets.Controllers
                 await _context.SaveChangesAsync();
             }
             */
- 
+
             Employee tempRE = _context.Employees.Find(EmployeeId);
             await _userManager.AddToRoleAsync(tempRE, ApplicationRole.RE);
 
@@ -687,7 +694,7 @@ namespace COMP4911Timesheets.Controllers
                             && ep.WorkPackageId == WorkPackagesController.workPackageId)
                            .FirstOrDefault();
 
-            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId 
+            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
                 && (ep.WorkPackageId == WorkPackagesController.workPackageId || ep.WorkPackageId == null)).ToList();
 
             if (countTempPE.Count != 1)
@@ -695,7 +702,8 @@ namespace COMP4911Timesheets.Controllers
                 _context.Remove(tempPE);
                 await _context.SaveChangesAsync();
             }
-            else {
+            else
+            {
                 tempPE.Role = ProjectEmployee.NOT_ASSIGNED;
                 tempPE.WorkPackageId = null;
                 _context.Update(tempPE);
@@ -718,7 +726,7 @@ namespace COMP4911Timesheets.Controllers
                             && ep.ProjectId == WorkPackagesController.projectId)
                            .FirstOrDefault();
 
-            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId                
+            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
                 && ep.ProjectId == WorkPackagesController.projectId
                 && (ep.WorkPackageId == WorkPackagesController.workPackageId || ep.WorkPackageId == null)).ToList();
 

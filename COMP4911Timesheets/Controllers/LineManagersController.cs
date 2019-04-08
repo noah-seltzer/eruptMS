@@ -281,32 +281,39 @@ namespace COMP4911Timesheets.Controllers
                 .Include(pr => pr.Project)
                 .ToListAsync();
 
-            // Calculate how many employees are under current user's supervision and pass into ViewData
-            var currentUser = await _userManager.GetUserAsync(User);
-            var employeePays = await _context.EmployeePays
-               .Include(e => e.Employee)
-               .Include(e => e.PayGrade)
-               .Where(ep => ep.Status == EmployeePay.VALID)
-               .ToListAsync();
             var employeeNum = new Dictionary<int, int>();
-            foreach (var employeePay in employeePays)
+            // paygradeid & number of employees
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            foreach (ProjectRequest projectRequest in projectRequests)
             {
-                var count = _context.ProjectEmployees
-                    .Where(pe => pe.EmployeeId == employeePay.EmployeeId)
-                    .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
-                    .Count();
-                if (employeePay.Employee.SupervisorId == currentUser.Id && count != 0)
+                var employeePays = await _context.EmployeePays
+                .Include(e => e.Employee)
+                .Include(e => e.PayGrade)
+                .Where(ep => ep.PayGradeId == projectRequest.PayGradeId)
+                .Where(ep => ep.Status == EmployeePay.VALID)
+                .ToListAsync();
+                foreach (var employeePay in employeePays)
                 {
-                    if (employeeNum.ContainsKey(employeePay.PayGrade.PayGradeId))
+                    var projectEmployee = await _context.ProjectEmployees
+                        .Where(pe => pe.EmployeeId == employeePay.EmployeeId)
+                        .Where(pe => pe.ProjectId == projectRequest.ProjectId)
+                        .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
+                        .FirstOrDefaultAsync();
+                    if ((employeePay.Employee.SupervisorId == currentUser.Id || User.IsInRole("AD")) && projectEmployee == null)
                     {
-                        employeeNum[employeePay.PayGrade.PayGradeId] += 1;
-                    }
-                    else
-                    {
-                        employeeNum.Add(employeePay.PayGrade.PayGradeId, 1);
+                        if (employeeNum.ContainsKey(employeePay.PayGradeId.GetValueOrDefault()))
+                        {
+                            employeeNum[employeePay.PayGradeId.GetValueOrDefault()] += 1;
+                        }
+                        else
+                        {
+                            employeeNum[employeePay.PayGradeId.GetValueOrDefault()] = 1;
+                        }
                     }
                 }
             }
+
             ViewData["num"] = employeeNum;
 
             project.ProjectRequests = projectRequests;
@@ -320,7 +327,6 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> AssignEmployees(int id)
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var projectRequest = await _context.ProjectRequests
                 .Include(pr => pr.PayGrade)
                 .Include(pr => pr.Project)
@@ -420,7 +426,6 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> ChangeTA(string id)
         {
-            ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
             var employee = await _context.Employees.FindAsync(id);
             LineManagerManagement lineManagerManagement = new LineManagerManagement
             {
