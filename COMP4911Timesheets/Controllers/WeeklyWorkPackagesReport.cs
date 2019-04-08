@@ -33,8 +33,8 @@ namespace COMP4911Timesheets.Controllers
 
         
                 workPackages = await _context.WorkPackages
-                    .Include(w => w.ParentWorkPackage)
                     .Include(w => w.Project)
+                    .Where(w => w.ChildWorkPackages.Count == 0)
                     .ToListAsync();
 
             return View(workPackages);
