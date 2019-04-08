@@ -35,7 +35,6 @@ namespace COMP4911Timesheets.Controllers
                 workPackages = await _context.WorkPackages
                     .Include(w => w.ParentWorkPackage)
                     .Include(w => w.Project)
-                    .Include(w => w.ProjectEmployees)
                     .ToListAsync();
 
             return View(workPackages);

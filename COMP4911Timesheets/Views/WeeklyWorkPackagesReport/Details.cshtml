@@ -83,19 +83,34 @@
                                 @week.Timesheet.WeekNumber
                             </th>
                         }
+                        <th>
+                            Total
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
                         
                         <tr>
                             <th>
-                                Hours
+                                Man-Days
                             </th>
-                            @foreach (var week in Model.TimesheetRows)
-                            {
-                                var totalHour = week.SatHour + week.SunHour + week.MonHour + week.TueHour + week.WedHour + week.ThuHour + week.FriHour;
+                            @{
+                                double totalManDay = 0;
+
+                                foreach (var week in Model.TimesheetRows)
+                                {
+                                    var weekTotal = week.SatHour + week.SunHour + week.MonHour + week.TueHour + week.WedHour + week.ThuHour + week.FriHour;
+                                    if (weekTotal != 0)
+                                    {
+                                        weekTotal = weekTotal / 8;
+                                    }
+                                    totalManDay += weekTotal;
+                                    <td>
+                                        @weekTotal
+                                    </td>
+                                }
                                 <td>
-                                    @totalHour
+                                    @totalManDay
                                 </td>
                             }
                         </tr>
