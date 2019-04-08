@@ -54,5 +54,6 @@ namespace COMP4911Timesheets.Models
         public List<ResponsibleEngineerReport> ResponsibleEngineerReports { get; set; }
         public List<TimesheetRow> TimesheetRows { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
+
     }
 }
