@@ -188,6 +188,12 @@ namespace COMP4911Timesheets
                     Description = "",
                 };
                 _context.Add(mgmt);
+                _context.SaveChanges();
+
+                mgmt = _context.WorkPackages
+                    .Where(w => w.ProjectId == pId 
+                             && w.WorkPackageCode == "00000")
+                    .FirstOrDefault();
 
                 ProjectEmployee managerAsRE = new ProjectEmployee
                 {
@@ -251,7 +257,8 @@ namespace COMP4911Timesheets
                     && e.Status == ProjectEmployee.CURRENTLY_WORKING
                     && (e.Role == ProjectEmployee.PROJECT_MANAGER
                     || e.Role == ProjectEmployee.PROJECT_ASSISTANT
-                    || e.Role == ProjectEmployee.NOT_ASSIGNED))
+                    || e.Role == ProjectEmployee.NOT_ASSIGNED
+                    || e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER))
                 .Distinct()
                 .ToList();
 
@@ -400,9 +407,8 @@ namespace COMP4911Timesheets
                         .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
                         .FirstOrDefault();
 
-                    if (model.projectManager != managerPE.EmployeeId)
+                    if (model.projectManager != managerPE.EmployeeId) //we are setting a new PM
                     {
-
                         ProjectEmployee managerRE = _context.ProjectEmployees
                             .Where(e => e.ProjectId == id
                                      && e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER)
@@ -418,14 +424,32 @@ namespace COMP4911Timesheets
                         await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.PM);
                         await _usermgr.RemoveFromRoleAsync(oldmgr, ApplicationRole.RE);
 
-                        Employee mgr = _context.Employees.Find(model.projectManager);
-                        await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
-                        await _usermgr.AddToRoleAsync(mgr, ApplicationRole.RE);
+                        Employee newmgr = _context.Employees.Find(model.projectManager);
+                        await _usermgr.AddToRoleAsync(newmgr, ApplicationRole.PM);
+                        await _usermgr.AddToRoleAsync(newmgr, ApplicationRole.RE);
+
+                        ProjectEmployee unassigned = _context.ProjectEmployees
+                            .Where(pe => pe.ProjectId == id
+                                && pe.EmployeeId == newmgr.Id
+                                && pe.Role == ProjectEmployee.NOT_ASSIGNED)
+                            .FirstOrDefault();
+                        
+                        if(unassigned != null)
+                        {
+                            unassigned.Role = ProjectEmployee.RESPONSIBLE_ENGINEER;
+                            unassigned.Status = ProjectEmployee.CURRENTLY_WORKING;
+                            _context.Update(unassigned);
+                            _context.Remove(managerRE);
+                        }
+                        else
+                        {
+                            managerRE.EmployeeId = model.projectManager;
+                            _context.Update(managerRE);
+                        }
 
                         managerPE.EmployeeId = model.projectManager;
                         _context.Update(managerPE);
-                        managerRE.EmployeeId = model.projectManager;
-                        _context.Update(managerPE);
+
                     }
 
                     var assistantPE = _context.ProjectEmployees
@@ -459,6 +483,19 @@ namespace COMP4911Timesheets
                             });
                             Employee oldAssist = _context.Employees.Find(assistantPE.EmployeeId);
                             await _usermgr.RemoveFromRoleAsync(oldAssist, ApplicationRole.PA);
+                            //The following makes sure that removing an assistant, doesnt remove them from the
+                            //project if that was their only assignment in the project
+                            var check = _context.ProjectEmployees
+                                .Where(w => w.ProjectId == id && w.EmployeeId == assistantPE.EmployeeId)
+                                .FirstOrDefault();
+                            if (check == null)
+                                _context.Add(new ProjectEmployee
+                                {
+                                    EmployeeId = assistantPE.EmployeeId,
+                                    ProjectId = id,
+                                    Status = ProjectEmployee.CURRENTLY_WORKING,
+                                    Role = ProjectEmployee.NOT_ASSIGNED
+                                });
                         }
 
                         Employee assistant = _context.Employees.Find(assistantPE.EmployeeId);
