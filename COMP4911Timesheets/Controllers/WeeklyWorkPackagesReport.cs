@@ -29,13 +29,18 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages
         public async Task<IActionResult> Index()
         {
-            var workPackages = new List<WorkPackage>();
+            var uid = _userManager.GetUserId(User);
 
-        
-                workPackages = await _context.WorkPackages
-                    .Include(w => w.Project)
-                    .Where(w => w.ChildWorkPackages.Count == 0)
-                    .ToListAsync();
+            var workPackages = await _context.ProjectEmployees
+                .Where(pe => pe.EmployeeId == uid
+                   && (pe.Status == ProjectEmployee.CURRENTLY_WORKING))
+                .Join(_context.WorkPackages,
+                    pe => pe.WorkPackageId,
+                    wp => wp.WorkPackageId,
+                    (pe, wp) => wp)
+                .Where(wp => wp.ChildWorkPackages.Count == 0)
+                .Include(wp => wp.Project)
+                .ToListAsync();
 
             return View(workPackages);
         }
