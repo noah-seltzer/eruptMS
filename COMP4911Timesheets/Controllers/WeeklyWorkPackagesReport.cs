@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
-    [Authorize(Roles = "PM,AD")]
+    [Authorize(Roles = "PM,AD,PA")]
     public class WeeklyWorkPackagesReportController : Controller
     {
         private readonly ApplicationDbContext _context;
