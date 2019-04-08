@@ -61,10 +61,6 @@ namespace COMP4911Timesheets.Data
                     if (employee.EmployeeId == 1)
                     {
                         await userManager.AddToRoleAsync(employee, "AD");
-                        await userManager.AddToRoleAsync(employee, "EM");
-                        await userManager.AddToRoleAsync(employee, "EM");
-                        await userManager.AddToRoleAsync(employee, "EM");
-                        await userManager.AddToRoleAsync(employee, "EM");
                     }
                     else if (employee.EmployeeId == 2)
                     {

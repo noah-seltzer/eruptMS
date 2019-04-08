@@ -163,6 +163,7 @@ namespace COMP4911Timesheets.Controllers
                         };
                         _context.Add(projectEmployee);
                         await _context.SaveChangesAsync();
+                        await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.EM);
                     }
                 }
 
