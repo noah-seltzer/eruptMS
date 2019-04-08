@@ -207,7 +207,11 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var user = await _userManager.GetUserAsync(User);
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
+            _context.Update(timesheet);
+            user.FlexTime = timesheet.FlexTime;
+            await _userManager.UpdateAsync(user);
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));
@@ -224,6 +228,7 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
