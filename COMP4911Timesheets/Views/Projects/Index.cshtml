@@ -9,7 +9,10 @@
 @if (User.IsInRole("AD"))
 {
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Create New</a> |
+        <a class="small-box-footer" asp-area="" asp-controller="Uploads" asp-action="Index">
+            Bulk Upload Work Packages
+        </a>
     </p>
 }
 @using (Html.BeginForm())
