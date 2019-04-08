@@ -51,7 +51,17 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> Restore()
         {
-            Utility.RestoreDatabase();
+            try
+            {
+                Utility.RestoreDatabase();
+            }
+            catch (SqlException e)
+            {
+                TempData["ErrorMessage"] = "Database restore unsuccessful";
+                Console.WriteLine(e.ToString());
+                return RedirectToAction(nameof(Index));
+            }
+
             try
             {
                 await _userManager.GetUserAsync(User);
