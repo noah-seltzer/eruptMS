@@ -9,9 +9,11 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize(Roles = "PM,AD")]
     public class WeeklyWorkPackagesReportController : Controller
     {
         private readonly ApplicationDbContext _context;
