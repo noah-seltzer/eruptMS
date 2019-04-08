@@ -28,8 +28,10 @@ namespace COMP4911Timesheets.Controllers
         // GET: ResponsibleEngineerReports/Reports/6
         public async Task<IActionResult> Reports(int? id)
         {
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
+            //var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id);
             var workPackage = await _context.WorkPackages.FindAsync(id);
+            var responsibleEngineerReport = _context.ResponsibleEngineerReport.Where(m => m.WorkPackageId == id).ToList();
+            workPackage.ResponsibleEngineerReports = responsibleEngineerReport;
 
             TempData["workPackageName"] = workPackage.Name;
             TempData["workPackageId"] = workPackage.WorkPackageId;
@@ -44,8 +46,16 @@ namespace COMP4911Timesheets.Controllers
             //TODO: disable if workpackage is closed, or if leaf work package.
             //TODO: Also disable if the Responsible Engineer report has already been created for the week.
             var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
-
             var workPackage = await _context.WorkPackages.FindAsync(id);
+            var project = _context.Projects.Where(m => m.ProjectId == workPackage.ProjectId).FirstOrDefault();
+
+            TempData["projectName"] = project.Name;
+            
+            TempData["workPackageName"] = workPackage.Name;
+            TempData["workPackageId"] = workPackage.WorkPackageId;
+            TempData["projectId"] = workPackage.ProjectId;
+            TempData["workPackageStatus"] = workPackage.Status;
+            
             ResponsibleEngineerReport respEngReport = new ResponsibleEngineerReport
             {
                 WeekNumber = Utility.GetWeekNumberByDate(DateTime.Today),
@@ -90,20 +100,21 @@ namespace COMP4911Timesheets.Controllers
                 }
 
                 //Invalid if work package is a parent
-                if (report.WorkPackage.ChildWorkPackages == null) {
+                if (report.WorkPackage.ChildWorkPackages != null) {
                     ViewBag.CodeError = "Can only create Responsible Engineer Report for leaf work packages.";
                     return View(report);
                 }
 
                 report.Status = ResponsibleEngineerReport.VALID;
 
+                workPackageREReports.Add(report);
                 _context.Add(report);
 
                 _context.SaveChanges();
 
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(ReportDetails), report.ResponsibleEngineerReportId);
+                //return RedirectToAction(nameof(ReportDetails), report.ResponsibleEngineerReportId);
             }
             return View(report);
         }

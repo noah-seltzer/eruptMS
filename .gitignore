@@ -6,7 +6,6 @@ COMP4911Timesheets/Data/Migrations/
 COMP4911Timesheets/Migrations/
 ##COMP4911Timesheets/appsettings.json
 
-
 # User-specific files
 *.suo
 *.user

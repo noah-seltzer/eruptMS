@@ -10,6 +10,26 @@
 
 <form asp-action="Create">
     <div class="well bs-component">
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Project Name</label>
+                <input value='@TempData["projectName"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Work Package Name</label>
+                <input value="@Model.WorkPackage.Name" class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">projectId</label>
+                <input value='@TempData["projectId"]' class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <div class="form-row">
+        </div>
+        <div class="form-row">
+        </div>
         <label asp-for="WorkPackageId" class="control-label"></label>
         <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" readonly/>
         <label asp-for="WeekNumber" class="control-label"></label>

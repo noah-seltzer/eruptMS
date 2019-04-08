@@ -33,27 +33,39 @@
             <div class="form-group">
                 <label asp-for="projectManager" class="control-label"></label>
                 @{
-                    if(User.IsInRole("PA")) {
+                    if (ViewBag.Assistant)
+                    {
                         <select asp-for="projectManager" class="form-control searchDropDown" asp-items="ViewBag.EmployeesM" disabled="disabled"></select>
-                    } 
-                    else 
+                    }
+                    else
                     {
                         <select asp-for="projectManager" class="form-control searchDropDown" asp-items="ViewBag.EmployeesM"></select>
+
                     }
                 }
             </div>
             <div class="form-group">
                 <label asp-for="managersAssistant" class="control-label"></label>
-                <select asp-for="managersAssistant" class="form-control searchDropDown" asp-items="ViewBag.EmployeesA"></select>
+                @{
+                    if (ViewBag.Assistant)
+                    {
+                        <select asp-for="managersAssistant" class="form-control searchDropDown" asp-items="ViewBag.EmployeesA" disabled="disabled"></select>
+                    }
+                    else
+                    {
+                        <select asp-for="managersAssistant" class="form-control searchDropDown" asp-items="ViewBag.EmployeesA"></select>
+                        <span class="text-danger">@ViewBag.MgrIsAssist</span>
+                    }
+                }
             </div>
             <div class="form-group">
                 <label asp-for="project.CostingProposal" class="control-label"></label>
-                <input asp-for="project.CostingProposal" class="form-control" required type="number" />
+                <input asp-for="project.CostingProposal" class="form-control" required type="number" min="0" />
                 <span asp-validation-for="project.CostingProposal" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="project.OriginalBudget" class="control-label"></label>
-                <input asp-for="project.OriginalBudget" class="form-control" required type="number" />
+                <input asp-for="project.OriginalBudget" class="form-control" required type="number" min="0" />
                 <span asp-validation-for="project.OriginalBudget" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -72,7 +84,8 @@
                     <label>@Model.requests[i].PayGrade.PayLevel</label>
                     <input type="hidden" asp-for="requests[i].PayGradeId" />
                     <input type="hidden" asp-for="requests[i].ProjectId" />
-                    <input asp-for="requests[i].AmountRequested" class="form-control" type="number" />
+                    <input asp-for="requests[i].AmountRequested" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="requests[i].AmountRequested" class="text-danger"></span>
                 </div>
             }
         </div>
@@ -97,13 +110,13 @@
             <div class="form-group">
                 <label class="control-label">Work Packages</label>
                 <ul>
-                        @foreach (var w in Model.project.WorkPackages)
-                        {
-                            <li>
-                                @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
-                            </li>
-                        }
-                    </ul>
+                    @foreach (var w in Model.project.WorkPackages)
+                    {
+                        <li>
+                            @Html.ActionLink(w.Name, "Edit", "WorkPackages", new { id = w.WorkPackageId }, null)
+                        </li>
+                    }
+                </ul>
                 @*<select asp-for="project.WorkPackages" class="form-control  wps" asp-items="ViewBag.WPs"></select>*@
             </div>
         </div>

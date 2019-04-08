@@ -163,6 +163,7 @@ namespace COMP4911Timesheets.Controllers
                         };
                         _context.Add(projectEmployee);
                         await _context.SaveChangesAsync();
+                        await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.EM);
                     }
                 }
 
@@ -205,7 +206,7 @@ namespace COMP4911Timesheets.Controllers
             var employeeManagement = new EmployeeManagement
             {
                 Employee = employee,
-                EmployeePay = employeePay
+                EmployeePay = employeePay,
             };
 
             return View(employeeManagement);
@@ -225,7 +226,8 @@ namespace COMP4911Timesheets.Controllers
 
             if (employeeManagement.Employee.SupervisorId == id || employeeManagement.Employee.ApproverId == id)
             {
-                return BadRequest("Supervisor and Approver can't be themselves");
+                ViewBag.ErrorMessage = "Supervisor and Approver can't be themselves";
+                return await Edit(id);
             }
 
             if (ModelState.IsValid)
@@ -274,6 +276,32 @@ namespace COMP4911Timesheets.Controllers
                     employeeToBeEdited.UserName = employeeManagement.Employee.Email;
                     employeeToBeEdited.Email = employeeManagement.Employee.Email;
                     employeeToBeEdited.PhoneNumber = employeeManagement.Employee.PhoneNumber;
+                    if (!string.IsNullOrEmpty(employeeManagement.passPhrase))
+                    {
+                        var datetime = DateTime.Now;
+                        var newSignature = new Signature
+                        {
+                            HashedSignature = Utility.HashEncrypt(employeeManagement.passPhrase + datetime),
+                            CreatedTime = datetime,
+                            Status = Signature.VALID,
+                            EmployeeId = id
+                        };
+
+                        var oldSig = _context.Signatures
+                            .Where(s => s.EmployeeId == id)
+                            .FirstOrDefault();
+
+                        if (oldSig == null)
+                            _context.Signatures.Add(newSignature);
+                        else
+                        {
+                            oldSig.CreatedTime = newSignature.CreatedTime;
+                            oldSig.HashedSignature = newSignature.HashedSignature;
+                            _context.Signatures.Update(oldSig);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
                     await _userManager.UpdateAsync(employeeToBeEdited);
 
                     var employeePayToBeDisabled = _context.EmployeePays.Find(employeeManagement.EmployeePay.EmployeePayId);
