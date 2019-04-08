@@ -54,7 +54,10 @@ namespace COMP4911Timesheets.Controllers
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
                 .Include(w => w.ProjectEmployees)
-                .Include("ProjectEmployees.Employee.EmployeePays")
+                .Include(w => w.TimesheetRows)
+                .Include("ProjectEmployees.Employee.EmployeePays.PayGrade")
+                .Include("TimesheetRows.Timesheet")
+                .Include("TimesheetRows.Timesheet.Employee")
                 .FirstOrDefaultAsync(m => m.WorkPackageId == id);
 
             var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();

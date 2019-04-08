@@ -379,3 +379,41 @@ body {
     opacity: .65;
     filter: alpha(opacity=65)
 }
+
+/* Supervisory page styles
+-------------------------------------------------- */
+.approval-heading {
+    padding-bottom: 0.225em;
+}
+
+.multiple-roles {
+    position: relative;
+    max-height: 325px;
+    overflow: auto;
+    margin-bottom: 12px;
+  }
+
+  .table-wrapper-scroll-y {
+    display: block;
+  }
+
+  .single-role {
+    position: relative;
+    height: 525px;
+    overflow: auto;
+  }
+
+  .project-button {
+      float: right;
+  }
+.badge {
+    font-size: 85% !important;
+}
+
+.block {
+    display: block;
+}
+
+.none {
+    display: none;
+}

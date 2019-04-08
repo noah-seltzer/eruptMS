@@ -1,5 +1,4 @@
 ﻿@model COMP4911Timesheets.Models.WorkPackage
-
 @{
     ViewData["PageTitle"] = "Details";
 }
@@ -23,7 +22,7 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            WP @Html.DisplayNameFor(model => model.Description)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
@@ -35,31 +34,16 @@
     <thead>
         <tr>
             <th>
-                @PayGrade.P1
+                Role
             </th>
             <th>
-                @PayGrade.P2
+                Name
             </th>
             <th>
-                @PayGrade.P3
+                Pay Level
             </th>
             <th>
-                @PayGrade.P4
-            </th>
-            <th>
-                @PayGrade.P5
-            </th>
-            <th>
-                @PayGrade.P6
-            </th>
-            <th>
-                @PayGrade.SS
-            </th>
-            <th>
-                @PayGrade.JS
-            </th>
-            <th>
-                @PayGrade.DS
+                Man Days
             </th>
 
             <th></th>
@@ -68,13 +52,55 @@
     <tbody>
         @foreach (var item in Model.ProjectEmployees)
         {
-            
-                var paygradelist = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
-                var paygrade = paygradelist[0].PayGradeId;
+
+            var paygradelist = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
+            var paylevel = paygradelist[0].PayGrade;
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ProjectEmployeeId)
-                @paygrade
+                @Html.DisplayFor(modelItem => item.Role)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
+                ,
+                @Html.DisplayFor(modelItem => item.Employee.FirstName)
+            </td>
+            <td>
+                @paylevel.PayLevel
+            </td>
+            <td>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            @foreach (var week in Model.TimesheetRows)
+                            {
+                            <th>
+                                @week.Timesheet.WeekNumber
+                            </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tt in Model.ProjectEmployees)
+                        {
+
+                            var paygradelist2 = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
+                            var paylevel2 = paygradelist[0].PayGrade;
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => tt.Role)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => tt.Employee.LastName)
+                                    ,
+                                    @Html.DisplayFor(modelItem => tt.Employee.FirstName)
+                                </td>
+                                <td>
+                                    @paylevel2.PayLevel
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </td>
         </tr>
         }

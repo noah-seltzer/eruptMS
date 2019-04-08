@@ -11,7 +11,12 @@
     <div class="col-md-8 col-lg-6 well bs-component">
         <form asp-action="AssignEmployees" class="form-horizontal">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <output>@ViewBag.ErrorMessage <br></output>
+            <div class="@ViewBag.Display">
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    @ViewBag.ErrorMessage
+                </div>
+            </div>
             <output># of @Model.ProjectRequest.PayGrade.PayLevel Requests: @Model.ProjectRequest.AmountRequested</output>
             <div class="form-group">
                 <label asp-for="Employee.Email" class="control-label"></label>

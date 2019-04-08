@@ -1,14 +1,14 @@
 @model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
 
 @{
-    ViewData["PageTitle"] = "Projects";
+    ViewData["PageTitle"] = "All Projects";
 }
 
-<h1>@ViewData["PageTitle"]</h1>
-
 <p>
-    <a asp-action="Index">Employees</a>
+    <a asp-action="Index" class="btn btn-info btn-raised project-button btn-lg">Employees</a>
 </p>
+
+<h1>@ViewData["PageTitle"]</h1>
 
 <table class="table well bs-component">
     <thead>
