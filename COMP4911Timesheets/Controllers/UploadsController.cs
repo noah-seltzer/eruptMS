@@ -76,6 +76,7 @@ namespace COMP4911Timesheets.Controllers
             var path = Path.Combine(
                   hostingEnvironment.WebRootPath, "workpackages.csv");
             var failedList = new List<String>();
+            var failedPackages = new List<Dictionary<String, String>>();
             var WPcontroller = new WorkPackagesController(_context, _userManager);
             using (var stream = new FileStream(path, FileMode.Create))
             {
@@ -124,19 +125,22 @@ namespace COMP4911Timesheets.Controllers
                             };
                             if (workPackageData["ParentWorkPackageCode"] != null && !workPackageData["ParentWorkPackageCode"].Equals(""))
                             {
-                                //var parentWorkPackage = await _context.WorkPackages.FirstOrDefaultAsync(m =>
-                                //    m.WorkPackageCode.Equals(workPackageData["ProjectCode"])
-                                //        && m.ProjectId == parentProject.ProjectId);
-                                //package.ParentWorkPackage = parentWorkPackage;
-                                //package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
-                                //var projectWorkPackages = await _context.WorkPackages.Where(u => u.ProjectId == parentProject.ProjectId).ToListAsync();
-                                var parentWorkPackage = parentProject.WorkPackages
-                                    .Where(m =>
-                                        m.WorkPackageCode.Equals(workPackageData["ParentWorkPackageCode"]))
-                                    .FirstOrDefault();
-                                package.ParentWorkPackage = parentWorkPackage;
-                                package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
-                                package.WorkPackageCode = await generateChildWorkPackageCode(parentWorkPackage);
+                                try
+                                {
+                                    var parentWorkPackage = parentProject.WorkPackages
+                                        .Where(m =>
+                                            m.WorkPackageCode.Equals(workPackageData["ParentWorkPackageCode"]))
+                                        .FirstOrDefault();
+                                    package.ParentWorkPackage = parentWorkPackage;
+                                    package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
+                                    package.WorkPackageCode = await generateChildWorkPackageCode(parentWorkPackage);
+                                } 
+                                catch (NullReferenceException e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                    failedPackages.Add(workPackageData);
+                                    continue;
+                                }
                             }
                             else
                             {
@@ -149,16 +153,23 @@ namespace COMP4911Timesheets.Controllers
                             } else
                             {
                                 failedList.Add(workPackageData["Name"]);
+                                failedPackages.Add(workPackageData);
                             }
                         }
                         else
                         {
                             failedList.Add(workPackageData["Name"]);
+                            failedPackages.Add(workPackageData);
                         }
                     }
                 }
             }
-            ViewData["failedPackages"] = String.Join(",", failedList);
+            //ViewData["failedPackages"] = String.Join(",", failedList);
+            ViewData["failedPackages"] = "";
+            foreach (var record in failedPackages)
+            {
+                ViewData["failedPackages"] += string.Join(";", record.Select(x => x.Key + "=" + x.Value).ToArray()) + "\n";
+            }
             return View("Success");
         }
 

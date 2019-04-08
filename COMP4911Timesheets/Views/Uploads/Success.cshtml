@@ -4,7 +4,16 @@
 }
 
 
-<h1>@ViewData["fileContents"]</h1>
-<p>Could not upload rows @ViewData["failedList"]</p>
+<h1>Job Finished</h1>
+
+@if ( (String) ViewData["failedPackages"] != "" )
+{
+    <p>The following rows failed to be added</p>
+    <p>@ViewData["failedPackages"]</p>
+} else
+{
+    <p>All rows added successfully</p>
+}
+
 
 
