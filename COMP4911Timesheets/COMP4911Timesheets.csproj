@@ -11,19 +11,7 @@
     <WarningLevel>1</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\Migrations\**" />
-    <Content Remove="Data\Migrations\**" />
-    <EmbeddedResource Remove="Data\Migrations\**" />
-    <None Remove="Data\Migrations\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Data\Migrations\20190406221526_InitialCreate.cs" />
-    <Compile Include="Data\Migrations\20190406221526_InitialCreate.Designer.cs" />
-    <Compile Include="Data\Migrations\ApplicationDbContextModelSnapshot.cs" />
-  </ItemGroup>
-
+ 
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="12.1.2" />
