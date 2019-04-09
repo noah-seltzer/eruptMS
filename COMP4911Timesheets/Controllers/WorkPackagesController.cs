@@ -247,7 +247,6 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
-
         // GET: WorkPackages/CreateWorkPackage/6
         public async Task<IActionResult> CreateWorkPackageReport(int? id)
         {
@@ -323,7 +322,6 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
-
 
             if (ModelState.IsValid)
             {
