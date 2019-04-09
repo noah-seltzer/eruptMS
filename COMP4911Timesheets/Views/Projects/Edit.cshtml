@@ -69,6 +69,11 @@
                 <span asp-validation-for="project.OriginalBudget" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="project.MarkupRate" class="control-label"></label>
+                <input asp-for="project.MarkupRate" type="number" class="form-control" />
+                <span asp-validation-for="project.MarkupRate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="project.Status" class="control-label"></label>
                 <select asp-for="project.Status" class="form-control searchDropDown" asp-items="ViewBag.Status"></select>
             </div>

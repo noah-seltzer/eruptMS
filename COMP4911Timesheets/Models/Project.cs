@@ -12,6 +12,7 @@ namespace COMP4911Timesheets.Models
         public static readonly int INTERNAL = 2;
         public static readonly int PAUSED = 3;
         public static readonly int CLOSED = 4;
+        public static readonly int ARCHIVED = 5;
 
         public static readonly Dictionary<int, string> Statuses = new Dictionary<int, string>
         {
@@ -19,7 +20,8 @@ namespace COMP4911Timesheets.Models
             {1, "Ongoing"},
             {2, "Internal"},
             {3, "Paused"},
-            {4, "Closed"}
+            {4, "Closed"},
+            {5, "Archived"}
         };
 
         [Key]
@@ -48,5 +50,8 @@ namespace COMP4911Timesheets.Models
 
         [Display(Name = "Employee Requests")]
         public List<ProjectRequest> ProjectRequests { get; set; }
+
+        [Display(Name = "Markup Rate")]
+        public double MarkupRate { get; set; }
     }
 }
