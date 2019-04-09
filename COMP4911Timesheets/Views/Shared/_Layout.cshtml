@@ -41,7 +41,7 @@
                         {
                             if (User.IsInRole(role: "AD") || User.IsInRole(role: "HR") || User.IsInRole(role: "TA") || User.IsInRole(role: "LM"))
                             {
-                                <li class="nav-item dropdown @Html.IsSelected(actions: 
+                                <li class="nav-item dropdown @Html.IsSelected(actions:
                                                             "Index,Create,Details,Delete,Edit,Backup,Restore,TimesheetView,Approval,ApprovalConfirmed,Reject",
                                                             controllers: "Employees,PayGrades,Admins,LineManagers")">
                                     <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" href="#" id="download">
@@ -85,6 +85,11 @@
 
                             <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Timesheet")">
                                 <a class="nav-link" asp-area="" asp-controller="Timesheets" asp-action="Index">Timesheet</a>
+                            </li>
+
+
+                            <li class="nav-item @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "WorkPackages")">
+                                <a class="nav-link" asp-area="" asp-controller="WorkPackages" asp-action="Index">Work Packages</a>
                             </li>
 
                             <li class="nav-item dropdown @Html.IsSelected(actions: "Index,Create,Details,Delete,Edit", controllers: "Projects,ProjectSumReport,WeeklyWorkPackagesReport")"
