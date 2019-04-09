@@ -485,9 +485,10 @@ namespace COMP4911Timesheets.Controllers
 
         public async Task<IActionResult> RemoveEmployees(int id)
         {
+            bool isAdmin = await _userManager.IsInRoleAsync(await _userManager.GetUserAsync(User), "AD");
             var projectEmployees = await _context.ProjectEmployees
                 .Where(pe => pe.ProjectId == id)
-                .Where(pe => pe.Employee.SupervisorId == _userManager.GetUserId(User))
+                .Where(pe => isAdmin || pe.Employee.SupervisorId == _userManager.GetUserId(User))
                 .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                 .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER)
                 .Include(pe => pe.Employee)
