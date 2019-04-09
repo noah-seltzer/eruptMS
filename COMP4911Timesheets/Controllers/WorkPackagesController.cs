@@ -126,6 +126,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/CreateInternalWorkPackage
+        [Authorize(Roles = "AD,PM,PA")]
         public IActionResult CreateInternalWorkPackage()
         {
             TempData["projectId"] = projectId;
@@ -157,6 +158,7 @@ namespace COMP4911Timesheets.Controllers
 
 
         // GET: WorkPackages/CreateWorkPackage
+        [Authorize(Roles = "AD,PM,PA")]
         public IActionResult CreateWorkPackage()
         {
             TempData["projectId"] = projectId;
@@ -221,6 +223,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/CreateChildWorkPackage/6
+        [Authorize(Roles = "AD,PM,PA")]
         public IActionResult CreateChildWorkPackage(int? id)
         {
             parentWorkPKId = id;
@@ -554,6 +557,7 @@ namespace COMP4911Timesheets.Controllers
 
 
         // GET: WorkPackages/CreateChildWorkPackage/6
+        [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> AssignEmployee(int? id)
         {
             workPackageId = id;
@@ -629,6 +633,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/AssignRE/6
+        [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> AssignRE(string EmployeeId, string name)
         {
 
@@ -698,6 +703,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/AssignEm/6
+        [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> AssignEm(string EmployeeId, string name)
         {
             ProjectEmployee projectEmployee = new ProjectEmployee();
@@ -730,6 +736,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/RemoveRE/6
+        [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> RemoveRE(string EmployeeId)
         {
 
@@ -761,6 +768,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/RemoveRE/6
+        [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> RemoveEm(string EmployeeId)
         {
 
