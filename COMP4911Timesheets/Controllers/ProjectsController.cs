@@ -29,6 +29,14 @@ namespace COMP4911Timesheets
         // GET: Projects
         public async Task<IActionResult> Index(string searchString)
         {
+            try
+            {
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             var uid = (await _usermgr.GetUserAsync(User)).Id;
             ProjectListingModel model = new ProjectListingModel();
 
@@ -186,12 +194,13 @@ namespace COMP4911Timesheets
                     ParentWorkPackageId = null,
                     Name = "Management",
                     Description = "",
+                    Status = WorkPackage.ARCHIVED
                 };
                 _context.Add(mgmt);
                 _context.SaveChanges();
 
                 mgmt = _context.WorkPackages
-                    .Where(w => w.ProjectId == pId 
+                    .Where(w => w.ProjectId == pId
                              && w.WorkPackageCode == "00000")
                     .FirstOrDefault();
 
@@ -359,7 +368,7 @@ namespace COMP4911Timesheets
                 assItems.AddRange(new SelectList(mgrList, "Id", "Email"));
                 assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
             }
-                
+
 
             ViewBag.EmployeesM = mgrItems;
             ViewBag.EmployeesA = assItems;
@@ -384,7 +393,8 @@ namespace COMP4911Timesheets
                 return NotFound();
             }
 
-            if (model.projectManager == model.managersAssistant) {
+            if (model.projectManager == model.managersAssistant)
+            {
                 ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
                 return await Edit(id);
             }
@@ -433,8 +443,8 @@ namespace COMP4911Timesheets
                                 && pe.EmployeeId == newmgr.Id
                                 && pe.Role == ProjectEmployee.NOT_ASSIGNED)
                             .FirstOrDefault();
-                        
-                        if(unassigned != null)
+
+                        if (unassigned != null)
                         {
                             unassigned.Role = ProjectEmployee.RESPONSIBLE_ENGINEER;
                             unassigned.Status = ProjectEmployee.CURRENTLY_WORKING;
@@ -563,8 +573,26 @@ namespace COMP4911Timesheets
 
         public async Task<IActionResult> Close(int id)
         {
+            var workPackage = await _context.WorkPackages
+                .Where(wp => wp.ProjectId == id)
+                .Where(wp => wp.Status == WorkPackage.ARCHIVED || wp.Status == WorkPackage.OPENED)
+                .FirstOrDefaultAsync();
+            if (workPackage != null)
+            {
+                TempData["ErrorMessage"] = "All work packages have to be closed to be able to close the proejct.";
+                return RedirectToAction(nameof(Index));
+            }
             var project = await _context.Projects.FindAsync(id);
             project.Status = Project.CLOSED;
+            _context.Update(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Archive(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            project.Status = Project.ARCHIVED;
             _context.Update(project);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

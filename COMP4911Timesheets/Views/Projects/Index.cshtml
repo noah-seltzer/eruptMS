@@ -4,10 +4,16 @@
     ViewData["PageTitle"] = "Projects";
     var manage = Model.managedProjects.Count > 0;
     var assign = Model.assignedProjects.Count > 0;
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
-<h4>@TempData["info"]</h4>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
 @if (User.IsInRole("AD"))
 {
     <p>
@@ -78,15 +84,16 @@
                         @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
                     </td>
                     <td>
-                        @if(item.Status != Project.CLOSED) {
+                        @if(item.Status != Project.CLOSED && item.Status != Project.ARCHIVED) {
                             <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">Work Packages</a><br />
                             <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage</a> <br />
                         }
-                        @if(User.IsInRole("AD") || User.IsInRole("PM")) {
-                            @if(item.Status==Project.CLOSED) {
+                        @if(User.IsInRole("AD") || User.IsInRole("PM") || User.IsInRole("PA")) {
+                            @if(item.Status==Project.ARCHIVED) {
                                 <a asp-action="Reopen" asp-route-id="@item.ProjectId" asp-controller="Projects">Reopen</a><br/>
-                            } else {
-                                <a asp-action="Close" asp-route-id="@item.ProjectId" asp-controller="Projects">Archive</a><br/>
+                            } else if (item.Status!=Project.CLOSED) {
+                                <a asp-action="Close" asp-route-id="@item.ProjectId" asp-controller="Projects">Close</a><br/>
+                                <a asp-action="Archive" asp-route-id="@item.ProjectId" asp-controller="Projects">Archive</a><br/>
                             }
                         }
                     </td>
