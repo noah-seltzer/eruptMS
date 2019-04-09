@@ -392,16 +392,16 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
 
-            if ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM"))
+            if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "AD") && !User.IsInRole(role: "PA"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
-                    .Where(u => u.EmployeeId == users.Id
+                    .Where(u => u.EmployeeId == users.Id && u.ProjectId == projectId
                     && (u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER || u.Role == ProjectEmployee.EMPLOYEE)).ToListAsync();
 
                 foreach (ProjectEmployee temp in REWorkPackages)
                 {
                     WorkPackage tempwp = _context.WorkPackages
-                        .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
+                        .Where(u => u.ProjectId == projectId && u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
                     workPackages.Add(tempwp);
                 }
                 return View(workPackages);
