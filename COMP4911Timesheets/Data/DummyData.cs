@@ -539,6 +539,7 @@ namespace COMP4911Timesheets.Data
                     Description="I need descriptions.",
                     CostingProposal=0,
                     OriginalBudget=0,
+                    MarkupRate = 0,
                     Status=Project.INTERNAL
                 }
             };

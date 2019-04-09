@@ -75,9 +75,6 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction("Index", "ProjectSumReport");
             }
 
-
-
-
             if (project == null)
             {
                 return NotFound();
@@ -102,6 +99,13 @@ namespace COMP4911Timesheets.Controllers
 
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
 
+            double PMHourTotal = 0;
+            double PMCostTotal = 0;
+            double REHourTotal = 0;
+            double RECostTotal = 0;
+            double AHourTotal = 0;
+            double ACostTotal = 0;
+
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
                 ProjectSumReport tempReport = new ProjectSumReport();
@@ -118,14 +122,20 @@ namespace COMP4911Timesheets.Controllers
                     if (tempBudget.Type == Budget.ACTUAL)
                     {
                         aHour += tempBudget.Hour;
+                        AHourTotal += tempBudget.Hour;
                         aCost += payGrade.Cost * aHour;
+                        ACostTotal += payGrade.Cost * aHour;
                     }
                     else if (tempBudget.Type == Budget.ESTIMATE)
                     {
                         PMHour += tempBudget.Hour;
-                        PMCost += payGrade.Cost * PMHour;
+                        PMHourTotal += tempBudget.Hour;
+                        PMCost += payGrade.Cost * PMHour * 8;
+                        PMCostTotal += payGrade.Cost * PMHour * 8;
                         REHour += tempBudget.REHour;
-                        RECost += payGrade.Cost * REHour;
+                        REHourTotal += tempBudget.REHour;
+                        RECost += payGrade.Cost * REHour * 8;
+                        RECostTotal += payGrade.Cost * REHour * 8;
                     }
 
                 }
@@ -137,8 +147,8 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.ACost = aCost;
                 tempReport.RECost = RECost;
                 tempReport.AHour = aHour / 8;
-                tempReport.REHour = REHour / 8;
-                tempReport.PMHour = PMHour / 8;
+                tempReport.REHour = REHour;
+                tempReport.PMHour = PMHour;
                 tempReport.PMCost = PMCost;
 
                 if (REHour != 0)
@@ -155,6 +165,14 @@ namespace COMP4911Timesheets.Controllers
                 }
                 projectSumReports.Add(tempReport);
             }
+
+
+            TempData["PMCostTotal"] = PMCostTotal;
+            TempData["PMHourTotal"] = PMHourTotal;
+            TempData["RECostTotal"] = RECostTotal;
+            TempData["REHourTotal"] = REHourTotal;
+            TempData["ACostTotal"] = ACostTotal;
+            TempData["AHourTotal"] = AHourTotal;
 
             return View(projectSumReports);
         }

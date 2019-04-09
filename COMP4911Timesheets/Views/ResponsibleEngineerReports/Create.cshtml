@@ -1,0 +1,104 @@
+@model COMP4911Timesheets.Models.ResponsibleEngineerReport
+
+@{
+    ViewData["PageTitle"] = "Create";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Responsible Engineer Report</h4>
+
+<form asp-action="Create">
+    <div class="well bs-component">
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Project Name</label>
+                <input value='@TempData["projectName"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Work Package Name</label>
+                <input value="@Model.WorkPackage.Name" class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Project Code</label>
+                <input value='@TempData["projectCode"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Work Package Code</label>
+                <input value='@TempData["workPackageCode"]' class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Project Manager</label>
+                <input value='@TempData["projectManager"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Project Manager Assistant</label>
+                <input value='@TempData["projectManagerAssistant"]' class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Responsible Engineer</label>
+                <input value='@TempData["projectResponsibleEngineer"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="WeekNumber" class="control-label"></label>
+                <input asp-for="WeekNumber" value="@Model.WeekNumber" class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
+        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
+    </div>
+    <br>
+
+    <div class="well bs-component">
+        <!-- TODO: PLanned/spent/need by labour plevel -->
+    </div>
+    <br>
+
+    <div class="well bs-component">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" required/>
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="WorkAccomplished" class="control-label"></label>
+                <input asp-for="WorkAccomplished" class="form-control" required/>
+                <span asp-validation-for="WorkAccomplished" class="text-danger"></span>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="Problem" class="control-label"></label>
+                <input asp-for="Problem" class="form-control" required/>
+                <span asp-validation-for="Problem" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="WorkPlanned" class="control-label"></label>
+                <input asp-for="WorkPlanned" class="form-control" required/>
+                <span asp-validation-for="WorkPlanned" class="text-danger"></span>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="ProblemAnticipated" class="control-label"></label>
+                <input asp-for="ProblemAnticipated" class="form-control" required/>
+                <span asp-validation-for="ProblemAnticipated" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Reports" asp-route-id="@Model.WorkPackageId" asp-controller="ResponsibleEngineerReports">Back to List</a>
+</div>
