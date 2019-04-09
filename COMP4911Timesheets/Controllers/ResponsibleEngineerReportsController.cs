@@ -313,12 +313,31 @@ namespace COMP4911Timesheets.Controllers
                                 EmployeePayId = ts.EmployeePayId,
                                 WorkPackageId = tsr.WorkPackageId
                             };
+                            
+            var timeSheetsEP = from ts in timeSheets
+                            join ep in _context.EmployeePays
+                            on ts.EmployeePayId equals ep.EmployeePayId into joined
+                            from ep in joined.DefaultIfEmpty()
+                            select new {
+                                SatHour = ts.SatHour,
+                                SunHour = ts.SunHour,
+                                MonHour = ts.MonHour,
+                                TueHour = ts.TueHour,
+                                WedHour = ts.WedHour,
+                                ThuHour = ts.ThuHour,
+                                FriHour = ts.FriHour,
+                                WeekNumber = ts.WeekNumber,
+                                EmployeePayId = ts.EmployeePayId,
+                                WorkPackageId = ts.WorkPackageId,
+                                PayGradeId = ep.PayGradeId
+                            };
+
             //All Weeks
-            var timeSheetsAllWeeks = await timeSheets.Where(ts => ts.WorkPackageId == workPackage.WorkPackageId).ToListAsync();
-            var timeSheetsAllWeeksDictionary = timeSheetsAllWeeks.ToDictionary(ts => ts.EmployeePayId);
+            var timeSheetsAllWeeks = await timeSheetsEP.Where(ts => ts.WorkPackageId == workPackage.WorkPackageId).ToListAsync();
+            var timeSheetsAllWeeksDictionary = timeSheetsAllWeeks.ToDictionary(ts => ts.PayGradeId);
             //This Week
-            var timeSheetsThisWeek = await timeSheets.Where(ts => ts.WorkPackageId == workPackage.WorkPackageId && ts.WeekNumber == responsibleEngineerReport.WeekNumber).ToListAsync();
-            var timeSheetsThisWeekDictionary = timeSheetsThisWeek.ToDictionary(ts => ts.EmployeePayId);
+            var timeSheetsThisWeek = await timeSheetsEP.Where(ts => ts.WorkPackageId == workPackage.WorkPackageId && ts.WeekNumber == responsibleEngineerReport.WeekNumber).ToListAsync();
+            var timeSheetsThisWeekDictionary = timeSheetsThisWeek.ToDictionary(ts => ts.PayGradeId);
             
             ArrayList pLevels = new ArrayList();
             ArrayList planned = new ArrayList();
@@ -343,7 +362,7 @@ namespace COMP4911Timesheets.Controllers
                           ts.Value.WedHour +
                           ts.Value.ThuHour +
                           ts.Value.FriHour;
-                var index = payGrades.IndexOf(payGrades.Find(pg => pg.PayGradeId == ts.Value.EmployeePayId));
+                var index = payGrades.IndexOf(payGrades.Find(pg => pg.PayGradeId == ts.Value.PayGradeId));
                 spentToDate[index] += sum;
             };
 
@@ -355,7 +374,7 @@ namespace COMP4911Timesheets.Controllers
                           ts.Value.WedHour +
                           ts.Value.ThuHour +
                           ts.Value.FriHour;
-                var index = payGrades.IndexOf(payGrades.Find(pg => pg.PayGradeId == ts.Value.EmployeePayId));
+                var index = payGrades.IndexOf(payGrades.Find(pg => pg.PayGradeId == ts.Value.PayGradeId));
                 spentThisWeek[index] += sum;
             };
 
