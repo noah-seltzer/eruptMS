@@ -534,7 +534,7 @@ namespace COMP4911Timesheets.Controllers
             {
                 ViewBag.ErrorMessage = "Employee can only be assigned to a leaf workpackage";
                 var wpTemp = _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefault();
-                return RedirectToAction("AssignEmployee", "WorkPackages", new { id = id, pId = pId });
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = pId });
             }
 
             var projectEmployees = new List<ProjectEmployee>();
