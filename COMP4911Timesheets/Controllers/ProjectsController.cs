@@ -130,7 +130,11 @@ namespace COMP4911Timesheets
         [Authorize(Roles = "AD")]
         public IActionResult Create()
         {
-            ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
+            ViewBag.MEmployees = new SelectList(_context.Employees, "Id", "Email");
+            List<SelectListItem> assItems = new List<SelectListItem>();
+            assItems.AddRange(new SelectList(_context.Employees, "Id", "Email"));
+            assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+            ViewBag.AEmployees = assItems;
             return View();
         }
 
@@ -140,7 +144,7 @@ namespace COMP4911Timesheets
         [HttpPost]
         [Authorize(Roles = "AD")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProjectCode,Name,Description,ProjectManager")] NewProject input)
+        public async Task<IActionResult> Create([Bind("ProjectCode,Name,Description,ProjectManager,ManagersAssistant,MarkupRate")] NewProject input)
         {
             if (ModelState.IsValid)
             {
@@ -161,12 +165,20 @@ namespace COMP4911Timesheets
                     return View(input);
                 }
 
+                if (input.ProjectManager == input.ManagersAssistant)
+                {
+                    ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
+                    ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
+                    return View(input);
+                }
+
                 Project project = new Project
                 {
                     ProjectCode = input.ProjectCode,
                     Name = input.Name,
                     Description = input.Description,
                     Status = Project.ONGOING,
+                    MarkupRate = input.MarkupRate
                 };
                 _context.Add(project);
 
@@ -186,6 +198,22 @@ namespace COMP4911Timesheets
 
                 Employee mgr = _context.Employees.Find(manager.EmployeeId);
                 await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
+
+                if(!String.IsNullOrEmpty(input.ManagersAssistant))
+                {
+                    ProjectEmployee assist = new ProjectEmployee
+                    {
+                        Status = ProjectEmployee.CURRENTLY_WORKING,
+                        Role = ProjectEmployee.PROJECT_ASSISTANT,
+                        ProjectId = pId,
+                        EmployeeId = input.ManagersAssistant,
+                        WorkPackageId = null
+                    };
+                    _context.Add(assist);
+
+                    Employee ast = _context.Employees.Find(assist.EmployeeId);
+                    await _usermgr.AddToRoleAsync(ast, ApplicationRole.PA);
+                }
 
                 WorkPackage mgmt = new WorkPackage
                 {
@@ -359,6 +387,7 @@ namespace COMP4911Timesheets
 
 
             List<SelectListItem> assItems = new List<SelectListItem>();
+
             if (ViewBag.Assistant)
             {
                 assItems.Insert(0, new SelectListItem { Text = assistant.Employee.Email, Value = assistant.EmployeeId });
