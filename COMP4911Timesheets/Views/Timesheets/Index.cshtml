@@ -58,12 +58,11 @@
                 @Html.DisplayFor(modelItem => item.Employee.LastName)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.TimesheetId">Details</a>
                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
                     COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Submitted & Not Approved" ||
                     COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")
                 {
-                <a asp-action="Edit" asp-route-id="@item.TimesheetId"> | Edit </a>
+                <a asp-action="Edit" asp-route-id="@item.TimesheetId">View </a>
                 }
                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
                     COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")

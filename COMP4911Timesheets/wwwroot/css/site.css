@@ -423,3 +423,8 @@ body {
     padding-bottom: 10px !important;
     margin-bottom: 6px;
 }
+
+.timesheetTotal {
+    background-color: #222222;
+    font-weight: 600;
+}
