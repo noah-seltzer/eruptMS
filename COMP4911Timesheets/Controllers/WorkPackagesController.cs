@@ -392,7 +392,11 @@ namespace COMP4911Timesheets.Controllers
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
 
+
             if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "AD") && !User.IsInRole(role: "PA"))
+            //changed in PR#309
+            //if ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM"))
+
             {
                 var REWorkPackages = await _context.ProjectEmployees
                     .Where(u => u.EmployeeId == users.Id && u.ProjectId == projectId
