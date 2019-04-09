@@ -207,11 +207,28 @@ namespace COMP4911Timesheets.Controllers
                 return RedirectToAction(nameof(Index));
             }
             var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _context.Employees.Where(e => e.Id == timesheet.EmployeeId).FirstOrDefaultAsync();
+            var employeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == user.Id).Where(ep => ep.Status == EmployeePay.VALID).FirstOrDefaultAsync();
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
             _context.Update(timesheet);
             user.FlexTime = timesheet.FlexTime;
             await _userManager.UpdateAsync(user);
+            
+            foreach(TimesheetRow row in timesheet.TimesheetRows) 
+            {
+                Budget budget = new Budget
+                {
+                    WorkPackageId = row.WorkPackageId,
+                    WeekNumber = timesheet.WeekNumber,
+                    Hour = row.SatHour + row.SunHour + row.MonHour + row.TueHour + row.WedHour + row.ThuHour + row.FriHour,
+                    PayGradeId = employeePay.PayGradeId,
+                    PayGrade = employeePay.PayGrade,
+                    Status = Budget.VALID,
+                    Type = Budget.ACTUAL,
+                    WorkPackage = row.WorkPackage
+                };
+                await _context.AddAsync(budget);
+            }
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));
