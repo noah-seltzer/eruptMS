@@ -147,6 +147,30 @@ namespace COMP4911Timesheets.Controllers
             }
             ViewData["ApproverList"] = approverManagements;
 
+            var requestManagements = new List<LineManagerManagement>();
+            var projects = await _context.Projects
+                .Include(p => p.WorkPackages)
+                .ToListAsync();
+            foreach (var project in projects)
+            {
+                var projectRequests = await _context.ProjectRequests
+                .Where(pr => pr.ProjectId == project.ProjectId)
+                .Where(pr => pr.Status == ProjectRequest.VALID)
+                .Where(pr => pr.AmountRequested != 0)
+                .Include(pr => pr.PayGrade)
+                .Include(pr => pr.Project)
+                .ToListAsync();
+                project.ProjectRequests = projectRequests;
+                requestManagements.Add
+                (
+                    new LineManagerManagement
+                    {
+                        Project = project
+                    }
+                );
+            }
+            ViewData["ProjectRequest"] = requestManagements;
+
             return View(lineManagerManagements);
         }
 
@@ -263,33 +287,6 @@ namespace COMP4911Timesheets.Controllers
             _context.Update(timesheetToBeChanged);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> ProjectIndex()
-        {
-            var projects = await _context.Projects
-                .Include(p => p.WorkPackages)
-                .ToListAsync();
-            var lineManagerManagements = new List<LineManagerManagement>();
-            foreach (var project in projects)
-            {
-                var projectRequests = await _context.ProjectRequests
-                .Where(pr => pr.ProjectId == project.ProjectId)
-                .Where(pr => pr.Status == ProjectRequest.VALID)
-                .Where(pr => pr.AmountRequested != 0)
-                .Include(pr => pr.PayGrade)
-                .Include(pr => pr.Project)
-                .ToListAsync();
-                project.ProjectRequests = projectRequests;
-                lineManagerManagements.Add
-                (
-                    new LineManagerManagement
-                    {
-                        Project = project
-                    }
-                );
-            }
-            return View(lineManagerManagements);
         }
 
         public async Task<IActionResult> ViewRequests(int id)
