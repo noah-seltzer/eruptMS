@@ -206,15 +206,14 @@ namespace COMP4911Timesheets.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Where(m => m.TimesheetId == id).FirstOrDefaultAsync();
             var user = await _context.Employees.Where(e => e.Id == timesheet.EmployeeId).FirstOrDefaultAsync();
             var employeePay = await _context.EmployeePays.Where(ep => ep.EmployeeId == user.Id).Where(ep => ep.Status == EmployeePay.VALID).FirstOrDefaultAsync();
+            var rows = await _context.TimesheetRows.Where(r => r.TimesheetId == id).ToListAsync();
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
-            _context.Update(timesheet);
             user.FlexTime = timesheet.FlexTime;
-            await _userManager.UpdateAsync(user);
             
-            foreach(TimesheetRow row in timesheet.TimesheetRows) 
+            foreach(var row in rows) 
             {
                 Budget budget = new Budget
                 {
@@ -229,6 +228,9 @@ namespace COMP4911Timesheets.Controllers
                 };
                 await _context.AddAsync(budget);
             }
+            _context.Update(timesheet);
+            await _userManager.UpdateAsync(user);
+
             _context.SaveChanges();
             await ApprovalConfirmed(id);
             return RedirectToAction(nameof(Index));
