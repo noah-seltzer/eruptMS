@@ -48,5 +48,8 @@ namespace COMP4911Timesheets.Models
 
         [Display(Name = "Employee Requests")]
         public List<ProjectRequest> ProjectRequests { get; set; }
+
+        [Display(Name = "Markup Rate")]
+        public double MarkupRate { get; set; }
     }
 }
