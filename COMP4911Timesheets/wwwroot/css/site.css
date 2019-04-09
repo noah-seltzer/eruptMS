@@ -418,3 +418,8 @@ body {
 .none {
     display: none;
 }
+
+.nav-tabs {
+    padding-bottom: 10px !important;
+    margin-bottom: 6px;
+}

@@ -1,36 +1,36 @@
 ﻿@model COMP4911Timesheets.Models.WorkPackage
 @{
-    ViewData["PageTitle"] = "Details";
+    ViewData["PageTitle"] = "Weekly Work Package Report";
 }
 
-<h1>Weekly Work Package Report</h1>
+<h1>@ViewData["PageTitle"]</h1>
 
 <div>
     <h4>Report For: </h4>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.WorkPackageCode)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.WorkPackageCode)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class="col-sm-2">
+        <dt class="col-sm-4">
             WP @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <a asp-controller="WorkPackages" asp-action="Details" asp-route-id="@Model.WorkPackageId">View Work Package Overall Report</a>
+        <a asp-controller="WorkPackages" asp-action="Details" asp-route-id="@Model.WorkPackageId"> View Work Package Overall Report</a>
     </dl>
 </div>
-<table class="table">
+<table class="table well bs-component table-responsive-sm">
     <thead>
         <tr>
             <th>
@@ -55,70 +55,68 @@
 
             var paygradelist = item.Employee.EmployeePays.Where(w => w.Status == EmployeePay.VALID).ToList();
             var paylevel = paygradelist[0].PayGrade;
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Role)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.LastName)
-                ,
-                @Html.DisplayFor(modelItem => item.Employee.FirstName)
-            </td>
-            <td>
-                @paylevel.PayLevel
-            </td>
-            <td>
-                <!--Man days Inner Table-->
-                <table class="table">
-                    <thead>
-                    
-                    <tr>
-                        <th>
-                            Weeks
-                        </th>
-                        @foreach (var week in Model.TimesheetRows)
-                        {
-                            <th>
-                                Week 
-                                @week.Timesheet.WeekNumber
-                            </th>
-                        }
-                        <th>
-                            Total
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        
-                        <tr>
-                            <th>
-                                Man-Days
-                            </th>
-                            @{
-                                double totalManDay = 0;
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.LastName),
+                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                </td>
+                <td>
+                    @paylevel.PayLevel
+                </td>
+                <td>
+                    <!--Man days Inner Table-->
+                    <table class="table">
+                        <thead>
 
-                                foreach (var week in Model.TimesheetRows)
+                            <tr>
+                                <th>
+                                    Weeks
+                                </th>
+                                @foreach (var week in Model.TimesheetRows)
                                 {
-                                    var weekTotal = week.SatHour + week.SunHour + week.MonHour + week.TueHour + week.WedHour + week.ThuHour + week.FriHour;
-                                    if (weekTotal != 0)
+                                    <th>
+                                        Week
+                                        @week.Timesheet.WeekNumber
+                                    </th>
+                                }
+                                <th>
+                                    Total
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <th>
+                                    Man-Days
+                                </th>
+                                @{
+                                    double totalManDay = 0;
+
+                                    foreach (var week in Model.TimesheetRows)
                                     {
-                                        weekTotal = weekTotal / 8;
+                                        var weekTotal = week.SatHour + week.SunHour + week.MonHour + week.TueHour + week.WedHour + week.ThuHour + week.FriHour;
+                                        if (weekTotal != 0)
+                                        {
+                                            weekTotal = weekTotal / 8;
+                                        }
+                                        totalManDay += weekTotal;
+                                        <td>
+                                            @weekTotal
+                                        </td>
                                     }
-                                    totalManDay += weekTotal;
                                     <td>
-                                        @weekTotal
+                                        @totalManDay
                                     </td>
                                 }
-                                <td>
-                                    @totalManDay
-                                </td>
-                            }
-                        </tr>
-                       
-                    </tbody>
-                </table>
-            </td>
-        </tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
         }
     </tbody>
 </table>

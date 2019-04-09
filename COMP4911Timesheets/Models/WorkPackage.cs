@@ -44,6 +44,7 @@ namespace COMP4911Timesheets.Models
 
         [ForeignKey("ParentWorkPackage")]
         public int? ParentWorkPackageId { get; set; }
+        [Display(Name = "Parent WP")]
         public WorkPackage ParentWorkPackage { get; set; }
 
         [InverseProperty("ParentWorkPackage")]
