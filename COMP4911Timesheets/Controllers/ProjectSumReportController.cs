@@ -155,11 +155,15 @@ namespace COMP4911Timesheets.Controllers
                 {
                     double tempVar = (int)(aHour / REHour * 10000);
                     tempReport.Variance = tempVar / 100;
+
+                    double tempComp = (int)(aHour / REHour * 10000);
+                    tempReport.Complete = tempComp / 100;
                 }
                 else {
                     tempReport.Variance = 0;
+                    tempReport.Complete = 0;
                 }
-
+                
                 if (workPackageReport != null) { 
                     tempReport.Comment = workPackageReport.Comments;
                 }
