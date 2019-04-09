@@ -27,7 +27,7 @@ namespace COMP4911Timesheets
         }
 
         // GET: Projects
-        public async Task<IActionResult> Index(string searchString, string errorMessage)
+        public async Task<IActionResult> Index(string searchString)
         {
             ViewBag.ErrorMessage = TempData["ErrorMessage"] == null ? null : TempData["ErrorMessage"].ToString();
             var uid = (await _usermgr.GetUserAsync(User)).Id;
