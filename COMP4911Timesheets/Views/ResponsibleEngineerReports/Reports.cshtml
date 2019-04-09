@@ -11,8 +11,8 @@
     <h1>@TempData["workPackageName"] - Responsible Engineer Reports</h1>
 
     //Need to hide button when workpackage is closed. RE reports should still be viewable
-    //Need to hide for leaf workpackages too
-    //@if (TempData["workPackageStatus"] == WorkPackage.OPENED) {
+    //Need to hide for non-leaf workpackages too
+    //@if (TempData["workPackageStatus"] != WorkPackage.OPENED) {
         <a asp-action="Create" asp-route-id="@TempData["workPackageId"]">Create a Responsible Engineers Report</a>
         <hr>
     //}

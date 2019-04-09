@@ -2,6 +2,12 @@
 
 @{
     ViewData["PageTitle"] = "Details";
+    var pLevels = ViewBag.pLevels;
+    var planned = ViewBag.planned;
+    var spentTD = ViewBag.spentTD;
+    var spentTW = ViewBag.spentTW;
+    var needed = ViewBag.needed;
+    var tableLength = ViewBag.tableLength;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -53,7 +59,33 @@
 <br>
 
 <div class="well bs-component">
-    <!-- TODO: PLanned/spent/need by labour plevel -->
+    <table>
+        @for (int i = 0; i < tableLength; i++) {
+            <tr class="row">
+                <td class="col-2">
+                    @Html.Raw(pLevels[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(planned[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTD[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTW[i])
+                </td>
+                @if (i == 0) {
+                    <td class="col-2">
+                        @Html.Raw(needed[i])
+                    </td>
+                } else {
+                    <td class="col-2">
+
+                    </td>
+                }
+            </tr>
+        }
+    </table>
 </div>
 <br>
 
