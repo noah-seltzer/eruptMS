@@ -12,8 +12,9 @@
 
     //Need to hide button when workpackage is closed. RE reports should still be viewable
     //Need to hide for leaf workpackages too
-    //@if (@TempData["workPackageStatus"] == WorkPackage.OPENED) {
+    //@if (TempData["workPackageStatus"] == WorkPackage.OPENED) {
         <a asp-action="Create" asp-route-id="@TempData["workPackageId"]">Create a Responsible Engineers Report</a>
+        <hr>
     //}
     
     <div class="row well bs-component">
@@ -42,12 +43,9 @@
                 <div class="col-3">
                     @Html.DisplayFor(modelReport => report.CompletedPercentage)
                 </div>
-                <div class="col-6">
-                    @Html.DisplayFor(modelReport => report.Comments)
-                </div>
+                    <textarea class="col-6 form-control-plaintext" readonly>@Html.DisplayFor(modelReport => report.Comments)</textarea>
                 <div class="col-1">
-                    //TODO
-                    <a asp-action="ReportDetails" asp-route-id="report.">Details</a>
+                    <a asp-action="ReportDetails" asp-route-id="@report.ResponsibleEngineerReportId">Details</a>
                 </div>
             </div>
         }

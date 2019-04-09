@@ -22,21 +22,36 @@
         </div>
         <div class="form-row">
             <div class="form-group col-6">
-                <label class="control-label">projectId</label>
-                <input value='@TempData["projectId"]' class="form-control-plaintext" readonly/>
+                <label class="control-label">Project Code</label>
+                <input value='@TempData["projectCode"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Work Package Code</label>
+                <input value='@TempData["workPackageCode"]' class="form-control-plaintext" readonly/>
             </div>
         </div>
         <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Project Manager</label>
+                <input value='@TempData["projectManager"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label class="control-label">Project Manager Assistant</label>
+                <input value='@TempData["projectManagerAssistant"]' class="form-control-plaintext" readonly/>
+            </div>
         </div>
         <div class="form-row">
+            <div class="form-group col-6">
+                <label class="control-label">Responsible Engineer</label>
+                <input value='@TempData["projectResponsibleEngineer"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="WeekNumber" class="control-label"></label>
+                <input asp-for="WeekNumber" value="@Model.WeekNumber" class="form-control-plaintext" readonly/>
+            </div>
         </div>
-        <label asp-for="WorkPackageId" class="control-label"></label>
-        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" readonly/>
-        <label asp-for="WeekNumber" class="control-label"></label>
-        <input asp-for="WeekNumber" value="@Model.WeekNumber" class="form-control" readonly/>
-        <label asp-for="ResponsibleEngineerReportId" class="control-label"></label>
-        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" class="form-control" readonly/>
-        <!-- TODO: report details -->
+        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
+        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
     </div>
     <br>
 

@@ -45,14 +45,40 @@ namespace COMP4911Timesheets.Controllers
         {
             //TODO: disable if workpackage is closed, or if leaf work package.
             //TODO: Also disable if the Responsible Engineer report has already been created for the week.
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
+            //var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
             var workPackage = await _context.WorkPackages.FindAsync(id);
             var project = _context.Projects.Where(m => m.ProjectId == workPackage.ProjectId).FirstOrDefault();
 
-            TempData["projectName"] = project.Name;
+            var manager = _context.ProjectEmployees
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                .FirstOrDefault();
+            if (manager != null) {
+                var projectManager = _context.Employees.Where(e => e.Id == manager.EmployeeId).FirstOrDefault();
+                TempData["projectManager"] = projectManager.FirstName + " " +  projectManager.LastName;
+            }
+
+            var assistant = _context.ProjectEmployees
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                .FirstOrDefault();
+            if (assistant != null) {
+                var projectManagerAssistant = _context.Employees.Where(e => e.Id == assistant.EmployeeId).FirstOrDefault();
+                TempData["projectManagerAssistant"] = projectManagerAssistant.FirstName + " " +  projectManagerAssistant.LastName;
+            }
             
+            var responsibleEngineer = _context.ProjectEmployees
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER)
+                .FirstOrDefault();
+            if (assistant != null) {
+                var projectresponsibleEngineer = _context.Employees.Where(e => e.Id == responsibleEngineer.EmployeeId).FirstOrDefault();
+                TempData["projectResponsibleEngineer"] = projectresponsibleEngineer.FirstName + " " +  projectresponsibleEngineer.LastName;
+            }
+
+            TempData["projectName"] = project.Name;
             TempData["workPackageName"] = workPackage.Name;
-            TempData["workPackageId"] = workPackage.WorkPackageId;
+            
+            TempData["projectCode"] = project.ProjectCode;
+            TempData["workPackageCode"] = workPackage.WorkPackageCode;
+
             TempData["projectId"] = workPackage.ProjectId;
             TempData["workPackageStatus"] = workPackage.Status;
             
@@ -83,8 +109,10 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
-                report.WorkPackage = await _context.WorkPackages.FindAsync(report.WorkPackageId);
-                var workPackageREReports = report.WorkPackage.ResponsibleEngineerReports;
+                var workPackage = await _context.WorkPackages.FindAsync(report.WorkPackageId);
+                var project = _context.Projects.Where(m => m.ProjectId == workPackage.ProjectId).FirstOrDefault();
+
+                var workPackageREReports = workPackage.ResponsibleEngineerReports;
                 
                 //Invalid if there has already been a REreport created for this week.
                 if (workPackageREReports != null && workPackageREReports.Any(r => r.WeekNumber == report.WeekNumber))
@@ -94,27 +122,28 @@ namespace COMP4911Timesheets.Controllers
                 }
 
                 //Invalid if work package is closed
-                if (report.WorkPackage.Status == WorkPackage.CLOSED) {
+                if (workPackage.Status == WorkPackage.CLOSED) {
                     ViewBag.CodeError = "Cannot create Responsible Engineer Report for closed work packages.";
                     return View(report);
                 }
 
                 //Invalid if work package is a parent
-                if (report.WorkPackage.ChildWorkPackages != null) {
+                if (workPackage.ChildWorkPackages != null) {
                     ViewBag.CodeError = "Can only create Responsible Engineer Report for leaf work packages.";
                     return View(report);
                 }
 
+                //var budgets = await _context.Budgets.Where(u => u.WorkPackageId == workPackage.WorkPackageId).ToListAsync();
+
                 report.Status = ResponsibleEngineerReport.VALID;
 
-                workPackageREReports.Add(report);
                 _context.Add(report);
 
                 _context.SaveChanges();
 
                 await _context.SaveChangesAsync();
 
-                //return RedirectToAction(nameof(ReportDetails), report.ResponsibleEngineerReportId);
+                return RedirectToAction("ReportDetails", "ResponsibleEngineerReports", new { id = report.ResponsibleEngineerReportId });
             }
             return View(report);
         }
@@ -122,107 +151,141 @@ namespace COMP4911Timesheets.Controllers
         // GET: ResponsibleEngineerReports/ReportDetails/5
         public async Task<IActionResult> ReportDetails(int id)
         {
-            if (id == 0)
-            {
-                return NotFound();
-            }
-
-            var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
-            var users = _usermanager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            var projectEmployee = _context.ProjectEmployees
-                .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
-
-            if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "PA") && !User.IsInRole(role: "AD"))
-            {
-                TempData["info"] = "Please login with AD, PM OR PA";
-                return RedirectToAction("Index", "ProjectSumReport");
-            }
-
-            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
-            {
-                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
-                return RedirectToAction("Index", "ProjectSumReport");
-            }
-
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var responsibleEngineerReport = await _context.ResponsibleEngineerReport.FindAsync(id);
+            var workPackage = await _context.WorkPackages.FindAsync(responsibleEngineerReport.WorkPackageId);
+            var project = _context.Projects.Where(m => m.ProjectId == workPackage.ProjectId).FirstOrDefault();
 
             var manager = _context.ProjectEmployees
-                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.PROJECT_MANAGER)
                 .FirstOrDefault();
-
-            var assistant = _context.ProjectEmployees
-                .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
-                .FirstOrDefault();
-
-            //Check authorization to see report
-            var uid = (await _usermanager.GetUserAsync(User)).Id;
-            if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
-                return RedirectToAction("asdf");
-
-            ViewData["ProjectName"] = project.Name;
-
-            List<ProjectSumReport> projectSumReports = new List<ProjectSumReport>();
-
-            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
-
-            foreach (WorkPackage tempWorkPackage in workPackages)
-            {
-                ProjectSumReport tempReport = new ProjectSumReport();
-                double aHour = 0;
-                double PMHour = 0;
-                double REHour = 0;
-                double aCost = 0;
-                double PMCost = 0;
-                double RECost = 0;
-                var budgets = await _context.Budgets.Where(u => u.WorkPackageId == tempWorkPackage.WorkPackageId).ToListAsync();
-                foreach (Budget tempBudget in budgets)
-                {
-                    var payGrade = await _context.PayGrades.Where(p => p.PayGradeId == tempBudget.PayGradeId).FirstOrDefaultAsync();
-                    if (tempBudget.Type == Budget.ACTUAL)
-                    {
-                        aHour += tempBudget.Hour;
-                        aCost += payGrade.Cost * aHour;
-                    }
-                    else if (tempBudget.Type == Budget.ESTIMATE)
-                    {
-                        PMHour += tempBudget.Hour;
-                        PMCost += payGrade.Cost * PMHour;
-                        REHour += tempBudget.REHour;
-                        RECost += payGrade.Cost * REHour;
-                    }
-
-                }
-
-                var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId);
-
-                tempReport.WorkPackageCode = tempWorkPackage.WorkPackageCode;
-                tempReport.WorkPackageName = tempWorkPackage.Name;
-                tempReport.ACost = aCost;
-                tempReport.RECost = RECost;
-                tempReport.AHour = aHour / 8;
-                tempReport.REHour = REHour / 8;
-                tempReport.PMHour = PMHour / 8;
-                tempReport.PMCost = PMCost;
-
-                if (REHour != 0)
-                {
-                    double tempVar = (int)(aHour / REHour * 10000);
-                    tempReport.Variance = tempVar / 100;
-                }
-                else {
-                    tempReport.Variance = 0;
-                }
-
-                if (workPackageReport != null) { 
-                    tempReport.Comment = workPackageReport.Comments;
-                }
-                projectSumReports.Add(tempReport);
+            if (manager != null) {
+                var projectManager = _context.Employees.Where(e => e.Id == manager.EmployeeId).FirstOrDefault();
+                TempData["projectManager"] = projectManager.FirstName + " " +  projectManager.LastName;
             }
 
-            return View(projectSumReports);
+            var assistant = _context.ProjectEmployees
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                .FirstOrDefault();
+            if (assistant != null) {
+                var projectManagerAssistant = _context.Employees.Where(e => e.Id == assistant.EmployeeId).FirstOrDefault();
+                TempData["projectManagerAssistant"] = projectManagerAssistant.FirstName + " " +  projectManagerAssistant.LastName;
+            }
+            
+            var responsibleEngineer = _context.ProjectEmployees
+                .Where(e => e.ProjectId == project.ProjectId && e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER)
+                .FirstOrDefault();
+            if (assistant != null) {
+                var projectresponsibleEngineer = _context.Employees.Where(e => e.Id == responsibleEngineer.EmployeeId).FirstOrDefault();
+                TempData["projectResponsibleEngineer"] = projectresponsibleEngineer.FirstName + " " +  projectresponsibleEngineer.LastName;
+            }
+
+            TempData["projectName"] = project.Name;
+            TempData["workPackageName"] = workPackage.Name;
+            
+            TempData["projectCode"] = project.ProjectCode;
+            TempData["workPackageCode"] = workPackage.WorkPackageCode;
+
+            TempData["projectId"] = workPackage.ProjectId;
+            TempData["workPackageStatus"] = workPackage.Status;
+            
+            return View(responsibleEngineerReport);
+
+            // var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
+            // var users = _usermanager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            // var projectEmployee = _context.ProjectEmployees
+            //     .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
+
+            // if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "PA") && !User.IsInRole(role: "AD"))
+            // {
+            //     TempData["info"] = "Please login with AD, PM OR PA";
+            //     return RedirectToAction("Index", "ProjectSumReport");
+            // }
+
+            // if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+            // {
+            //     TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+            //     return RedirectToAction("Index", "ProjectSumReport");
+            // }
+
+            // if (project == null)
+            // {
+            //     return NotFound();
+            // }
+
+            // var manager = _context.ProjectEmployees
+            //     .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_MANAGER)
+            //     .FirstOrDefault();
+
+            // var assistant = _context.ProjectEmployees
+            //     .Where(e => e.ProjectId == id && e.Role == ProjectEmployee.PROJECT_ASSISTANT)
+            //     .FirstOrDefault();
+
+            // //Check authorization to see report
+            // var uid = (await _usermanager.GetUserAsync(User)).Id;
+            // if (!User.IsInRole("AD") && manager.EmployeeId != uid && assistant != null && assistant.EmployeeId != uid)
+            //     return RedirectToAction("asdf");
+
+            // ViewData["ProjectName"] = project.Name;
+
+            // List<ProjectSumReport> projectSumReports = new List<ProjectSumReport>();
+
+            // var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
+
+            // foreach (WorkPackage tempWorkPackage in workPackages)
+            // {
+            //     ProjectSumReport tempReport = new ProjectSumReport();
+            //     double aHour = 0;
+            //     double PMHour = 0;
+            //     double REHour = 0;
+            //     double aCost = 0;
+            //     double PMCost = 0;
+            //     double RECost = 0;
+            //     var budgets = await _context.Budgets.Where(u => u.WorkPackageId == tempWorkPackage.WorkPackageId).ToListAsync();
+            //     foreach (Budget tempBudget in budgets)
+            //     {
+            //         var payGrade = await _context.PayGrades.Where(p => p.PayGradeId == tempBudget.PayGradeId).FirstOrDefaultAsync();
+            //         if (tempBudget.Type == Budget.ACTUAL)
+            //         {
+            //             aHour += tempBudget.Hour;
+            //             aCost += payGrade.Cost * aHour;
+            //         }
+            //         else if (tempBudget.Type == Budget.ESTIMATE)
+            //         {
+            //             PMHour += tempBudget.Hour;
+            //             PMCost += payGrade.Cost * PMHour;
+            //             REHour += tempBudget.REHour;
+            //             RECost += payGrade.Cost * REHour;
+            //         }
+
+            //     }
+
+            //     var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId);
+
+            //     tempReport.WorkPackageCode = tempWorkPackage.WorkPackageCode;
+            //     tempReport.WorkPackageName = tempWorkPackage.Name;
+            //     tempReport.ACost = aCost;
+            //     tempReport.RECost = RECost;
+            //     tempReport.AHour = aHour / 8;
+            //     tempReport.REHour = REHour / 8;
+            //     tempReport.PMHour = PMHour / 8;
+            //     tempReport.PMCost = PMCost;
+
+            //     if (REHour != 0)
+            //     {
+            //         double tempVar = (int)(aHour / REHour * 10000);
+            //         tempReport.Variance = tempVar / 100;
+            //     }
+            //     else {
+            //         tempReport.Variance = 0;
+            //     }
+
+            //     if (workPackageReport != null) { 
+            //         tempReport.Comment = workPackageReport.Comments;
+            //     }
+            //     projectSumReports.Add(tempReport);
+            // }
+
+            // return View(projectSumReports);
         }
 
         private bool ProjectExists(int id)
