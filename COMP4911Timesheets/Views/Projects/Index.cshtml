@@ -1,7 +1,9 @@
 ﻿@model COMP4911Timesheets.ViewModels.ProjectListingModel
 
 @{
-    ViewData["PageTitle"] = "Index";
+    ViewData["PageTitle"] = "Projects";
+    var manage = Model.managedProjects.Count > 0;
+    var assign = Model.assignedProjects.Count > 0;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -17,14 +19,17 @@
 }
 @using (Html.BeginForm())
 {
-    <p>
+    <p style=" @((manage || assign) ? "" : "display:none") ">
         Find by name or project code: @Html.TextBox("SearchString")
         <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
         <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
     </p>
 }
 
-<div style=" @(Model.managedProjects.Count > 0 ? "" : "display:none") ">
+<p style=" @((manage || assign) ? "display:none" : "") ">
+    No managed or assigned projects
+</p>
+<div style=" @(manage ? "" : "display:none") ">
     <h3>Managed Projects</h3>
     <table class="table well bs-component">
         <thead>
@@ -90,7 +95,7 @@
         </tbody>
     </table>
 </div>
-<div style=" @(Model.assignedProjects.Count > 0 ? "" : "display:none") ">
+<div style=" @(assign ? "" : "display:none") ">
     <h3>Assigned Projects</h3>
     <table class="table well bs-component">
         <thead>
