@@ -25,10 +25,13 @@
         <div class="col-2">
             @Html.DisplayNameFor(model => model.WeekNumber)
         </div>
-        <div class="col-3">
+        <div class="col-2">
+            @Html.DisplayNameFor(model => model.StartingPercentage)
+        </div>
+        <div class="col-2">
             @Html.DisplayNameFor(model => model.CompletedPercentage)
         </div>
-        <div class="col-6">
+        <div class="col-5">
             @Html.DisplayNameFor(model => model.Comments)
         </div>
         <div class="col-1">
@@ -36,6 +39,7 @@
         </div>
     </div>
     <br>
+    
     @if (Model != null)
     {
         foreach (var report in Model)
@@ -44,10 +48,13 @@
                 <div class="col-2">
                     @Html.DisplayFor(modelReport => report.WeekNumber)
                 </div>
-                <div class="col-3">
+                <div class="col-2">
+                    @Html.DisplayFor(modelReport => report.StartingPercentage)
+                </div>
+                <div class="col-2">
                     @Html.DisplayFor(modelReport => report.CompletedPercentage)
                 </div>
-                    <textarea class="col-6 form-control-plaintext" readonly>@Html.DisplayFor(modelReport => report.Comments)</textarea>
+                    <textarea class="col-5 form-control-plaintext" readonly>@Html.DisplayFor(modelReport => report.Comments)</textarea>
                 <div class="col-1">
                     <a asp-action="ReportDetails" asp-route-id="@report.ResponsibleEngineerReportId">Details</a>
                 </div>

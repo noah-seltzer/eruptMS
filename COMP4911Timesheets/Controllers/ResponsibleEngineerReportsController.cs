@@ -143,6 +143,9 @@ namespace COMP4911Timesheets.Controllers
             ArrayList spentTD = new ArrayList();
             ArrayList spentTW = new ArrayList();
             ArrayList needed = new ArrayList();
+            
+            var totalBudget = 0.0;
+            var workCompleted = 0.0;
 
             pLevels.Add("P-Level");
             planned.Add("Planned (Budget Total)");
@@ -163,6 +166,7 @@ namespace COMP4911Timesheets.Controllers
                           ts.Value.FriHour;
                 var index = payGrades.IndexOf(payGrades.Find(pg => pg.PayGradeId == ts.Value.PayGradeId));
                 spentToDate[index] += sum;
+                workCompleted += workCompleted;
             };
 
             foreach(var ts in timeSheetsThisWeekDictionary) {
@@ -186,10 +190,13 @@ namespace COMP4911Timesheets.Controllers
                             b => b.PayGradeId == pg.PayGradeId &&
                             b.Status == Budget.VALID &&
                             b.Type == Budget.ESTIMATE)) {
-                    planned.Add(budgets.Find(
+                    var budg = budgets.Find(
                             b => b.PayGradeId == pg.PayGradeId &&
                             b.Status == Budget.VALID &&
-                            b.Type == Budget.ESTIMATE).REHour.ToString("N"));
+                            b.Type == Budget.ESTIMATE).REHour;
+
+                    planned.Add(budg.ToString("N"));
+                    totalBudget += budg;
                 } else {
                     planned.Add("0");
                 }
@@ -202,6 +209,23 @@ namespace COMP4911Timesheets.Controllers
                     spentTW.Add(spentThisWeek[i].ToString("N"));
                 }
             });
+
+            //Grab last weeks responsible Engineers report
+            if (_context.ResponsibleEngineerReport != null) {
+                var lastWeekREReport = _context.ResponsibleEngineerReport
+                                    .Where(re => re.WorkPackageId == workPackage.WorkPackageId &&
+                                                 re.WeekNumber == (respEngReport.WeekNumber - 1)).FirstOrDefault();
+
+                TempData["startPer"] = lastWeekREReport != null ? lastWeekREReport.CompletedPercentage : 0;
+            }
+
+            if (totalBudget == 0 || workCompleted == 0) {
+                TempData["compPer"] = 0;
+            } else {
+                var compPer = 100 * (workCompleted/totalBudget > 1 ? 1 : workCompleted/totalBudget);
+                compPer = compPer == 100 && true ? 99 : compPer;
+                TempData["compPer"] = compPer;
+            }
 
             ViewBag.tableLength = pLevels.Count;
             ViewBag.pLevels = pLevels;
@@ -219,7 +243,7 @@ namespace COMP4911Timesheets.Controllers
         [HttpPost]
         [Authorize(Roles = "AD,RE")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WeekNumber,WorkPackageId,WorkPackage,Comments,WorkAccomplished,WorkPlanned,Problem,ProblemAnticipated")] ResponsibleEngineerReport report)
+        public async Task<IActionResult> Create([Bind("WeekNumber,WorkPackageId,WorkPackage,Comments,WorkAccomplished,WorkPlanned,Problem,ProblemAnticipated,StartingPercentage,CompletedPercentage")] ResponsibleEngineerReport report)
         {
             if (ModelState.IsValid)
             {
@@ -406,10 +430,12 @@ namespace COMP4911Timesheets.Controllers
                             b => b.PayGradeId == pg.PayGradeId &&
                             b.Status == Budget.VALID &&
                             b.Type == Budget.ESTIMATE)) {
-                    planned.Add(budgets.Find(
+                    var budg = budgets.Find(
                             b => b.PayGradeId == pg.PayGradeId &&
                             b.Status == Budget.VALID &&
-                            b.Type == Budget.ESTIMATE).REHour.ToString("N"));
+                            b.Type == Budget.ESTIMATE).REHour;
+
+                    planned.Add(budg.ToString("N"));
                 } else {
                     planned.Add("0");
                 }

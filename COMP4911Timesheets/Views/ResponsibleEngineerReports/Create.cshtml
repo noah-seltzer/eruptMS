@@ -62,6 +62,20 @@
     <br>
 
     <div class="well bs-component">
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="StartingPercentage" class="control-label"></label>
+                <input asp-for="StartingPercentage" value='@TempData["startPer"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="CompletedPercentage" class="control-label"></label>
+                <input asp-for="CompletedPercentage" value='@TempData["compPer"]'  class="form-control-plaintext" readonly/>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    <div class="well bs-component">
         <table>
             @for (int i = 0; i < tableLength; i++) {
                 <tr class="row">
