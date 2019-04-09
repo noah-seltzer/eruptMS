@@ -270,7 +270,7 @@ namespace COMP4911Timesheets.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            var timesheet = await _context.Timesheets.FirstOrDefaultAsync(m => m.TimesheetId == id);
+            var timesheet = await _context.Timesheets.Where(m => m.TimesheetId == id).FirstOrDefaultAsync();
 
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
             _context.SaveChanges();
