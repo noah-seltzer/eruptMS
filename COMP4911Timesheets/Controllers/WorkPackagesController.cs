@@ -10,9 +10,11 @@ using COMP4911Timesheets.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using COMP4911Timesheets.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize]
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -32,24 +34,64 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
             var workPackages = new List<WorkPackage>();
-
-            if (!String.IsNullOrEmpty(searchString))
+            
+            if (this.User.IsInRole("AD"))
             {
-                workPackages = await _context.WorkPackages
-                    .Include(w => w.ParentWorkPackage)
-                    .Include(w => w.Project)
-                    .Where(w => w.Project.ProjectCode.Contains(searchString)
-                            || w.WorkPackageCode.Contains(searchString))
-                    .ToListAsync();
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+
+                    workPackages = await _context.WorkPackages
+                        .Include(w => w.ParentWorkPackage)
+                        .Include(w => w.Project)
+                        .Where(w => w.Project.ProjectCode.Contains(searchString)
+                                || w.WorkPackageCode.Contains(searchString))
+                        .ToListAsync();
+                }
+                else
+                {
+                    workPackages = await _context.WorkPackages
+                        .Include(w => w.ParentWorkPackage)
+                        .Include(w => w.Project)
+                        .ToListAsync();
+
+                    //.Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User))
+                }
             }
             else
             {
-                workPackages = await _context.WorkPackages
-                    .Include(w => w.ParentWorkPackage)
-                    .Include(w => w.Project)
-                    .ToListAsync();
-            }
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    workPackages = (from wp in _context.WorkPackages
+                                    join pe in _context.ProjectEmployees
+                                         on wp.WorkPackageId equals pe.WorkPackageId
+                                    where pe.EmployeeId == _userManager.GetUserId(HttpContext.User)
+                                        && (wp.Project.ProjectCode.Contains(searchString)
+                                            || wp.WorkPackageCode.Contains(searchString))
+                                        && !wp.Project.ProjectCode.Equals("010")
+                                    select wp)
+                                       .Include(wp => wp.ParentWorkPackage)
+                                       .Include(wp => wp.Project)
+                                       .Distinct()
+                                       .ToList();
 
+                }
+                else
+                {
+
+
+                    workPackages = (from wp in _context.WorkPackages
+                                    join pe in _context.ProjectEmployees
+                                        on wp.WorkPackageId equals pe.WorkPackageId
+                                    where pe.EmployeeId == _userManager.GetUserId(HttpContext.User)
+                                        && !wp.Project.ProjectCode.Equals("010")
+                                    select wp)
+                                           .Include(wp => wp.ParentWorkPackage)
+                                           .Include(wp => wp.Project)
+                                           .Distinct()
+                                           .ToList();
+                }                        
+            }
             return View(workPackages);
         }
 
@@ -286,7 +328,7 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
         }
 
-
+        [Authorize(Roles="AD,PM,PA")]
         // GET: WorkPackages/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
