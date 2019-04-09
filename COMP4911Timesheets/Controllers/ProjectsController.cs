@@ -187,6 +187,7 @@ namespace COMP4911Timesheets
                     ParentWorkPackageId = null,
                     Name = "Management",
                     Description = "",
+                    Status = WorkPackage.ARCHIVED
                 };
                 _context.Add(mgmt);
                 _context.SaveChanges();
