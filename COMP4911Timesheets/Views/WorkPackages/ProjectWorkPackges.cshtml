@@ -149,7 +149,7 @@
                     <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add RE Budget Plan&nbsp;</a> &nbsp;|&nbsp;
                     <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">&nbsp;Edit&nbsp;</a> &nbsp;|&nbsp;
                     <a asp-action="Details" asp-route-id="@item.WorkPackageId">&nbsp;Details&nbsp;</a> &nbsp;|&nbsp;
-                    <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId">&nbsp;Assign Employee</a> &nbsp|&nbsp
+                    <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Assign Employee</a> &nbsp;|&nbsp;
                     <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
                 </div>
             }
@@ -201,7 +201,7 @@
             </div>
 
             <div>
-                <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+                <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports" >Responsible Engineer Reports</a>
             </div>
         }
     }

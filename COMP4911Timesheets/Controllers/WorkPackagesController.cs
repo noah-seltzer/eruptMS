@@ -18,7 +18,7 @@ namespace COMP4911Timesheets.Controllers
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private static int? projectId;
+        //private static int? projectId;
 
         //private static int? workPackageId;
         public static int PROJECT_CODE_LENGTH = 4;
@@ -127,10 +127,10 @@ namespace COMP4911Timesheets.Controllers
 
         // GET: WorkPackages/CreateInternalWorkPackage
         [Authorize(Roles = "AD,PM,PA")]
-        public IActionResult CreateInternalWorkPackage()
+        public IActionResult CreateInternalWorkPackage(int? id)
         {
 
-            TempData["projectId"] = projectId;
+            TempData["projectId"] = id;
             return View();
         }
 
@@ -140,17 +140,17 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateInternalWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> CreateInternalWorkPackage(int? id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
 
-            workPackage.ProjectId = projectId;
+            workPackage.ProjectId = id;
             workPackage.Status = WorkPackage.OPENED;
 
             if (ModelState.IsValid)
             {
                 _context.Add(workPackage);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = id });
             }
             //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
@@ -291,44 +291,6 @@ namespace COMP4911Timesheets.Controllers
             //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
-        }
-
-        // GET: WorkPackages/CreateWorkPackage/6
-        public async Task<IActionResult> CreateWorkPackageReport(int? id)
-        {
-            var workPackages = await _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefaultAsync();
-            if (workPackages == null)
-            {
-                var theWorkPackage = await _context.WorkPackages.FindAsync(id);
-                WorkPackageReport workPackageReport = new WorkPackageReport
-                {
-                    WorkPackage = theWorkPackage,
-                    WeekNumber = Utility.GetWeekNumberByDate(DateTime.Today)
-                };
-                return View(workPackageReport);
-            }
-
-            ViewBag.ErrorMessage = "Workpackage report only can be created on leaf workpackages";
-            var wpTemp = await _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefaultAsync();
-            return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
-
-        }
-
-        // POST: WorkPackageReports/CreateWorkPackageReport
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateWorkPackageReport([Bind("WorkPackageReportId,WeekNumber,Status,Comments,StartingPercentage,CompletedPercentage,CostStarted,CostFinished,WorkAccomplished,WorkAccomplishedNP,Problem,ProblemAnticipated,WorkPackageId")] WorkPackageReport workPackageReport)
-        {
-            workPackageReport.Status = WorkPackageReport.VALID;
-            if (ModelState.IsValid)
-            {
-                _context.Add(workPackageReport);
-                await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-            }
-            return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
         }
 
         [Authorize(Roles="AD,PM,PA")]
