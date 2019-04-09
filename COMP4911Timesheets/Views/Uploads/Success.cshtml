@@ -3,17 +3,20 @@
     ViewData["PageTitle"] = "Success";
 }
 
-
 <h1>Job Finished</h1>
-
-@if ( (String) ViewData["failedPackages"] != "" )
+@if ((String)ViewData["failedPackages"] != "")
 {
     <p>The following rows failed to be added</p>
     <p>@ViewData["failedPackages"]</p>
-} else
+}
+@if ((String)ViewData["failedPackages"] != "")
+{
+    <p>The following rows were added, but the indicated employees were not</p>
+    <p>@ViewData["failedEmployees"]</p>
+}
+@if ((String)ViewData["failedPackages"] == "" && (String)ViewData["failedPackages"] == "")
 {
     <p>All rows added successfully</p>
 }
-
 
 

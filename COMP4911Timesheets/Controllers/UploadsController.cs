@@ -32,7 +32,7 @@ namespace COMP4911Timesheets.Controllers
             Map(m => m.Activity).Name("Activity");
             Map(m => m.Status).Name("Status");
             Map(m => m.ParentWorkPackageId).Name("ParentWorkPackage");
-            
+
         }
     }
     public class UploadsController : Controller
@@ -44,8 +44,8 @@ namespace COMP4911Timesheets.Controllers
         private readonly UserManager<Employee> _userManager;
 
         public UploadsController(
-            ApplicationDbContext context, 
-            IFileProvider fileProvider, 
+            ApplicationDbContext context,
+            IFileProvider fileProvider,
             IHostingEnvironment environment,
             UserManager<Employee> userManager)
         {
@@ -60,7 +60,7 @@ namespace COMP4911Timesheets.Controllers
             return View();
         }
 
-        
+
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
@@ -68,15 +68,16 @@ namespace COMP4911Timesheets.Controllers
             {
                 ViewData["FailureMessage"] = "Unrecognized Mime Type";
                 return View("Failure");
-            } 
+            }
             //TODO remove these
             Guid guid = Guid.NewGuid();      // created guid
-            var uploadedFileName = 
+            var uploadedFileName =
                 guid + Path.GetFileName(file.FileName);    // added guid to filename
             var path = Path.Combine(
                   hostingEnvironment.WebRootPath, "workpackages.csv");
             var failedList = new List<String>();
             var failedPackages = new List<Dictionary<String, String>>();
+            var failedEmployees = new Dictionary<String, String>();
             var WPcontroller = new WorkPackagesController(_context, _userManager);
             using (var stream = new FileStream(path, FileMode.Create))
             {
@@ -95,20 +96,21 @@ namespace COMP4911Timesheets.Controllers
                     {
                         String[] fieldArray = new String[]
                                              { "ProjectCode", "Name", "Description", "Contractor",
-                                                 "Purpose", "Input", "Output", "Activity", "ParentWorkPackageCode"};
+                                                 "Purpose", "Input", "Output", "Activity",
+                                                 "ParentWorkPackageCode", "Employees"};
                         var workPackageData =
                             new Dictionary<String, String>();
-                        foreach(var field in fieldArray)
+                        foreach (var field in fieldArray)
                         {
                             workPackageData.Add(field, csv.GetField(field) ?? "");
                         }
                         //If whoever's code reviewing know's a cleaner way to do this, please let me know
-                        if ( workPackageData["ProjectCode"] != null 
-                            && _context.Projects.Any(m => 
+                        if (workPackageData["ProjectCode"] != null
+                            && _context.Projects.Any(m =>
                                 m.ProjectCode.Equals(workPackageData["ProjectCode"])))
                         {
                             var parentProject = await _context.Projects.Include(w => w.WorkPackages)
-                                .FirstOrDefaultAsync(m => 
+                                .FirstOrDefaultAsync(m =>
                                                 m.ProjectCode == workPackageData["ProjectCode"]);
 
                             var package = new WorkPackage()
@@ -134,7 +136,7 @@ namespace COMP4911Timesheets.Controllers
                                     package.ParentWorkPackage = parentWorkPackage;
                                     package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
                                     package.WorkPackageCode = await generateChildWorkPackageCode(parentWorkPackage);
-                                } 
+                                }
                                 catch (NullReferenceException e)
                                 {
                                     Console.WriteLine(e.Message);
@@ -150,7 +152,47 @@ namespace COMP4911Timesheets.Controllers
                             {
                                 _context.Add(package);
                                 await _context.SaveChangesAsync();
-                            } else
+
+
+                                if (workPackageData["Employees"] != "")
+                                {
+                                    var emails = workPackageData["Employees"].Split(';');
+
+                                    foreach (var email in emails)
+                                    {
+                                        Employee employee = await _userManager.Users.FirstOrDefaultAsync(m =>
+                                                m.Email == email);
+                                        if (employee != null)
+                                        {
+                                            var projectEmployee = new ProjectEmployee()
+                                            {
+                                                WorkPackageId = package.WorkPackageId,
+                                                EmployeeId = employee.Id,
+                                                ProjectId = parentProject.ProjectId
+                                            };
+
+                                            _context.Add(projectEmployee);
+                                            await _context.SaveChangesAsync();
+
+                                        }
+                                        else
+                                        {
+                                            var packageData = string.Join(";", workPackageData.Select(x => x.Key + "=" + x.Value).ToArray());
+                                            try
+                                            {
+                                                failedEmployees[packageData] += email;
+                                            }
+                                            catch (KeyNotFoundException ex)
+                                            {
+                                                Console.WriteLine(ex.Message);
+                                                failedEmployees.Add(packageData, email);
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                            else
                             {
                                 failedList.Add(workPackageData["Name"]);
                                 failedPackages.Add(workPackageData);
@@ -166,10 +208,16 @@ namespace COMP4911Timesheets.Controllers
             }
             //ViewData["failedPackages"] = String.Join(",", failedList);
             ViewData["failedPackages"] = "";
+            ViewData["failedEmployees"] = "";
             foreach (var record in failedPackages)
             {
                 ViewData["failedPackages"] += string.Join(";", record.Select(x => x.Key + "=" + x.Value).ToArray()) + "\n";
             }
+            foreach (var record in failedEmployees)
+            {
+                ViewData["failedEmployees"] += record.Key + "\n" + record.Value + "\n";
+            }
+
             return View("Success");
         }
 
@@ -177,7 +225,7 @@ namespace COMP4911Timesheets.Controllers
         {
             return View();
         }
-        
+
         private string GetContentType(string path)
         {
             var types = GetMimeTypes();
@@ -243,7 +291,7 @@ namespace COMP4911Timesheets.Controllers
 
             return theWorkpackageCode;
         }
-        private async Task<String> generateNonChildWorkPackageCode( Project parentProject)
+        private async Task<String> generateNonChildWorkPackageCode(Project parentProject)
         {
             int[] workpackageCode = new int[10];
             for (int i = 0; i < 10; i++)

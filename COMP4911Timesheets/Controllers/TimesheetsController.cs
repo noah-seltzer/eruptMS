@@ -294,13 +294,17 @@ namespace COMP4911Timesheets.Controllers
                     thu += tr.ThuHour;
                     fri += tr.FriHour;
                 }
-                if (sat > 8) timesheet.FlexTime += sat - 8;
-                if (sun > 8) timesheet.FlexTime += sun - 8;
-                if (mon > 8) timesheet.FlexTime += mon - 8;
-                if (tue > 8) timesheet.FlexTime += tue - 8;
-                if (wed > 8) timesheet.FlexTime += wed - 8;
-                if (thu > 8) timesheet.FlexTime += thu - 8;
-                if (fri > 8) timesheet.FlexTime += fri - 8;
+                if ((sat + sun + mon + tue + wed + thu + fri) > 40) {
+                    timesheet.FlexTime += sat + sun + mon + tue + wed + thu + fri - 40;
+                } else {
+                    if (sat > 8) timesheet.FlexTime += sat - 8;
+                    if (sun > 8) timesheet.FlexTime += sun - 8;
+                    if (mon > 8) timesheet.FlexTime += mon - 8;
+                    if (tue > 8) timesheet.FlexTime += tue - 8;
+                    if (wed > 8) timesheet.FlexTime += wed - 8;
+                    if (thu > 8) timesheet.FlexTime += thu - 8;
+                    if (fri > 8) timesheet.FlexTime += fri - 8;
+                }
                 timesheet.FlexTime -= flexused;
             }
 
