@@ -417,15 +417,34 @@ namespace COMP4911Timesheets
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ManageProject model)
         {
+
             if (id != model.project.ProjectId)
             {
                 return NotFound();
             }
 
-            if (model.projectManager == model.managersAssistant)
+            var uid = (await _usermgr.GetUserAsync(User)).Id;
+            bool isAssist = _context.ProjectEmployees
+                    .Where(pe => pe.ProjectId == id && pe.Role == ProjectEmployee.PROJECT_ASSISTANT)
+                    .FirstOrDefault()
+                    .EmployeeId
+                    .Equals(uid);
+
+            if (isAssist)//the assistants model will have two nulls because they cannot change PM or PMA
             {
-                ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
-                return await Edit(id);
+                model.projectManager = _context.ProjectEmployees
+                    .Where(pe => pe.ProjectId == id && pe.Role == ProjectEmployee.PROJECT_MANAGER)
+                    .FirstOrDefault()
+                    .EmployeeId;
+                model.managersAssistant = uid;
+            }
+            else
+            {
+                if (model.projectManager == model.managersAssistant)
+                {
+                    ViewBag.MgrIsAssist = "Manager and Assistant cannot be the same person!";
+                    return await Edit(id);
+                }
             }
 
             if (ModelState.IsValid)
