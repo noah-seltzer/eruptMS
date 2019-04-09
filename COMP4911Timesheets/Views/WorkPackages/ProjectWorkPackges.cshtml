@@ -98,7 +98,7 @@
                 <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp;|&nbsp;
                 <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit </a> &nbsp;|&nbsp;
                 <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details </a> &nbsp;|&nbsp;
-                <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId">Assign Employee</a> &nbsp|&nbsp
+                <a asp-action="AssignEmployee" asp-route-id="@item.WorkPackageId">Assign Employee</a> &nbsp;|&nbsp;
                 <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
             </div>
 
@@ -143,6 +143,7 @@
                 </div>
             </div>
             <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
+
                 <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId">Create Child Work Package&nbsp;</a> &nbsp;|&nbsp;
                 <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add PM Budget Plan&nbsp;</a> &nbsp;|&nbsp;
                 <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add RE Budget Plan&nbsp;</a> &nbsp;|&nbsp;

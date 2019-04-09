@@ -65,7 +65,7 @@ namespace COMP4911Timesheets.Controllers
             var workPackage = await _context.WorkPackages
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
-                .FirstOrDefaultAsync(m => m.WorkPackageId == id);
+                .Where(m => m.WorkPackageId == id).FirstOrDefaultAsync();
 
             var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();
             /*
@@ -136,7 +136,7 @@ namespace COMP4911Timesheets.Controllers
             workPackage.ProjectId = projectId;
             workPackage.Status = WorkPackage.OPENED;
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = await _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefaultAsync();
             int workPackageLength = 0;
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
@@ -202,7 +202,7 @@ namespace COMP4911Timesheets.Controllers
             workPackage.Status = WorkPackage.OPENED;
             var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
             var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = await _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefaultAsync();
             int workPackageLength = 0;
 
             foreach (WorkPackage tempWorkPackage in workPackages)
@@ -250,7 +250,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: WorkPackages/CreateWorkPackage/6
         public async Task<IActionResult> CreateWorkPackageReport(int? id)
         {
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
+            var workPackages = await _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefaultAsync();
             if (workPackages == null)
             {
                 var theWorkPackage = await _context.WorkPackages.FindAsync(id);
@@ -263,7 +263,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             ViewBag.ErrorMessage = "Workpackage report only can be created on leaf workpackages";
-            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
+            var wpTemp = await _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefaultAsync();
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
 
         }
@@ -480,7 +480,7 @@ namespace COMP4911Timesheets.Controllers
         //GET: ProjectWorkPackges/ClosedWorkPackageInfo/5
         public async Task<IActionResult> ClosedWorkPackageInfo()
         {
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = await _context.Projects.Where(m => m.ProjectId == projectId).FirstOrDefaultAsync();
 
             ViewData["projectCode"] = project.ProjectCode;
             ViewData["projectName"] = project.Name;
