@@ -2,7 +2,26 @@
 
 @{
     ViewData["PageTitle"] = "Create";
+    var pLevels = ViewBag.pLevels;
+    var planned = ViewBag.planned;
+    var spentTD = ViewBag.spentTD;
+    var spentTW = ViewBag.spentTW;
+    var needed = ViewBag.needed;
+    var tableLength = ViewBag.tableLength;
 }
+
+<script type="text/javascript">
+    function joinInputs() {
+        let text = "\"{";
+
+        for (let i = 1; i < @tableLength; i++) {
+            text = text + document.getElementById('value ' + i).value + ":\'" + document.getElementById('input ' + i).value + "\',";
+        }
+        text = text + "}\"";
+
+        document.getElementById('estimate').value = text;
+    };
+</script>
 
 <h1>@ViewData["PageTitle"]</h1>
 
@@ -50,16 +69,54 @@
                 <input asp-for="WeekNumber" value="@Model.WeekNumber" class="form-control-plaintext" readonly/>
             </div>
         </div>
-        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
-        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
     </div>
     <br>
 
     <div class="well bs-component">
-        <!-- TODO: PLanned/spent/need by labour plevel -->
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="StartingPercentage" class="control-label"></label>
+                <input asp-for="StartingPercentage" value='@TempData["startPer"]' class="form-control-plaintext" readonly/>
+            </div>
+            <div class="form-group col-6">
+                <label asp-for="CompletedPercentage" class="control-label"></label>
+                <input asp-for="CompletedPercentage" value='@TempData["compPer"]'  class="form-control-plaintext" readonly/>
+            </div>
+        </div>
     </div>
     <br>
 
+    <div class="well bs-component">
+        <table>
+            @for (int i = 0; i < tableLength; i++) {
+                <tr class="row">
+                    <td class="col-2">
+                        @Html.Raw(pLevels[i])
+                    </td>
+                    <td class="col-2">
+                        @Html.Raw(planned[i])
+                    </td>
+                    <td class="col-2">
+                        @Html.Raw(spentTD[i])
+                    </td>
+                    <td class="col-2">
+                        @Html.Raw(spentTW[i])
+                    </td>
+                    @if (i == 0) {
+                        <td class="col-2">
+                            @Html.Raw(needed[i])
+                        </td>
+                    } else {
+                        <td class="col-2">
+                            <input id="input @i" value="0" class="form-control" onchange="joinInputs();" required/>
+                        </td>
+                        <input id="value @i" value="@pLevels[i]" hidden />
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+    <br>
     <div class="well bs-component">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-row">
@@ -93,6 +150,9 @@
                 <span asp-validation-for="ProblemAnticipated" class="text-danger"></span>
             </div>
         </div>
+        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
+        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
+        <input id="estimate" asp-for="ResponsibleEngineerEstimate" hidden/>
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary btn-raised" />
         </div>

@@ -102,6 +102,7 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+                    <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
                 </td>
             </tr>
         }

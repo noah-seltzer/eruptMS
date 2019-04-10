@@ -1,7 +1,14 @@
 @model COMP4911Timesheets.Models.ResponsibleEngineerReport
+@using Newtonsoft.Json.Linq;
 
 @{
     ViewData["PageTitle"] = "Details";
+    var pLevels = ViewBag.pLevels;
+    var planned = ViewBag.planned;
+    var spentTD = ViewBag.spentTD;
+    var spentTW = ViewBag.spentTW;
+    var needed = ViewBag.needed;
+    var tableLength = ViewBag.tableLength;
 }
 
 <h1>@ViewData["PageTitle"]</h1>
@@ -53,7 +60,46 @@
 <br>
 
 <div class="well bs-component">
-    <!-- TODO: PLanned/spent/need by labour plevel -->
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label asp-for="StartingPercentage" class="control-label"></label>
+            <input  value='@Model.StartingPercentage' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label asp-for="CompletedPercentage" class="control-label"></label>
+            <input value='@Model.CompletedPercentage' class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="well bs-component">
+    <table>
+        @for (int i = 0; i < tableLength; i++) {
+            <tr class="row">
+                <td class="col-2">
+                    @Html.Raw(pLevels[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(planned[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTD[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTW[i])
+                </td>
+                @if (i == 0) {
+                    <td class="col-2">
+                        @Html.Raw(needed[i])
+                    </td>
+                } else {
+                    <td class="col-2">
+                    </td>
+                }
+            </tr>
+        }
+    </table>
 </div>
 <br>
 

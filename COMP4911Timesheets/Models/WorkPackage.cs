@@ -6,7 +6,6 @@ namespace COMP4911Timesheets.Models
 {
     public class WorkPackage
     {
-
         public static readonly int INVALID = 0;
         public static readonly int VALID = 1;
         public static readonly int OPENED = 2;
@@ -55,6 +54,5 @@ namespace COMP4911Timesheets.Models
         public List<ResponsibleEngineerReport> ResponsibleEngineerReports { get; set; }
         public List<TimesheetRow> TimesheetRows { get; set; }
         public List<ProjectEmployee> ProjectEmployees { get; set; }
-
     }
 }
