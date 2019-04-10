@@ -95,14 +95,14 @@
             }
         </div>
 
-        <div class="col-md-8 col-lg-4">
+        <div class="col-md-8 col-lg-4 overflow">
             <h4>Employees</h4>
             <hr />
             <ul class="projectEmployeeList">
                 @foreach (var e in Model.project.ProjectEmployees)
                 {
                     <li>
-                        @ProjectEmployee.Roles[e.Role] :
+                        <strong>@ProjectEmployee.Roles[e.Role]</strong> :
                         @e.Employee.Email
                     </li>
                 }

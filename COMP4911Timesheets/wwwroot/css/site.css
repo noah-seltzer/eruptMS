@@ -428,3 +428,8 @@ body {
     background-color: #222222;
     font-weight: 600;
 }
+
+.overflow {
+    overflow: auto;
+    max-height: max-content;
+}

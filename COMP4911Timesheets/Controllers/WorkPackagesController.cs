@@ -92,6 +92,7 @@ namespace COMP4911Timesheets.Controllers
                                            .ToList();
                 }                        
             }
+            ViewData["wps"] = workPackages;
             return View(workPackages);
         }
 

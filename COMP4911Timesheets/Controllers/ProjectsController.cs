@@ -199,7 +199,7 @@ namespace COMP4911Timesheets
                 Employee mgr = _context.Employees.Find(manager.EmployeeId);
                 await _usermgr.AddToRoleAsync(mgr, ApplicationRole.PM);
 
-                if(!String.IsNullOrEmpty(input.ManagersAssistant))
+                if (!String.IsNullOrEmpty(input.ManagersAssistant))
                 {
                     ProjectEmployee assist = new ProjectEmployee
                     {
@@ -291,11 +291,10 @@ namespace COMP4911Timesheets
             var mgmtAndUnasigned = _context.ProjectEmployees
                 .Include(e => e.Employee)
                 .Where(e => e.ProjectId == id
-                    && e.Status == ProjectEmployee.CURRENTLY_WORKING
-                    && (e.Role == ProjectEmployee.PROJECT_MANAGER
-                    || e.Role == ProjectEmployee.PROJECT_ASSISTANT
-                    || e.Role == ProjectEmployee.NOT_ASSIGNED
-                    || e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER))
+                    && e.Status == ProjectEmployee.CURRENTLY_WORKING)
+                .GroupBy(pe => new { pe.EmployeeId, pe.Role })
+                .Select(pe => pe.FirstOrDefault())
+                .OrderBy(pe => pe.Role)
                 .Distinct()
                 .ToList();
 
@@ -621,15 +620,14 @@ namespace COMP4911Timesheets
 
         public async Task<IActionResult> Close(int id)
         {
-            var workPackage = await _context.WorkPackages
+            var workPackages = await _context.WorkPackages
                 .Where(wp => wp.ProjectId == id)
-                .Where(wp => wp.Status == WorkPackage.ARCHIVED || wp.Status == WorkPackage.OPENED)
-                .FirstOrDefaultAsync();
-            if (workPackage != null)
+                .ToListAsync();
+            foreach (var workPackage in workPackages)
             {
-                TempData["ErrorMessage"] = "All work packages have to be closed to be able to close the proejct.";
-                return RedirectToAction(nameof(Index));
+                workPackage.Status = WorkPackage.CLOSED;
             }
+            _context.UpdateRange(workPackages);
             var project = await _context.Projects.FindAsync(id);
             project.Status = Project.CLOSED;
             _context.Update(project);
@@ -639,6 +637,15 @@ namespace COMP4911Timesheets
 
         public async Task<IActionResult> Archive(int id)
         {
+            var workPackages = await _context.WorkPackages
+                .Where(wp => wp.ProjectId == id)
+                .Where(wp => wp.Status == WorkPackage.OPENED)
+                .ToListAsync();
+            foreach (var workPackage in workPackages)
+            {
+                workPackage.Status = WorkPackage.ARCHIVED;
+            }
+            _context.UpdateRange(workPackages);
             var project = await _context.Projects.FindAsync(id);
             project.Status = Project.ARCHIVED;
             _context.Update(project);
