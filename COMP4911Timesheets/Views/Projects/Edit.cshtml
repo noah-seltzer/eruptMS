@@ -102,7 +102,7 @@
                 @foreach (var e in Model.project.ProjectEmployees)
                 {
                     <li>
-                        @ProjectEmployee.Roles[e.Role] :
+                        <strong>@ProjectEmployee.Roles[e.Role]</strong> :
                         @e.Employee.Email
                     </li>
                 }

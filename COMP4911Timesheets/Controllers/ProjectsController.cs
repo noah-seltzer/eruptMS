@@ -291,12 +291,10 @@ namespace COMP4911Timesheets
             var mgmtAndUnasigned = _context.ProjectEmployees
                 .Include(e => e.Employee)
                 .Where(e => e.ProjectId == id
-                    && e.Status == ProjectEmployee.CURRENTLY_WORKING
-                    && (e.Role == ProjectEmployee.PROJECT_MANAGER
-                    || e.Role == ProjectEmployee.PROJECT_ASSISTANT
-                    || e.Role == ProjectEmployee.NOT_ASSIGNED
-                    || e.Role == ProjectEmployee.RESPONSIBLE_ENGINEER))
-                .Distinct()
+                    && e.Status == ProjectEmployee.CURRENTLY_WORKING)
+                .GroupBy(pe => new { pe.EmployeeId, pe.Role })
+                .Select(pe => pe.FirstOrDefault())
+                .OrderBy(pe => pe.Role)
                 .ToList();
 
             var reqs = _context.ProjectRequests
