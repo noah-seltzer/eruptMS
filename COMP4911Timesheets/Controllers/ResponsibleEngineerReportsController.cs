@@ -450,6 +450,9 @@ namespace COMP4911Timesheets.Controllers
                 for (int i = 0; i < spentThisWeek.Length; i++){
                     spentTW.Add(spentThisWeek[i].ToString("N"));
                 }
+
+                //sets it default to zero. so if the p-level is missing for the JSON, it stays 0
+                TempData[pg.PayLevel] = "0";
             });
 
             ViewBag.tableLength = pLevels.Count;
@@ -459,15 +462,11 @@ namespace COMP4911Timesheets.Controllers
             ViewBag.spentTW = spentTW;
             ViewBag.needed = needed;
 
-            // JObject json = JObject.Parse(responsibleEngineerReport.ResponsibleEngineerEstimate);
+            JObject json = JObject.Parse(responsibleEngineerReport.ResponsibleEngineerEstimate);
 
-            // foreach (var p in json.Properties()) {
-            //     TempData[p.Name] = p.Value;
-            // }
-
-            // ViewBag.responsibleEngineerEstimate = json;
-
-            // ViewBag.p1 = json.ToString();
+            foreach (var p in json.Properties()) {
+                TempData[p.Name] = p.Value;
+            }
 
             return View(responsibleEngineerReport);
         }
