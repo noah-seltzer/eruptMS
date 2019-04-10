@@ -10,9 +10,9 @@
 @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
 {
     <p>
-        <a asp-action="CreateInternalWorkPackage">Create New Work Package</a> &nbsp|&nbsp
+        <a asp-action="CreateInternalWorkPackage"  asp-route-id="@TempData["ProjectId"]">Create New Work Package</a> &nbsp|&nbsp
 
-        <a asp-action="ClosedWorkPackageInfo">Closed Work Package Info</a>
+        <a asp-action="ClosedWorkPackageInfo" asp-route-id="@TempData["ProjectId"]">Closed Work Package Info</a>
     </p>
 }
 <div class="row well bs-component">
@@ -84,7 +84,7 @@
             </div>
         </div>
         <div>
-            <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> &nbsp|&nbsp
+            <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Edit</a> &nbsp|&nbsp
             <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
         </div>     
         
