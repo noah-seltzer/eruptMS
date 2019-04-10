@@ -12,12 +12,12 @@
 
 <script type="text/javascript">
     function joinInputs() {
-        let text = "\"{";
+        let text = "{";
 
         for (let i = 1; i < @tableLength; i++) {
             text = text + document.getElementById('value ' + i).value + ":\'" + document.getElementById('input ' + i).value + "\',";
         }
-        text = text + "}\"";
+        text = text + "}";
 
         document.getElementById('estimate').value = text;
     };
