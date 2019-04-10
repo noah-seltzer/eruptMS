@@ -44,7 +44,7 @@
                 <td>
                     @{
                         if (item.Role != COMP4911Timesheets.Models.ProjectEmployee.PROJECT_MANAGER) {
-                            <a asp-action="RemoveEmployee" asp-route-id="@item.EmployeeId" asp-route-projectId="@item.ProjectId">Remove Employees</a>
+                            <a asp-action="RemoveEmployee" asp-route-id="@item.EmployeeId" asp-route-projectId="@item.ProjectId">Remove</a>
                         }
                     }
                 </td>
