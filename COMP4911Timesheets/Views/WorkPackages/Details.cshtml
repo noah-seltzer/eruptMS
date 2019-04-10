@@ -14,6 +14,11 @@
     {
         <p>
             <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+
+            @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && Model.Project.ProjectCode != "010" && Model.WorkPackageCode != "00000") {
+                <a>&nbsp;|&nbsp;</a>
+                <a asp-action="Reports" asp-route-id="@Model.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+            }
         </p>
     }
     <dl class="row col-lg-6 well bs-component">

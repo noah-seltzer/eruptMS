@@ -102,7 +102,11 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
-                    <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+
+                    @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
+                    {
+                        <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+                    }
                 </td>
             </tr>
         }

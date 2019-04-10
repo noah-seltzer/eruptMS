@@ -308,7 +308,7 @@ namespace COMP4911Timesheets.Controllers
 
             if (workPackage.Status == WorkPackage.CLOSED)
             {
-                ViewBag.ErrorMessage = "Workpackage already closed you can not change  work package info";
+                ViewBag.ErrorMessage = "Workpackage already closed you can not change work package info";
                 return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = pId });
             }
 
@@ -401,8 +401,6 @@ namespace COMP4911Timesheets.Controllers
             }
 
             List<WorkPackage> workPackages = new List<WorkPackage>();
-
-
 
             if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "AD") && !User.IsInRole(role: "PA"))
             //changed in PR#309
