@@ -94,7 +94,7 @@
                 </div>
                 <div>
                     <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Create Child Work Package </a> &nbsp;|&nbsp;
-                    <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a> &nbsp;|&nbsp;
+                    <a asp-action="Create" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan </a> &nbsp;|&nbsp;
                     <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan </a> &nbsp;|&nbsp;
                     <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Edit </a> &nbsp;|&nbsp;
                     <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details </a> &nbsp;|&nbsp;
@@ -145,7 +145,7 @@
                 <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
 
                     <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Create Child Work Package </a> &nbsp;|&nbsp;
-                    <a asp-action="Create" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add PM Budget Plan&nbsp;</a> &nbsp;|&nbsp;
+                    <a asp-action="Create" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add PM Budget Plan&nbsp;</a> &nbsp;|&nbsp;
                     <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add RE Budget Plan&nbsp;</a> &nbsp;|&nbsp;
                     <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">&nbsp;Edit&nbsp;</a> &nbsp;|&nbsp;
                     <a asp-action="Details" asp-route-id="@item.WorkPackageId">&nbsp;Details&nbsp;</a> &nbsp;|&nbsp;
