@@ -34,7 +34,7 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
             var workPackages = new List<WorkPackage>();
-
+            
             if (this.User.IsInRole("AD"))
             {
 
@@ -90,7 +90,7 @@ namespace COMP4911Timesheets.Controllers
                                            .Include(wp => wp.Project)
                                            .Distinct()
                                            .ToList();
-                }
+                }                        
             }
             ViewData["wps"] = workPackages;
             return View(workPackages);
@@ -294,7 +294,7 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
-        [Authorize(Roles = "AD,PM,PA")]
+        [Authorize(Roles="AD,PM,PA")]
         // GET: WorkPackages/Edit/5
         public async Task<IActionResult> Edit(int? id, int? pId)
         {
@@ -603,6 +603,7 @@ namespace COMP4911Timesheets.Controllers
         [Authorize(Roles = "AD,PM,PA")]
         public async Task<IActionResult> AssignRE(string EmployeeId, string name, int pId, int wId)
         {
+
             //create the ProjectEmployee object and assign the value to the object
             ProjectEmployee projectEmployee = new ProjectEmployee();
             projectEmployee.Status = ProjectEmployee.CURRENTLY_WORKING;
@@ -612,56 +613,57 @@ namespace COMP4911Timesheets.Controllers
             projectEmployee.EmployeeId = EmployeeId;
             ViewData["projectId"] = pId;
 
-            var projectEmployeeUnassigned = await _context.ProjectEmployees
-                .Where(pe => pe.EmployeeId == EmployeeId
-                    && pe.WorkPackageId == null
-                    && pe.ProjectId == pId
-                    && pe.Role == ProjectEmployee.NOT_ASSIGNED)
-                .FirstOrDefaultAsync();
-            if (projectEmployeeUnassigned != null)
-            {
-                _context.ProjectEmployees.Remove(projectEmployeeUnassigned);
-            }
-
-            ProjectEmployee projectEmployeeManagement = new ProjectEmployee()
-            {
-                EmployeeId = EmployeeId,
-                Status = ProjectEmployee.CURRENTLY_WORKING,
-                ProjectId = pId,
-                Role = ProjectEmployee.EMPLOYEE,
-                WorkPackageId = _context.WorkPackages.Where(wp => wp.ProjectId == pId && wp.WorkPackageCode == "00000").FirstOrDefault().WorkPackageId,
-            };
-
             //get the RESPONSIBLE_ENGINEER of the workpackage
-            var oldRE = _context.ProjectEmployees
-                .Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
-                    && ep.ProjectId == pId
-                    && ep.WorkPackageId == wId)
-                .FirstOrDefault();
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
+                            && ep.ProjectId == pId
+                            && ep.WorkPackageId == wId)
+                           .FirstOrDefault();
 
             //Operator old Assigned Employee 
             //1. if only one row left update the row. 
             //2. if more than one row, remove thw row
-            if (oldRE != null)
+            if (tempPE != null)
             {
-                var oldPEManagement = await _context.ProjectEmployees
-                    .Where(pe => pe.EmployeeId == oldRE.EmployeeId
-                        && pe.WorkPackageId == projectEmployeeManagement.WorkPackageId)
-                    .FirstOrDefaultAsync();
+                Employee oldtempRE = _context.Employees.Find(tempPE.EmployeeId);
+                await _userManager.RemoveFromRoleAsync(oldtempRE, ApplicationRole.RE);
 
-                Employee oldREEmployee = _context.Employees.Find(oldRE.EmployeeId);
-                await _userManager.RemoveFromRoleAsync(oldREEmployee, ApplicationRole.RE);
+                var countOldTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == tempPE.EmployeeId
+                                && ep.ProjectId == pId
+                                && (ep.WorkPackageId == wId
+                                || ep.WorkPackageId == null)).ToList();
 
-                _context.ProjectEmployees.Remove(oldRE);
-                _context.ProjectEmployees.Remove(oldPEManagement);
+                var oldTempPE = countOldTempPE.FirstOrDefault();
+
+                if (countOldTempPE.Count != 1)
+                {
+                    _context.ProjectEmployees.Remove(tempPE);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    oldTempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                    oldTempPE.WorkPackageId = null;
+                    _context.Update(oldTempPE);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            /*
+            var currentTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                                && ep.ProjectId == WorkPackagesController.projectId
+                                && (ep.WorkPackageId == WorkPackagesController.workPackageId
+                                    || ep.WorkPackageId == null)).FirstOrDefault();
+
+            if (currentTempPE.Role == ProjectEmployee.NOT_ASSIGNED)
+            {
+                _context.ProjectEmployees.Remove(currentTempPE);
                 await _context.SaveChangesAsync();
             }
+            */
 
             Employee tempRE = _context.Employees.Find(EmployeeId);
             await _userManager.AddToRoleAsync(tempRE, ApplicationRole.RE);
 
             _context.Add(projectEmployee);
-            _context.Add(projectEmployeeManagement);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("AssignEmployee", "WorkPackages", new { id = wId, pId = pId });
@@ -678,17 +680,6 @@ namespace COMP4911Timesheets.Controllers
             projectEmployee.WorkPackageId = wId;
             projectEmployee.EmployeeId = EmployeeId;
             ViewData["projectId"] = pId;
-
-            var projectEmployeeUnassigned = await _context.ProjectEmployees
-                .Where(pe => pe.EmployeeId == EmployeeId
-                    && pe.WorkPackageId == null
-                    && pe.ProjectId == pId
-                    && pe.Role == ProjectEmployee.NOT_ASSIGNED)
-                .FirstOrDefaultAsync();
-            if (projectEmployeeUnassigned != null)
-            {
-                _context.ProjectEmployees.Remove(projectEmployeeUnassigned);
-            }
 
             Employee tempRE = _context.Employees.Find(EmployeeId);
             await _userManager.AddToRoleAsync(tempRE, ApplicationRole.EM);
