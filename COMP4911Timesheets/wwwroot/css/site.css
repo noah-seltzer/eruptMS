@@ -433,3 +433,9 @@ body {
     overflow: auto;
     max-height: max-content;
 }
+
+table>thead {
+    color: #FFF !important;
+    background-color: #444 !important;
+    border-color: #98a2ac !important;
+}
