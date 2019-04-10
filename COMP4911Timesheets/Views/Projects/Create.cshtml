@@ -39,8 +39,8 @@
                 <span class="text-danger">@ViewBag.MgrIsAssist</span>
             </div>
             <div class="form-group">
-                <label asp-for="MarkupRate" class="control-label"></label> (%)
-                <input asp-for="MarkupRate" type="number" class="form-control" required min="0" />
+                <label asp-for="MarkupRate" class="control-label"></label>
+                <input asp-for="MarkupRate" type="number" class="form-control" required min="0" value="1" />
                 <span asp-validation-for="MarkupRate" class="text-danger"></span>
             </div>
             <div class="form-group">

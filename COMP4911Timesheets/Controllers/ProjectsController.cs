@@ -150,7 +150,11 @@ namespace COMP4911Timesheets
             {
                 if (input.ProjectCode.ToString().Length != 4)
                 {
-                    ViewBag.Employees = new SelectList(_context.Employees, "Id", "Email");
+                    ViewBag.MEmployees = new SelectList(_context.Employees, "Id", "Email");
+                    List<SelectListItem> assItems = new List<SelectListItem>();
+                    assItems.AddRange(new SelectList(_context.Employees, "Id", "Email"));
+                    assItems.Insert(0, new SelectListItem { Text = "None", Value = "" });
+                    ViewBag.AEmployees = assItems;
                     ViewBag.CodeError = "Project code must be four digits long.";
                     return View(input);
                 }
