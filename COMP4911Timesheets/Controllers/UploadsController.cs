@@ -58,8 +58,15 @@ namespace COMP4911Timesheets.Controllers
         }
         public IActionResult Index()
         {
-            ViewData["fileContents"] = fileContents ?? "none";
-            return View();
+            if (User.IsInRole("AD")) 
+            {
+                ViewData["fileContents"] = fileContents ?? "none";
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
 
