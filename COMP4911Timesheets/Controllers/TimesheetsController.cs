@@ -191,7 +191,7 @@ namespace COMP4911Timesheets.Controllers
                 TimesheetRow tr4 = new TimesheetRow() { Timesheet = timesheet, WorkPackage = wp4 };
                 _context.Add(tr4);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Edit", new { id = timesheet.TimesheetId});
             }
             return View(timesheet);
         }

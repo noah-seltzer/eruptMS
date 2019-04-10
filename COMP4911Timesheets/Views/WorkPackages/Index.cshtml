@@ -1,14 +1,15 @@
 ﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
-
 @{
-    ViewData["PageTitle"] = "Index";
+    ViewData["PageTitle"] = "Work Packages";
 }
-
 <h1>@ViewData["PageTitle"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.Identity.IsAuthenticated && User.IsInRole(role: "AD"))
+{
+    <p>
+        <a asp-action="Index" asp-controller="Uploads">Bulk Upload Work Packages</a>
+    </p>
+}
 @using (Html.BeginForm())
 {
     <p>
@@ -20,6 +21,12 @@
 <table class="table well bs-component">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.WorkPackageCode)
             </th>
@@ -45,9 +52,6 @@
                 @Html.DisplayNameFor(model => model.Activity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.ParentWorkPackage)
             </th>
             <th></th>
@@ -57,6 +61,12 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </td>
@@ -82,15 +92,10 @@
                     @Html.DisplayFor(modelItem => item.Activity)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.WorkPackageId">Delete</a>
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
                 </td>
             </tr>
         }

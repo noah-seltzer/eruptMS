@@ -8,6 +8,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize(Roles ="AD")]
     public sealed class WorkPackagesMap : ClassMap<WorkPackage>
     {
         public WorkPackagesMap()
