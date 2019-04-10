@@ -176,7 +176,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.ADMIN,
                     CreatedTime=new DateTime(2018, 3, 29),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=104,
                     Status=Employee.CURRENTLY_EMPLOYEED
                 }, // AD
                 new Employee
@@ -188,7 +188,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.HR_MANAGER,
                     CreatedTime=new DateTime(2018, 4, 23),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=96,
                     Status=Employee.CURRENTLY_EMPLOYEED
                 } // HR, PM, RE
             };
@@ -208,7 +208,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.LINE_MANAGER,
                     CreatedTime=new DateTime(2018, 12, 25),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=32,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
@@ -222,7 +222,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.SUPERVISOR,
                     CreatedTime=new DateTime(2019, 1, 1),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=32,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 2).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 2).First().Id
@@ -244,7 +244,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.BUSINESS_ANALYST,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
@@ -258,7 +258,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.TECHNICAL_WRITER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
@@ -272,7 +272,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.SOFTWARE_ARCHITECT,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
@@ -286,7 +286,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
@@ -300,7 +300,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.SOFTWARE_TESTER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
@@ -314,7 +314,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.SENIOR_SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
@@ -328,7 +328,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.JUNIOR_SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
@@ -342,7 +342,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.INTERMEDIATE_SOFTWARE_DEVELOPER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 4).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 4).First().Id
@@ -356,7 +356,7 @@ namespace COMP4911Timesheets.Data
                     Title=Employee.UI_DESIGNER,
                     CreatedTime=new DateTime(2019, 1, 2),
                     FlexTime=0,
-                    VacationTime=0,
+                    VacationTime=24,
                     Status=Employee.CURRENTLY_EMPLOYEED,
                     SupervisorId=context.Employees.Where(e => e.EmployeeId == 3).First().Id,
                     ApproverId=context.Employees.Where(e => e.EmployeeId == 3).First().Id
