@@ -21,6 +21,10 @@
                 <input asp-for="@user.FlexTime" class="form-control" disabled />
             </div>
             <div class="form-group">
+                <label asp-for="@user.SickLeave"></label>
+                <input asp-for="@user.SickLeave" class="form-control" disabled />
+            </div>
+            <div class="form-group">
                 <label asp-for="@user.Supervisor"></label>
                 <input asp-for='@ViewData["approver"]' class="form-control" disabled />
             </div>

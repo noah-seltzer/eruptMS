@@ -79,6 +79,9 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Vacation Time")]
         public double VacationTime { get; set; }
 
+        [Display(Name = "Sick Leave")]
+        public double SickLeave { get; set; }
+
         public int Status { get; set; }
 
         [Display(Name = "Approver")]

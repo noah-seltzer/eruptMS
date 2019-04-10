@@ -53,6 +53,7 @@ namespace COMP4911Timesheets
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IService, VacationTimeService>();
+            services.AddScoped<ISickLeaveService, SickLeaveService>();
             Utility.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
 
             services.AddHangfire(configuration => configuration
@@ -126,11 +127,17 @@ namespace COMP4911Timesheets
             app.UseHangfireDashboard();
             var manager = new RecurringJobManager();
             manager.AddOrUpdate("UPDATE-VACATION-TIME", Job.FromExpression(() => updateVacationTime()), "0 0 1 * * ", TimeZoneInfo.Local);
+            manager.AddOrUpdate("UPDATE-SICK-LEAVE", Job.FromExpression(() => updateSickLeave()), "0 0 1 1 * ", TimeZoneInfo.Local);
         }
 
         public static void updateVacationTime()
         {
             BackgroundJob.Enqueue<VacationTimeService>(vts => vts.updateVacationTimes());
+        }
+
+        public static void updateSickLeave()
+        {
+            BackgroundJob.Enqueue<SickLeaveService>(sls => sls.updateSickLeaves());
         }
     }
 }
