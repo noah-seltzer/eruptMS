@@ -483,26 +483,41 @@ namespace COMP4911Timesheets.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
         public async Task<IActionResult> RemoveEmployees(int id)
         {
             bool isAdmin = await _userManager.IsInRoleAsync(await _userManager.GetUserAsync(User), "AD");
-            var projectEmployees = await _context.ProjectEmployees
+
+            var managerId = (await _context.ProjectEmployees
+                .Where(pe => pe.ProjectId == id)
+                .Where(pe => pe.Role == ProjectEmployee.PROJECT_MANAGER)
+                .FirstOrDefaultAsync())
+                .EmployeeId;
+
+            var employeesPositions = await _context.ProjectEmployees
                 .Where(pe => pe.ProjectId == id)
                 .Where(pe => isAdmin || pe.Employee.SupervisorId == _userManager.GetUserId(User))
                 .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
-                .Where(pe => pe.Role != ProjectEmployee.PROJECT_MANAGER)
-                .Include(pe => pe.Employee)
-                .Include(pe => pe.Project)
-                .OrderBy(pe => pe.Role)
                 .GroupBy(pe => pe.EmployeeId)
-                .Select(pe => pe.FirstOrDefault())
+                .Join(_context.Employees, g => g.Key, e => e.Id, (g, e) => new {E = e, PEs = g.ToList()})
                 .ToListAsync();
-            var project = await _context.Projects.FindAsync(id);
+
+            List<ProjectEmployee> PEs = new List<ProjectEmployee>();
+            foreach(var g in employeesPositions)
+            {
+                g.PEs.Sort((a, b) => { return a.Role - b.Role; }); //so we get the most senior role
+                var pe = g.PEs.First();
+                pe.Employee = g.E;
+                PEs.Add(pe);
+            }
+
+            PEs.Sort((a, b) => { return a.Role - b.Role; });
+
             LineManagerManagement lineManagerManagement = new LineManagerManagement
             {
-                ProjectEmployees = projectEmployees,
-                Project = project
-            };
+                ProjectEmployees = PEs,
+                Project = await _context.Projects.FindAsync(id)
+        };
             return View(lineManagerManagement);
         }
 
