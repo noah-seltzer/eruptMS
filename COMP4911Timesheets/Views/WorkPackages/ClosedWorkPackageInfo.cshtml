@@ -4,7 +4,7 @@
     ViewData["PageTitle"] = "Index";
 }
 
-<h1>Closed Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
+<h1>Closed Internal Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
 <h4>@TempData["info"]</h4>
 
 <table class="table well bs-component">
@@ -39,7 +39,7 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr class="row" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+            <tr id="@item.WorkPackageCode" name="@item.WorkPackageCode">
                 <td>
                     @Html.DisplayFor(modelItem => item.WorkPackageCode)
                 </td>

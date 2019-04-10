@@ -1,14 +1,14 @@
 @model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
 
 @{
-    ViewData["PageTitle"] = "Projects";
+    ViewData["PageTitle"] = "All Projects";
 }
 
-<h1>@ViewData["PageTitle"]</h1>
-
 <p>
-    <a asp-action="Index">Employees</a>
+    <a asp-action="Index" class="btn btn-info btn-raised project-button btn-lg">Employees</a>
 </p>
+
+<h1>@ViewData["PageTitle"]</h1>
 
 <table class="table well bs-component">
     <thead>
@@ -36,7 +36,13 @@
                     @Html.DisplayFor(modelItem => item.Project.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Project.ProjectRequests.Count)
+                    @{
+                        int sum = 0;
+                        foreach (var projectRequest in item.Project.ProjectRequests) {
+                            sum += projectRequest.AmountRequested;
+                        }
+                    }
+                    @Html.DisplayFor(modelItem => sum)
                 </td>
                 <td>
                     <a asp-action="ViewRequests" asp-route-id="@item.Project.ProjectId">View Requests</a> |

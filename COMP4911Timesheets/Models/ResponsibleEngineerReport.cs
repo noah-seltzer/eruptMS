@@ -27,6 +27,8 @@ namespace COMP4911Timesheets.Models
 
         public string Comments { get; set; }
 
+        public string ResponsibleEngineerEstimate { get; set; }
+
         [Display(Name = "Starting Percentage")]
         public double StartingPercentage { get; set; }
 
@@ -39,15 +41,16 @@ namespace COMP4911Timesheets.Models
         [Display(Name = "Cost Finished")]
         public double CostFinished { get; set; }
 
-        [Display(Name = "Work Accomplished")]
+        [Display(Name = "Work Accomplished This Period")]
         public string WorkAccomplished { get; set; }
 
-        [Display(Name = "Work Planned")]
+        [Display(Name = "Work Planned For Next Period")]
         public string WorkPlanned { get; set; }
 
+        [Display(Name = "Problems This Period")]
         public string Problem { get; set; }
 
-        [Display(Name = "Problem Anticipated")]
+        [Display(Name = "Problems Anticipated")]
         public string ProblemAnticipated { get; set; }
 
         [Display(Name = "Work Package ID")]

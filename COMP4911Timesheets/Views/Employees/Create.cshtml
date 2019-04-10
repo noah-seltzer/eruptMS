@@ -2,11 +2,18 @@
 
 @{
     ViewData["PageTitle"] = "Create";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
 }
 
 <h1>@ViewData["PageTitle"]</h1>
 
 <h4>Employee</h4>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-8 col-lg-6 well bs-component">

@@ -6,7 +6,6 @@ namespace COMP4911Timesheets.Models
 {
     public class WorkPackage
     {
-
         public static readonly int INVALID = 0;
         public static readonly int VALID = 1;
         public static readonly int OPENED = 2;
@@ -44,6 +43,7 @@ namespace COMP4911Timesheets.Models
 
         [ForeignKey("ParentWorkPackage")]
         public int? ParentWorkPackageId { get; set; }
+        [Display(Name = "Parent WP")]
         public WorkPackage ParentWorkPackage { get; set; }
 
         [InverseProperty("ParentWorkPackage")]

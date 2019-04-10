@@ -1,0 +1,64 @@
+@model IEnumerable<COMP4911Timesheets.Models.ResponsibleEngineerReport>
+
+@{
+    ViewData["PageTitle"] = "Responsible Engineer Reports Page";
+    ViewBag.Display = TempData["ErrorMessage"] != null ? "block" : "none";
+}
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")))
+{
+    <h1>@TempData["workPackageName"] - Responsible Engineer Reports</h1>
+    
+    <div class="@ViewBag.Display">
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @TempData["ErrorMessage"]
+        </div>
+    </div>
+
+    @if (ViewBag.CreateButton) {
+        <a asp-action="Create" asp-route-id="@TempData["workPackageId"]">Create a Responsible Engineers Report</a>
+        <hr>
+    }
+    
+    <div class="row well bs-component">
+        <div class="col-2">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </div>
+        <div class="col-2">
+            @Html.DisplayNameFor(model => model.StartingPercentage)
+        </div>
+        <div class="col-2">
+            @Html.DisplayNameFor(model => model.CompletedPercentage)
+        </div>
+        <div class="col-5">
+            @Html.DisplayNameFor(model => model.Comments)
+        </div>
+        <div class="col-1">
+            Details
+        </div>
+    </div>
+    <br>
+    
+    @if (Model != null)
+    {
+        foreach (var report in Model)
+        {
+            <div class="row well bs-component">
+                <div class="col-2">
+                    @Html.DisplayFor(modelReport => report.WeekNumber)
+                </div>
+                <div class="col-2">
+                    @Html.DisplayFor(modelReport => report.StartingPercentage)
+                </div>
+                <div class="col-2">
+                    @Html.DisplayFor(modelReport => report.CompletedPercentage)
+                </div>
+                    <textarea class="col-5 form-control-plaintext" readonly>@Html.DisplayFor(modelReport => report.Comments)</textarea>
+                <div class="col-1">
+                    <a asp-action="ReportDetails" asp-route-id="@report.ResponsibleEngineerReportId">Details</a>
+                </div>
+            </div>
+        }
+    }
+}

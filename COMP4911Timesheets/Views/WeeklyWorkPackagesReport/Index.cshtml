@@ -1,0 +1,63 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
+
+@{
+    ViewData["PageTitle"] = "Weekly Work Package Report";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<br />
+<h4>Select the Work Package to View the Weekly Report</h4>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectId)
+            </th>
+            <th>
+                Project @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th>
+                WP ID
+            </th>
+            <th>
+                WP @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.Contractor)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.Contractor)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId" class="btn btn-primary btn-raised btn-sm">Report</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

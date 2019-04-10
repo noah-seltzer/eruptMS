@@ -115,6 +115,11 @@ namespace COMP4911Timesheets.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (_context.Employees.Where(e => e.Email == employeeManagement.Employee.Email).FirstOrDefault() != null)
+                {
+                    ViewBag.ErrorMessage = "There is an employee already with the email you entered.";
+                    return await Create();
+                }
                 employeeManagement.Employee.Status = Employee.CURRENTLY_EMPLOYEED;
                 employeeManagement.Employee.CreatedTime = DateTime.Now;
                 employeeManagement.Employee.UserName = employeeManagement.Employee.Email;
@@ -133,6 +138,33 @@ namespace COMP4911Timesheets.Controllers
                 if (employeeManagement.Employee.Title == Employee.ADMIN)
                 {
                     await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.AD);
+                }
+
+                var internalProjects = await _context.Projects
+                    .Where(p => p.Status == Project.INTERNAL)
+                    .Include(p => p.WorkPackages)
+                    .ToListAsync();
+                foreach (Project internalProject in internalProjects)
+                {
+                    var workPackages = internalProject.WorkPackages;
+                    foreach (WorkPackage workPackage in workPackages)
+                    {
+                        if (workPackage.WorkPackageCode == "00000")
+                        {
+                            continue;
+                        }
+                        var projectEmployee = new ProjectEmployee
+                        {
+                            EmployeeId = employeeManagement.Employee.Id,
+                            ProjectId = internalProject.ProjectId,
+                            WorkPackageId = workPackage.WorkPackageId,
+                            Status = ProjectEmployee.CURRENTLY_WORKING,
+                            Role = ProjectEmployee.EMPLOYEE
+                        };
+                        _context.Add(projectEmployee);
+                        await _context.SaveChangesAsync();
+                        await _userManager.AddToRoleAsync(employeeManagement.Employee, ApplicationRole.EM);
+                    }
                 }
 
                 var supervisor = _context.Employees.Find(employeeManagement.Employee.SupervisorId);
@@ -174,7 +206,7 @@ namespace COMP4911Timesheets.Controllers
             var employeeManagement = new EmployeeManagement
             {
                 Employee = employee,
-                EmployeePay = employeePay
+                EmployeePay = employeePay,
             };
 
             return View(employeeManagement);
@@ -194,7 +226,8 @@ namespace COMP4911Timesheets.Controllers
 
             if (employeeManagement.Employee.SupervisorId == id || employeeManagement.Employee.ApproverId == id)
             {
-                return BadRequest("Supervisor and Approver can't be themselves");
+                ViewBag.ErrorMessage = "Supervisor and Approver can't be themselves";
+                return await Edit(id);
             }
 
             if (ModelState.IsValid)
@@ -243,6 +276,32 @@ namespace COMP4911Timesheets.Controllers
                     employeeToBeEdited.UserName = employeeManagement.Employee.Email;
                     employeeToBeEdited.Email = employeeManagement.Employee.Email;
                     employeeToBeEdited.PhoneNumber = employeeManagement.Employee.PhoneNumber;
+                    if (!string.IsNullOrEmpty(employeeManagement.passPhrase))
+                    {
+                        var datetime = DateTime.Now;
+                        var newSignature = new Signature
+                        {
+                            HashedSignature = Utility.HashEncrypt(employeeManagement.passPhrase + datetime),
+                            CreatedTime = datetime,
+                            Status = Signature.VALID,
+                            EmployeeId = id
+                        };
+
+                        var oldSig = _context.Signatures
+                            .Where(s => s.EmployeeId == id)
+                            .FirstOrDefault();
+
+                        if (oldSig == null)
+                            _context.Signatures.Add(newSignature);
+                        else
+                        {
+                            oldSig.CreatedTime = newSignature.CreatedTime;
+                            oldSig.HashedSignature = newSignature.HashedSignature;
+                            _context.Signatures.Update(oldSig);
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
                     await _userManager.UpdateAsync(employeeToBeEdited);
 
                     var employeePayToBeDisabled = _context.EmployeePays.Find(employeeManagement.EmployeePay.EmployeePayId);

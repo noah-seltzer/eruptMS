@@ -130,7 +130,7 @@
                         @Html.DisplayFor(modelItem => item.FriHour)
                         @{fri += item.FriHour;}
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @(item.SatHour + item.SunHour + item.MonHour + item.TueHour + item.WedHour + item.ThuHour + item.FriHour)
                     </td>
                     <td>
@@ -143,31 +143,31 @@
 
         <tr>
             <td></td>
-            <td>
+            <td class="timesheetTotal">
                 Total
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @sat
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @sun
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @mon
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @tue
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @wed
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @thu
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @fri
             </td>
-            <td>
+            <td class="timesheetTotal">
                 @(mon + tue + wed + thu + fri + sat + sun)
             </td>
             <td></td>

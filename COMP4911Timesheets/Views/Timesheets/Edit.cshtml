@@ -52,7 +52,6 @@
         <dd class="col-sm-8">
             @Html.DisplayFor(model => model.Comments)
         </dd>
-
     </dl>
 </div>
 
@@ -66,15 +65,13 @@
         <input type="hidden" asp-for="Status" />
         <input type="hidden" asp-for="FlexTime" />
 
-
         @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" || COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
         {
             <p>
-                @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId }, new { @class = "btn btn-primary", @role = "button" })
+                @Html.ActionLink("Create New Row", "Create", "TimesheetRows", new { id = Model.TimesheetId })
             </p>
+            <p class="text-danger">@TempData["info2"]</p>
         }
-
-
 
         <table class="table well bs-component table-responsive-sm">
             <thead>
@@ -155,64 +152,61 @@
                                 @Html.DisplayFor(modelItem => item.FriHour)
                                 @{fri += item.FriHour;}
                             </td>
-                            <td>
+                            <td class="timesheetTotal">
                                 @(item.SatHour + item.SunHour + item.MonHour + item.TueHour + item.WedHour + item.ThuHour + item.FriHour)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Notes)
                             </td>
-                            <td>
+                            <td style="padding:6px 12px">
                                 @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                    COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
                                 {
                                     @Html.ActionLink("Edit", "Edit", "TimesheetRows", new { id = item.TimesheetRowId },
-                                        new { @class = "btn btn-primary", @role = "button" })
+                                        new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
                                 }
-                            </td>
-                            <td>
-                                @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
-                   COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
-                                {
-                                    @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
-                                        new { @class = "btn btn-danger", @role = "button" })
-                                }
-                            </td>
+                                <span style=" @(item.WorkPackage.Project.Status == Project.INTERNAL ? "display:none" : "float:right") ">
+                                    @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" ||
+                                        COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+                                    {
+                                        @Html.ActionLink("Delete", "DeleteRow", "Timesheets", new { id = item.TimesheetRowId },
+                                            new { @class = "btn btn-danger btn-sm btn-raised", @role = "button" })
+                                    }
+                                </span>
                         </tr>
                     }
                 }
 
-
                 <tr>
                     <td></td>
-                    <td>
+                    <td class="timesheetTotal">
                         Total
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @sat
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @sun
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @mon
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @tue
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @wed
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @thu
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @fri
                     </td>
-                    <td>
+                    <td class="timesheetTotal">
                         @(mon + tue + wed + thu + fri + sat + sun)
                     </td>
                     <td></td>
-
                 </tr>
 
                 <tr>
@@ -301,22 +295,21 @@
                         @earn
                     </td>
                     <td></td>
-
                 </tr>
-
             </tbody>
         </table>
 
-        @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved" || COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
+        @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Not Submitted & Not Approved"
+         || COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Rejected & Need Resubmission")
         {
 
             @("Signature") <input type="text" name="pf" id="pf" value="" />
-            <a class="btn btn-primary" onclick="location.href='/Timesheets/Submit/'+@(Model.TimesheetId)+'?pass='+document.getElementById('pf').value;">Submit</a>
+            <a class="btn btn-primary btn-sm btn-raised" onclick="location.href='/Timesheets/Submit/'+@(Model.TimesheetId)+'?pass='+document.getElementById('pf').value;">Submit</a>
             <p class="text-danger">@TempData["info"]</p>
         }
         @if (COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status] == "Submitted & Not Approved")
         {
-            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger", @role = "button" })
+            @Html.ActionLink("Retract", "Retract", "Timesheets", new { id = Model.TimesheetId }, new { @class = "btn btn-danger btn-raised", @role = "button" })
         }
     </form>
 </div>
@@ -325,10 +318,6 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-
-
-
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

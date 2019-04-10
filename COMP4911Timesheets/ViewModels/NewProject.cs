@@ -22,5 +22,11 @@ namespace COMP4911Timesheets.ViewModels
         [Display(Name = "Project Manager")]
         public string ProjectManager { get; set; } 
 
+        [Display(Name = "Manager's Assistant")]
+        public string ManagersAssistant { get; set; }
+
+        [Display(Name = "Markup Rate")]
+        public double MarkupRate { get; set; }
+
     }
 }

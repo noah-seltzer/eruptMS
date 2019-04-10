@@ -91,7 +91,7 @@
         <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-purple">
                 <div class="inner">
-                    <h4>Rejected</h4>
+                    <h4>TS Rejected</h4>
                     <p>@ViewData["RejectedSheets"] - Need action</p>
                 </div>
                 <div class="icon">
@@ -123,20 +123,20 @@
         @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD") || User.IsInRole(role: "TA"))
         {
         <div class="col-lg-4 col-md-4 col-xs-6">
-            <div class="small-box bg-blue">
+            <div class="small-box bg-navy">
                 <div class="inner">
-                    <h4>Line Managers</h4>
-                    <p>&nbsp;</p>
+                    <h4>Supervisory</h4>
+                    <p>@ViewData["TimesheetsNeeded"] - TS awaiting approval</p>
                 </div>
                 <div class="icon">
-                    <i class="material-icons">content_paste</i>
+                    <i class="material-icons">assignment_turned_in</i>
                 </div>
                 <a class="small-box-footer" asp-area="" asp-controller="LineManagers" asp-action="Index">
                     More info <i class="material-icons">chevron_right</i>
                 </a>
             </div>
         </div>
-        <div class="col-lg-4 col-md-4 col-xs-6">
+        <!-- <div class="col-lg-4 col-md-4 col-xs-6">
             <div class="small-box bg-navy">
                 <div class="inner">
                     <h4>Approve</h4>
@@ -149,7 +149,7 @@
                     More info <i class="material-icons">chevron_right</i>
                 </a>
             </div>
-        </div>
+        </div> -->
         }
     </div>
 </section>

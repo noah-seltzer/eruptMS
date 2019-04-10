@@ -9,14 +9,18 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using COMP4911Timesheets.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace COMP4911Timesheets.Controllers
 {
+    [Authorize]
     public class WorkPackagesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private static int? projectId;
-        private static int? parentWorkPKId;
+        //private static int? projectId;
+
+        //private static int? workPackageId;
         public static int PROJECT_CODE_LENGTH = 4;
         private readonly UserManager<Employee> _userManager;
 
@@ -30,24 +34,65 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> Index(string searchString)
         {
             var workPackages = new List<WorkPackage>();
-
-            if (!String.IsNullOrEmpty(searchString))
+            
+            if (this.User.IsInRole("AD"))
             {
-                workPackages = await _context.WorkPackages
-                    .Include(w => w.ParentWorkPackage)
-                    .Include(w => w.Project)
-                    .Where(w => w.Project.ProjectCode.Contains(searchString)
-                            || w.WorkPackageCode.Contains(searchString))
-                    .ToListAsync();
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+
+                    workPackages = await _context.WorkPackages
+                        .Include(w => w.ParentWorkPackage)
+                        .Include(w => w.Project)
+                        .Where(w => w.Project.ProjectCode.Contains(searchString)
+                                || w.WorkPackageCode.Contains(searchString))
+                        .ToListAsync();
+                }
+                else
+                {
+                    workPackages = await _context.WorkPackages
+                        .Include(w => w.ParentWorkPackage)
+                        .Include(w => w.Project)
+                        .ToListAsync();
+
+                    //.Where(t => t.Employee.Id == _userManager.GetUserId(HttpContext.User))
+                }
             }
             else
             {
-                workPackages = await _context.WorkPackages
-                    .Include(w => w.ParentWorkPackage)
-                    .Include(w => w.Project)
-                    .ToListAsync();
-            }
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    workPackages = (from wp in _context.WorkPackages
+                                    join pe in _context.ProjectEmployees
+                                         on wp.WorkPackageId equals pe.WorkPackageId
+                                    where pe.EmployeeId == _userManager.GetUserId(HttpContext.User)
+                                        && (wp.Project.ProjectCode.Contains(searchString)
+                                            || wp.WorkPackageCode.Contains(searchString))
+                                        && !wp.Project.ProjectCode.Equals("010")
+                                    select wp)
+                                       .Include(wp => wp.ParentWorkPackage)
+                                       .Include(wp => wp.Project)
+                                       .Distinct()
+                                       .ToList();
 
+                }
+                else
+                {
+
+
+                    workPackages = (from wp in _context.WorkPackages
+                                    join pe in _context.ProjectEmployees
+                                        on wp.WorkPackageId equals pe.WorkPackageId
+                                    where pe.EmployeeId == _userManager.GetUserId(HttpContext.User)
+                                        && !wp.Project.ProjectCode.Equals("010")
+                                    select wp)
+                                           .Include(wp => wp.ParentWorkPackage)
+                                           .Include(wp => wp.Project)
+                                           .Distinct()
+                                           .ToList();
+                }                        
+            }
+            ViewData["wps"] = workPackages;
             return View(workPackages);
         }
 
@@ -63,7 +108,7 @@ namespace COMP4911Timesheets.Controllers
             var workPackage = await _context.WorkPackages
                 .Include(w => w.ParentWorkPackage)
                 .Include(w => w.Project)
-                .FirstOrDefaultAsync(m => m.WorkPackageId == id);
+                .Where(m => m.WorkPackageId == id).FirstOrDefaultAsync();
 
             var budgets = await _context.Budgets.Where(a => a.WorkPackageId == id).Include(a => a.PayGrade).ToListAsync();
             /*
@@ -81,10 +126,44 @@ namespace COMP4911Timesheets.Controllers
             return View(workPackage);
         }
 
-        // GET: WorkPackages/CreateWorkPackage
-        public IActionResult CreateWorkPackage()
+        // GET: WorkPackages/CreateInternalWorkPackage
+        [Authorize(Roles = "AD,PM,PA")]
+        public IActionResult CreateInternalWorkPackage(int? id)
         {
-            TempData["projectId"] = projectId;
+
+            TempData["projectId"] = id;
+            return View();
+        }
+
+
+        // POST: WorkPackages/CreateInternalWorkPackage
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateInternalWorkPackage(int? id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        {
+
+            workPackage.ProjectId = id;
+            workPackage.Status = WorkPackage.OPENED;
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(workPackage);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = id });
+            }
+            //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
+            //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
+            return View(workPackage);
+        }
+
+
+        // GET: WorkPackages/CreateWorkPackage
+        [Authorize(Roles = "AD,PM,PA")]
+        public IActionResult CreateWorkPackage(int? id)
+        {
+            TempData["projectId"] = id;
             return View();
         }
 
@@ -93,17 +172,17 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> Create([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage, int? id)
         {
             int[] workpackageCode = new int[10];
             for (int i = 0; i < 10; i++)
             {
                 workpackageCode[i] = -1;
             }
-            workPackage.ProjectId = projectId;
+            workPackage.ProjectId = id;
             workPackage.Status = WorkPackage.OPENED;
-            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == id).ToListAsync();
+            var project = await _context.Projects.Where(m => m.ProjectId == id).FirstOrDefaultAsync();
             int workPackageLength = 0;
             foreach (WorkPackage tempWorkPackage in workPackages)
             {
@@ -138,7 +217,7 @@ namespace COMP4911Timesheets.Controllers
             {
                 _context.Add(workPackage);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = id });
             }
             //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
@@ -146,10 +225,11 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: WorkPackages/CreateChildWorkPackage/6
-        public IActionResult CreateChildWorkPackage(int? id)
+        [Authorize(Roles = "AD,PM,PA")]
+        public IActionResult CreateChildWorkPackage(int? id, int? pId)
         {
-            parentWorkPKId = id;
-            TempData["projectId"] = projectId;
+            TempData["parentWorkPKId"] = id;
+            TempData["projectId"] = pId;
             return View();
         }
 
@@ -158,18 +238,18 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateChildWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> CreateChildWorkPackage([Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage, int? wId, int? pId)
         {
             int[] workpackageCode = new int[10];
             for (int i = 0; i < 10; i++)
             {
                 workpackageCode[i] = -1;
             }
-            workPackage.ProjectId = projectId;
+            workPackage.ProjectId = pId;
             workPackage.Status = WorkPackage.OPENED;
-            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == projectId).ToListAsync();
-            var parentWorkPackage = await _context.WorkPackages.FindAsync(parentWorkPKId);
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var workPackages = await _context.WorkPackages.Where(u => u.ProjectId == pId).ToListAsync();
+            var parentWorkPackage = await _context.WorkPackages.FindAsync(wId);
+            var project = await _context.Projects.Where(m => m.ProjectId == pId).FirstOrDefaultAsync();
             int workPackageLength = 0;
 
             foreach (WorkPackage tempWorkPackage in workPackages)
@@ -201,62 +281,24 @@ namespace COMP4911Timesheets.Controllers
                 }
             }
 
-            workPackage.ParentWorkPackageId = parentWorkPKId;
+            workPackage.ParentWorkPackageId = wId;
             workPackage.WorkPackageCode = theWorkpackageCode;
             if (ModelState.IsValid)
             {
                 _context.Add(workPackage);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
+                return RedirectToAction(nameof(ProjectWorkPackges), new { id = pId });
             }
             //ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             //ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
             return View(workPackage);
         }
 
-
-        // GET: WorkPackages/CreateWorkPackage/6
-        public async Task<IActionResult> CreateWorkPackageReport(int? id)
-        {
-            var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
-            if (workPackages == null)
-            {
-                var theWorkPackage = await _context.WorkPackages.FindAsync(id);
-                WorkPackageReport workPackageReport = new WorkPackageReport
-                {
-                    WorkPackage = theWorkPackage,
-                    WeekNumber = Utility.GetWeekNumberByDate(DateTime.Today)
-                };
-                return View(workPackageReport);
-            }
-
-            TempData["info"] = "Workpackage report only can be created on leaf workpackages";
-            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
-            return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
-
-        }
-
-        // POST: WorkPackageReports/CreateWorkPackageReport
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateWorkPackageReport([Bind("WorkPackageReportId,WeekNumber,Status,Comments,StartingPercentage,CompletedPercentage,CostStarted,CostFinished,WorkAccomplished,WorkAccomplishedNP,Problem,ProblemAnticipated,WorkPackageId")] WorkPackageReport workPackageReport)
-        {
-            workPackageReport.Status = WorkPackageReport.VALID;
-            if (ModelState.IsValid)
-            {
-                _context.Add(workPackageReport);
-                await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-            }
-            return RedirectToAction(nameof(ProjectWorkPackges), new { id = projectId });
-        }
-
-
+        [Authorize(Roles="AD,PM,PA")]
         // GET: WorkPackages/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, int? pId)
         {
+            TempData["projectId"] = pId;
             if (id == null)
             {
                 return NotFound();
@@ -266,8 +308,8 @@ namespace COMP4911Timesheets.Controllers
 
             if (workPackage.Status == WorkPackage.CLOSED)
             {
-                TempData["info"] = "Workpackage already closed you can not change  work package info";
-                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
+                ViewBag.ErrorMessage = "Workpackage already closed you can not change work package info";
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = pId });
             }
 
             if (workPackage == null)
@@ -284,13 +326,12 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
+        public async Task<IActionResult> Edit(int id, int pId, [Bind("WorkPackageId,WorkPackageCode,Name,Description,Contractor,Purpose,Input,Output,Activity,Status,ProjectId,ParentWorkPackageId")] WorkPackage workPackage)
         {
             if (id != workPackage.WorkPackageId)
             {
                 return NotFound();
             }
-
 
             if (ModelState.IsValid)
             {
@@ -326,7 +367,7 @@ namespace COMP4911Timesheets.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = projectId });
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = pId });
             }
             ViewData["ParentWorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", workPackage.ParentWorkPackageId);
             ViewData["ProjectId"] = new SelectList(_context.Projects, "ProjectId", "ProjectId", workPackage.ProjectId);
@@ -337,15 +378,17 @@ namespace COMP4911Timesheets.Controllers
         public async Task<IActionResult> ProjectWorkPackges(int? id)
         {
 
-            projectId = id;
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            //projectId = id;
+            TempData["ProjectId"] = id;
+            var project = _context.Projects.Where(m => m.ProjectId == id).FirstOrDefault();
             var users = _userManager.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             var projectEmployee = _context.ProjectEmployees
                 .Where(u => u.ProjectId == id && u.EmployeeId == users.Id).FirstOrDefault();
 
-            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null)
+
+            if ((User.IsInRole(role: "PM") || User.IsInRole(role: "PA")) && projectEmployee == null && !User.IsInRole("AD"))
             {
-                TempData["info"] = "You are not the project's PM or PA, Please choose the currect project";
+                ViewBag.ErrorMessage = "You are not the project's PM or PA, Please choose the correct project";
                 return RedirectToAction("Index", "Projects");
             }
 
@@ -359,16 +402,19 @@ namespace COMP4911Timesheets.Controllers
 
             List<WorkPackage> workPackages = new List<WorkPackage>();
 
+            if (!User.IsInRole(role: "PM") && !User.IsInRole(role: "AD") && !User.IsInRole(role: "PA"))
+            //changed in PR#309
+            //if ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && !User.IsInRole(role: "PM"))
 
-            if (User.IsInRole(role: "RE"))
             {
                 var REWorkPackages = await _context.ProjectEmployees
-                    .Where(u => u.EmployeeId == users.Id && u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER).ToListAsync();
+                    .Where(u => u.EmployeeId == users.Id && u.ProjectId == id
+                    && (u.Role == ProjectEmployee.RESPONSIBLE_ENGINEER || u.Role == ProjectEmployee.EMPLOYEE)).ToListAsync();
 
                 foreach (ProjectEmployee temp in REWorkPackages)
                 {
                     WorkPackage tempwp = _context.WorkPackages
-                        .Where(u => u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
+                        .Where(u => u.ProjectId == id && u.WorkPackageId == temp.WorkPackageId && u.Status != WorkPackage.CLOSED).FirstOrDefault();
                     workPackages.Add(tempwp);
                 }
                 return View(workPackages);
@@ -379,8 +425,13 @@ namespace COMP4911Timesheets.Controllers
                     .Where(u => u.ProjectId == id && u.Status != WorkPackage.CLOSED).ToListAsync();
             }
 
-            //order the workpackages
             workPackages = workPackages.OrderBy(u => u.WorkPackageCode).ToList();
+
+            if (project.Status == Project.INTERNAL)
+            {
+                return View("InternalProjectWorkPackges", workPackages);
+            }
+            //order the workpackages
 
             int maxWorkPackageCodeLength = 0;
 
@@ -440,21 +491,21 @@ namespace COMP4911Timesheets.Controllers
         }
 
         //GET: ProjectWorkPackges/ClosedWorkPackageInfo/5
-        public async Task<IActionResult> ClosedWorkPackageInfo()
+        public async Task<IActionResult> ClosedWorkPackageInfo(int? id)
         {
-            var project = await _context.Projects.FirstOrDefaultAsync(m => m.ProjectId == projectId);
+            var project = await _context.Projects.Where(m => m.ProjectId == id).FirstOrDefaultAsync();
 
             ViewData["projectCode"] = project.ProjectCode;
             ViewData["projectName"] = project.Name;
-            ViewData["projectId"] = projectId;
-            if (projectId == null)
+            ViewData["projectId"] = id;
+            if (id == null)
             {
                 return NotFound();
             }
 
 
             var workPackages = await _context.WorkPackages
-             .Where(u => u.ProjectId == projectId && u.Status == WorkPackage.CLOSED).ToListAsync();
+             .Where(u => u.ProjectId == id && u.Status == WorkPackage.CLOSED).ToListAsync();
 
             if (workPackages == null)
             {
@@ -466,6 +517,254 @@ namespace COMP4911Timesheets.Controllers
         private bool WorkPackageExists(int id)
         {
             return _context.WorkPackages.Any(e => e.WorkPackageId == id);
+        }
+
+
+        // GET: WorkPackages/CreateChildWorkPackage/6
+        [Authorize(Roles = "AD,PM,PA")]
+        public async Task<IActionResult> AssignEmployee(int? id, int? pId)
+        {
+            //workPackageId = id;
+            TempData["workPackageId"] = id;
+            TempData["projectId"] = pId;
+            //check if the workpackage is leaf workpackage
+            var workPackages = _context.WorkPackages.Where(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED).FirstOrDefault();
+            if (workPackages != null)
+            {
+                ViewBag.ErrorMessage = "Employee can only be assigned to a leaf workpackage";
+                var wpTemp = _context.WorkPackages.Where(m => m.WorkPackageId == id).FirstOrDefault();
+                return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = pId });
+            }
+
+            var projectEmployees = new List<ProjectEmployee>();
+            //get all currently working employee in the project 
+            projectEmployees = await _context.ProjectEmployees
+                .Where(e => e.Status == ProjectEmployee.CURRENTLY_WORKING
+                && e.ProjectId == pId
+                && (e.Role == ProjectEmployee.NOT_ASSIGNED || e.WorkPackageId == id || e.WorkPackageId == null))
+                .Include(e => e.Employee)
+                .OrderBy(s => s.EmployeeId).ToListAsync();
+
+            //container for return to front-end
+            var employeeManagements = new List<EmployeeManagement>();
+
+            //loop projectEmployees filte the employee role
+            foreach (var projectEmployee in projectEmployees)
+            {
+                //if the employee not in the employeeManagements, add to employeeManagements
+                if (!employeeManagements.Exists(x => x.Employee.Id == projectEmployee.Employee.Id))
+                {
+                    EmployeeManagement tempEm = new EmployeeManagement
+                    {
+                        Role = new List<int>(),
+                        Employee = projectEmployee.Employee,
+                        EmployeePay = await _context.EmployeePays
+                            .Where(ep => ep.EmployeeId == projectEmployee.Employee.Id)
+                            .Where(ep => ep.Status == EmployeePay.VALID)
+                            .Include(ep => ep.PayGrade).FirstOrDefaultAsync()
+                    };
+
+                    if (tempEm.Role.Contains(ProjectEmployee.NOT_ASSIGNED))
+                    {
+                        tempEm.Role.Remove(ProjectEmployee.NOT_ASSIGNED);
+                    }
+                    else
+                    {
+                        tempEm.Role.Add(projectEmployee.Role);
+                    }
+                    employeeManagements.Add(tempEm);
+                }
+                // if the employee already in the employeeManagements List add role to the employee and 
+                // delete not assigned role for the employee (Do not touch the database here) 
+                else
+                {
+                    for (int i = 0; i < employeeManagements.Count; i++)
+                    {
+                        if (employeeManagements[i].Employee.Id == projectEmployee.Employee.Id)
+                        {
+                            employeeManagements[i].Role.Add(projectEmployee.Role);
+
+                            if (employeeManagements[i].Role.Contains(ProjectEmployee.NOT_ASSIGNED))
+                            {
+                                employeeManagements[i].Role.Remove(ProjectEmployee.NOT_ASSIGNED);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return View(employeeManagements);
+        }
+
+        // GET: WorkPackages/AssignRE/6
+        [Authorize(Roles = "AD,PM,PA")]
+        public async Task<IActionResult> AssignRE(string EmployeeId, string name, int pId, int wId)
+        {
+
+            //create the ProjectEmployee object and assign the value to the object
+            ProjectEmployee projectEmployee = new ProjectEmployee();
+            projectEmployee.Status = ProjectEmployee.CURRENTLY_WORKING;
+            projectEmployee.ProjectId = pId;
+            projectEmployee.Role = ProjectEmployee.RESPONSIBLE_ENGINEER;
+            projectEmployee.WorkPackageId = wId;
+            projectEmployee.EmployeeId = EmployeeId;
+            ViewData["projectId"] = pId;
+
+            //get the RESPONSIBLE_ENGINEER of the workpackage
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
+                            && ep.ProjectId == pId
+                            && ep.WorkPackageId == wId)
+                           .FirstOrDefault();
+
+            //Operator old Assigned Employee 
+            //1. if only one row left update the row. 
+            //2. if more than one row, remove thw row
+            if (tempPE != null)
+            {
+                Employee oldtempRE = _context.Employees.Find(tempPE.EmployeeId);
+                await _userManager.RemoveFromRoleAsync(oldtempRE, ApplicationRole.RE);
+
+                var countOldTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == tempPE.EmployeeId
+                                && ep.ProjectId == pId
+                                && (ep.WorkPackageId == wId
+                                || ep.WorkPackageId == null)).ToList();
+
+                var oldTempPE = countOldTempPE.FirstOrDefault();
+
+                if (countOldTempPE.Count != 1)
+                {
+                    _context.ProjectEmployees.Remove(tempPE);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    oldTempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                    oldTempPE.WorkPackageId = null;
+                    _context.Update(oldTempPE);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            /*
+            var currentTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                                && ep.ProjectId == WorkPackagesController.projectId
+                                && (ep.WorkPackageId == WorkPackagesController.workPackageId
+                                    || ep.WorkPackageId == null)).FirstOrDefault();
+
+            if (currentTempPE.Role == ProjectEmployee.NOT_ASSIGNED)
+            {
+                _context.ProjectEmployees.Remove(currentTempPE);
+                await _context.SaveChangesAsync();
+            }
+            */
+
+            Employee tempRE = _context.Employees.Find(EmployeeId);
+            await _userManager.AddToRoleAsync(tempRE, ApplicationRole.RE);
+
+            _context.Add(projectEmployee);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = wId, pId = pId });
+        }
+
+        // GET: WorkPackages/AssignEm/6
+        [Authorize(Roles = "AD,PM,PA")]
+        public async Task<IActionResult> AssignEm(string EmployeeId, string name, int pId, int wId)
+        {
+            ProjectEmployee projectEmployee = new ProjectEmployee();
+            projectEmployee.Status = ProjectEmployee.CURRENTLY_WORKING;
+            projectEmployee.ProjectId = pId;
+            projectEmployee.Role = ProjectEmployee.EMPLOYEE;
+            projectEmployee.WorkPackageId = wId;
+            projectEmployee.EmployeeId = EmployeeId;
+            ViewData["projectId"] = pId;
+
+            Employee tempRE = _context.Employees.Find(EmployeeId);
+            await _userManager.AddToRoleAsync(tempRE, ApplicationRole.EM);
+
+            /*
+            var currentTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                    && ep.ProjectId == WorkPackagesController.projectId
+                    && (ep.WorkPackageId == WorkPackagesController.workPackageId 
+                                || ep.WorkPackageId == null)).FirstOrDefault();
+
+            if (currentTempPE.Role == ProjectEmployee.NOT_ASSIGNED)
+            {
+                _context.ProjectEmployees.Remove(currentTempPE);
+                await _context.SaveChangesAsync();
+            }
+            */
+            _context.Add(projectEmployee);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = wId, pId = pId });
+        }
+
+        // GET: WorkPackages/RemoveRE/6
+        [Authorize(Roles = "AD,PM,PA")]
+        public async Task<IActionResult> RemoveRE(string EmployeeId, int pId, int wId)
+        {
+
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                            && ep.Role == ProjectEmployee.RESPONSIBLE_ENGINEER
+                            && ep.WorkPackageId == wId)
+                           .FirstOrDefault();
+
+            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                && (ep.WorkPackageId == wId || ep.WorkPackageId == null)).ToList();
+
+            if (countTempPE.Count != 1)
+            {
+                _context.Remove(tempPE);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                tempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                tempPE.WorkPackageId = null;
+                _context.Update(tempPE);
+                await _context.SaveChangesAsync();
+            }
+            Employee tempRE = _context.Employees.Find(EmployeeId);
+            await _userManager.RemoveFromRoleAsync(tempRE, ApplicationRole.RE);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = wId, pId = pId });
+        }
+
+        // GET: WorkPackages/RemoveRE/6
+        [Authorize(Roles = "AD,PM,PA")]
+        public async Task<IActionResult> RemoveEm(string EmployeeId, int pId, int wId)
+        {
+
+            var tempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                            && ep.Role == ProjectEmployee.EMPLOYEE
+                            && ep.WorkPackageId == wId
+                            && ep.ProjectId == pId)
+                           .FirstOrDefault();
+
+            var countTempPE = _context.ProjectEmployees.Where(ep => ep.EmployeeId == EmployeeId
+                && ep.ProjectId == pId
+                && (ep.WorkPackageId == wId || ep.WorkPackageId == null)).ToList();
+
+            if (countTempPE.Count != 1)
+            {
+                _context.Remove(tempPE);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                tempPE.Role = ProjectEmployee.NOT_ASSIGNED;
+                tempPE.WorkPackageId = null;
+                _context.Update(tempPE);
+                await _context.SaveChangesAsync();
+            }
+
+            Employee tempEM = _context.Employees.Find(EmployeeId);
+            await _userManager.RemoveFromRoleAsync(tempEM, ApplicationRole.EM);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("AssignEmployee", "WorkPackages", new { id = wId, pId = pId });
         }
     }
 }
