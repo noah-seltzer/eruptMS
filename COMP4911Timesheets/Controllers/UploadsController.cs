@@ -177,9 +177,10 @@ namespace COMP4911Timesheets.Controllers
                                             {
                                                 WorkPackageId = package.WorkPackageId,
                                                 EmployeeId = employee.Id,
-                                                ProjectId = parentProject.ProjectId
+                                                ProjectId = parentProject.ProjectId,
+                                                Status = ProjectEmployee.CURRENTLY_WORKING
                                             };
-
+                                            
                                             _context.Add(projectEmployee);
                                             await _context.SaveChangesAsync();
 
