@@ -282,6 +282,22 @@ namespace COMP4911Timesheets.Controllers
                 timesheet.Employee.VacationTime -= vacCounter;
             }
 
+            var sickTimesheetRow = await _context.TimesheetRows
+                .Include(tr => tr.WorkPackage)
+                .Where(tr => tr.TimesheetId == id)
+                .Where(tr => tr.WorkPackage.WorkPackageCode == "SICK")
+                .FirstOrDefaultAsync();
+            if (sickTimesheetRow != null)
+            {
+                var sickCounter = 0.0;
+                sickCounter += sickTimesheetRow.MonHour;
+                sickCounter += sickTimesheetRow.TueHour;
+                sickCounter += sickTimesheetRow.WedHour;
+                sickCounter += sickTimesheetRow.ThuHour;
+                sickCounter += sickTimesheetRow.FriHour;
+                timesheet.Employee.SickLeave += sickCounter;
+            }
+
             _context.Update(timesheet);
             await _userManager.UpdateAsync(user);
 
@@ -529,11 +545,11 @@ namespace COMP4911Timesheets.Controllers
                 .Where(pe => isAdmin || pe.Employee.SupervisorId == _userManager.GetUserId(User))
                 .Where(pe => pe.Status == ProjectEmployee.CURRENTLY_WORKING)
                 .GroupBy(pe => pe.EmployeeId)
-                .Join(_context.Employees, g => g.Key, e => e.Id, (g, e) => new {E = e, PEs = g.ToList()})
+                .Join(_context.Employees, g => g.Key, e => e.Id, (g, e) => new { E = e, PEs = g.ToList() })
                 .ToListAsync();
 
             List<ProjectEmployee> PEs = new List<ProjectEmployee>();
-            foreach(var g in employeesPositions)
+            foreach (var g in employeesPositions)
             {
                 g.PEs.Sort((a, b) => { return a.Role - b.Role; }); //so we get the most senior role
                 var pe = g.PEs.First();
@@ -547,7 +563,7 @@ namespace COMP4911Timesheets.Controllers
             {
                 ProjectEmployees = PEs,
                 Project = await _context.Projects.FindAsync(id)
-        };
+            };
             return View(lineManagerManagement);
         }
 
