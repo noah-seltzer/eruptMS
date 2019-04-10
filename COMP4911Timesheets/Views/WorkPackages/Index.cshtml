@@ -105,6 +105,7 @@
 
                     @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
                     {
+                        <br>
                         <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
                     }
                 </td>
