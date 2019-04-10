@@ -10,6 +10,19 @@
     var tableLength = ViewBag.tableLength;
 }
 
+<script type="text/javascript">
+    function joinInputs() {
+        let text = "\"{";
+
+        for (let i = 1; i < @tableLength; i++) {
+            text = text + document.getElementById('value ' + i).value + ":\'" + document.getElementById('input ' + i).value + "\',";
+        }
+        text = text + "}\"";
+
+        document.getElementById('estimate').value = text;
+    };
+</script>
+
 <h1>@ViewData["PageTitle"]</h1>
 
 <h4>Responsible Engineer Report</h4>
@@ -56,8 +69,6 @@
                 <input asp-for="WeekNumber" value="@Model.WeekNumber" class="form-control-plaintext" readonly/>
             </div>
         </div>
-        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
-        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
     </div>
     <br>
 
@@ -97,15 +108,15 @@
                         </td>
                     } else {
                         <td class="col-2">
-
+                            <input id="input @i" value="0" class="form-control" onchange="joinInputs();" required/>
                         </td>
+                        <input id="value @i" value="@pLevels[i]" hidden />
                     }
                 </tr>
             }
         </table>
     </div>
     <br>
-
     <div class="well bs-component">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-row">
@@ -139,6 +150,9 @@
                 <span asp-validation-for="ProblemAnticipated" class="text-danger"></span>
             </div>
         </div>
+        <input asp-for="WorkPackageId" value="@Model.WorkPackageId" class="form-control" hidden/>
+        <input asp-for="ResponsibleEngineerReportId" value="@Model.ResponsibleEngineerReportId" hidden/>
+        <input id="estimate" asp-for="ResponsibleEngineerEstimate" hidden/>
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary btn-raised" />
         </div>

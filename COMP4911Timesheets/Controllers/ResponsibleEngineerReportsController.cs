@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using COMP4911Timesheets.Data;
 using COMP4911Timesheets.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 using COMP4911Timesheets.ViewModels;
 
 namespace COMP4911Timesheets.Controllers
@@ -26,6 +28,7 @@ namespace COMP4911Timesheets.Controllers
         }
 
         // GET: ResponsibleEngineerReports/Reports/6
+        [Authorize(Roles = "PM,PA,AD,RE")]
         public async Task<IActionResult> Reports(int? id)
         {
             var workPackage = await _context.WorkPackages.FindAsync(id);
@@ -243,7 +246,7 @@ namespace COMP4911Timesheets.Controllers
         [HttpPost]
         [Authorize(Roles = "AD,RE")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WeekNumber,WorkPackageId,WorkPackage,Comments,WorkAccomplished,WorkPlanned,Problem,ProblemAnticipated,StartingPercentage,CompletedPercentage")] ResponsibleEngineerReport report)
+        public async Task<IActionResult> Create([Bind("WeekNumber,WorkPackageId,WorkPackage,Comments,WorkAccomplished,WorkPlanned,Problem,ProblemAnticipated,StartingPercentage,CompletedPercentage,ResponsibleEngineerEstimate")] ResponsibleEngineerReport report)
         {
             if (ModelState.IsValid)
             {
@@ -455,7 +458,17 @@ namespace COMP4911Timesheets.Controllers
             ViewBag.spentTD = spentTD;
             ViewBag.spentTW = spentTW;
             ViewBag.needed = needed;
-            
+
+            // JObject json = JObject.Parse(responsibleEngineerReport.ResponsibleEngineerEstimate);
+
+            // foreach (var p in json.Properties()) {
+            //     TempData[p.Name] = p.Value;
+            // }
+
+            // ViewBag.responsibleEngineerEstimate = json;
+
+            // ViewBag.p1 = json.ToString();
+
             return View(responsibleEngineerReport);
         }
 

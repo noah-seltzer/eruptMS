@@ -27,6 +27,8 @@ namespace COMP4911Timesheets.Models
 
         public string Comments { get; set; }
 
+        public string ResponsibleEngineerEstimate { get; set; }
+
         [Display(Name = "Starting Percentage")]
         public double StartingPercentage { get; set; }
 
