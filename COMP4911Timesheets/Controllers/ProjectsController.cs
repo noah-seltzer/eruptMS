@@ -427,11 +427,11 @@ namespace COMP4911Timesheets
             }
 
             var uid = (await _usermgr.GetUserAsync(User)).Id;
-            bool isAssist = _context.ProjectEmployees
+            var assist = _context.ProjectEmployees
                     .Where(pe => pe.ProjectId == id && pe.Role == ProjectEmployee.PROJECT_ASSISTANT)
-                    .FirstOrDefault()
-                    .EmployeeId
-                    .Equals(uid);
+                    .FirstOrDefault();
+
+            bool isAssist = assist != null && assist.EmployeeId.Equals(uid);
 
             if (isAssist)//the assistants model will have two nulls because they cannot change PM or PMA
             {
