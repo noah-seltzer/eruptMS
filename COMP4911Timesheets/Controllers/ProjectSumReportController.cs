@@ -140,7 +140,7 @@ namespace COMP4911Timesheets.Controllers
 
                 }
 
-                var workPackageReport = await _context.WorkPackageReports.FirstOrDefaultAsync(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId);
+                var workPackageReport = await _context.WorkPackageReports.Where(wpk => wpk.WorkPackageId == tempWorkPackage.WorkPackageId).FirstOrDefaultAsync();
 
                 tempReport.WorkPackageCode = tempWorkPackage.WorkPackageCode;
                 tempReport.WorkPackageName = tempWorkPackage.Name;
@@ -151,15 +151,25 @@ namespace COMP4911Timesheets.Controllers
                 tempReport.PMHour = PMHour;
                 tempReport.PMCost = PMCost;
 
-                if (REHour != 0)
+                if (PMHour != 0)
                 {
-                    double tempVar = (int)(aHour / REHour * 10000);
+                    double tempVar = (int)((REHour - PMHour) / PMHour * 10000);
                     tempReport.Variance = tempVar / 100;
                 }
-                else {
+                else
+                {
                     tempReport.Variance = 0;
                 }
 
+                if (REHour != 0)
+                {
+                    double tempComp = (int)(aHour / REHour * 10000);
+                    tempReport.Complete = tempComp / 100;
+                }
+                else {
+                    tempReport.Complete = 0;
+                }
+                
                 if (workPackageReport != null) { 
                     tempReport.Comment = workPackageReport.Comments;
                 }
@@ -174,6 +184,14 @@ namespace COMP4911Timesheets.Controllers
             TempData["ACostTotal"] = ACostTotal;
             TempData["AHourTotal"] = AHourTotal;
 
+            if (PMHourTotal != 0)
+            {
+                double VarianceTotal = (int)((REHourTotal - PMHourTotal) / PMHourTotal * 10000);
+                TempData["VarianceTotal"] = VarianceTotal / 100;
+            }
+            else {
+                TempData["VarianceTotal"] = 0;
+            }
             return View(projectSumReports);
         }
 

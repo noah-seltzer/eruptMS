@@ -19,6 +19,6 @@ namespace COMP4911Timesheets.Models
         public double REHour { get; set; }
         public double Variance { get; set; }
         public string Comment { get; set; }
-
+        public double Complete { get; set; }
     }
 }
