@@ -12,8 +12,6 @@ namespace COMP4911Timesheets.Controllers
 {
     public class BudgetsController : Controller
     {
-        private static int? workpackageId;
-        private static int? parentWorkpackageId;
         private readonly ApplicationDbContext _context;
 
         public BudgetsController(ApplicationDbContext context)
@@ -51,8 +49,8 @@ namespace COMP4911Timesheets.Controllers
         // GET: Budgets/Create/5
         public async Task<IActionResult> Create(int? id)
         {
-            workpackageId = id;
-
+            //workpackageId = id;
+            TempData["wId"] = id;
             var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
             if (workPackages == null) {
                 var tempWorkpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
@@ -60,7 +58,8 @@ namespace COMP4911Timesheets.Controllers
                 ViewData["projectId"] = tempWorkpackage.ProjectId;
 
                 if (tempWorkpackage.ParentWorkPackageId != null) {
-                    parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
+                    //parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
+                    TempData["pwId"] = tempWorkpackage.ParentWorkPackageId;
                 }
                 var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
 
@@ -70,7 +69,7 @@ namespace COMP4911Timesheets.Controllers
             }
 
             TempData["info"] = "Budget plan only can be added into leaf workpackages";
-            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
 
         }
@@ -80,21 +79,26 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
+        public async Task<IActionResult> Create(int wId, int pwId, [Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
         {
-            budget.WorkPackageId = workpackageId;
+            budget.WorkPackageId = wId;
+
             budget.Status = 1;
-            var rmBudgets = await _context.Budgets.Where(a => a.WorkPackageId == parentWorkpackageId).ToListAsync();
+            var rmBudgets = await _context.Budgets.Where(a => a.WorkPackageId == pwId).ToListAsync();
             foreach (Budget rmBudget in rmBudgets) { 
                 _context.Budgets.Remove(rmBudget);
                 await _context.SaveChangesAsync();
             }
 
-            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId); ;
+            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == wId); ;
             //check if paygrade id already exist
-            var tempBudgets = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
+            var tempBudgets = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == wId && a.PayGradeId == budget.PayGradeId);
+
+            var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
+            ViewData["PayLevel"] = new SelectList(payLevels, "PayGradeId", "PayLevel");
 
             if (tempBudgets != null) {
+                TempData["wId"] = wId;
                 ViewData["projectId"] = workpackage.ProjectId;
                 TempData["budgetInfo"] = "You can not add same pay grade for same workpackage";
                 return View();
@@ -108,8 +112,6 @@ namespace COMP4911Timesheets.Controllers
             }
 
             TempData["budgetInfo"] = "Add budget plan failed please try again";
-            ViewData["PayGradeId"] = new SelectList(_context.PayGrades, "PayGradeId", "PayGradeId", budget.PayGradeId);
-            ViewData["WorkPackageId"] = new SelectList(_context.WorkPackages, "WorkPackageId", "WorkPackageId", budget.WorkPackageId);
             return View();
         }
 
@@ -117,7 +119,7 @@ namespace COMP4911Timesheets.Controllers
         // GET: Budgets/CreateRE/5
         public async Task<IActionResult> CreateRE(int? id)
         {
-            workpackageId = id;
+            TempData["wId"] = id;
 
             var workPackages = await _context.WorkPackages.FirstOrDefaultAsync(m => m.ParentWorkPackageId == id && m.Status != WorkPackage.CLOSED);
             var tempBudget = await _context.Budgets.FirstOrDefaultAsync(b => b.WorkPackageId == id);
@@ -131,7 +133,7 @@ namespace COMP4911Timesheets.Controllers
 
                 if (tempWorkpackage.ParentWorkPackageId != null)
                 {
-                    parentWorkpackageId = tempWorkpackage.ParentWorkPackageId;
+                    TempData["pwId"] = tempWorkpackage.ParentWorkPackageId;
                 }
 
                 var payLevels = await _context.PayGrades.Where(pg => pg.Year == DateTime.Now.Year).OrderBy(pg => pg.PayLevel).ToListAsync();
@@ -146,7 +148,7 @@ namespace COMP4911Timesheets.Controllers
             else { 
                 TempData["info"] = "Budget plan only can be added into leaf workpackages";
             }
-            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
+            var wpTemp = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == id);
             return RedirectToAction("ProjectWorkPackges", "WorkPackages", new { id = wpTemp.ProjectId });
 
         }
@@ -156,12 +158,12 @@ namespace COMP4911Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateRE([Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
+        public async Task<IActionResult> CreateRE(int wId, [Bind("BudgetId,Hour,REHour,Status,WeekNumber,Type,WorkPackageId,PayGradeId")] Budget budget)
         {
 
             //check if paygrade id already exist
-            var theBudget = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == workpackageId && a.PayGradeId == budget.PayGradeId);
-            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == workpackageId);
+            var theBudget = await _context.Budgets.FirstOrDefaultAsync(a => a.WorkPackageId == wId && a.PayGradeId == budget.PayGradeId);
+            var workpackage = await _context.WorkPackages.FirstOrDefaultAsync(m => m.WorkPackageId == wId);
 
             if (theBudget == null)
             {
