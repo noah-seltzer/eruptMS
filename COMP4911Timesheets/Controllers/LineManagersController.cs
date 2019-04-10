@@ -207,6 +207,14 @@ namespace COMP4911Timesheets.Controllers
             {
                 return NotFound();
             }
+            try
+            {
+                ViewBag.ErrorMessage = TempData["TimesheetMessage"].ToString();
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine(e.ToString());
+            }
             var projects = await _context.Projects.ToListAsync();
             var workpackages = await _context.WorkPackages.ToListAsync();
             var timesheet = await _context.Timesheets
@@ -236,8 +244,8 @@ namespace COMP4911Timesheets.Controllers
             var rows = await _context.TimesheetRows.Where(r => r.TimesheetId == id).ToListAsync();
             timesheet.Status = Timesheet.SUBMITTED_APPROVED;
             user.FlexTime = timesheet.FlexTime;
-            
-            foreach(var row in rows) 
+
+            foreach (var row in rows)
             {
                 Budget budget = new Budget
                 {
@@ -252,6 +260,28 @@ namespace COMP4911Timesheets.Controllers
                 };
                 await _context.AddAsync(budget);
             }
+
+            var vacTimesheetRow = await _context.TimesheetRows
+                .Include(tr => tr.WorkPackage)
+                .Where(tr => tr.TimesheetId == id)
+                .Where(tr => tr.WorkPackage.WorkPackageCode == "VACN")
+                .FirstOrDefaultAsync();
+            if (vacTimesheetRow != null)
+            {
+                var vacCounter = 0.0;
+                vacCounter += vacTimesheetRow.MonHour;
+                vacCounter += vacTimesheetRow.TueHour;
+                vacCounter += vacTimesheetRow.WedHour;
+                vacCounter += vacTimesheetRow.ThuHour;
+                vacCounter += vacTimesheetRow.FriHour;
+                if (vacCounter > timesheet.Employee.VacationTime)
+                {
+                    TempData["TimesheetMessage"] = "Vacation time on the timesheet exceeds the time that the employee has.";
+                    return RedirectToAction(nameof(TimesheetView), new { id = id });
+                }
+                timesheet.Employee.VacationTime -= vacCounter;
+            }
+
             _context.Update(timesheet);
             await _userManager.UpdateAsync(user);
 

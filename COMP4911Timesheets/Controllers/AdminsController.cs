@@ -34,6 +34,7 @@ namespace COMP4911Timesheets.Controllers
             {
                 ViewBag.Message = TempData["ErrorMessage"];
             }
+            ViewData["DomainName"] = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}";
             return View();
         }
 
