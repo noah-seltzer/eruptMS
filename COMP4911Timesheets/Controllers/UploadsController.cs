@@ -178,7 +178,8 @@ namespace COMP4911Timesheets.Controllers
                                                 WorkPackageId = package.WorkPackageId,
                                                 EmployeeId = employee.Id,
                                                 ProjectId = parentProject.ProjectId,
-                                                Status = ProjectEmployee.CURRENTLY_WORKING
+                                                Status = ProjectEmployee.CURRENTLY_WORKING,
+                                                Role = ProjectEmployee.EMPLOYEE
                                             };
                                             
                                             _context.Add(projectEmployee);
