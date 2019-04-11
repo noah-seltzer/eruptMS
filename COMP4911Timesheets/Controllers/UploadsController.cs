@@ -58,15 +58,8 @@ namespace COMP4911Timesheets.Controllers
         }
         public IActionResult Index()
         {
-            if (User.IsInRole("AD")) 
-            {
-                ViewData["fileContents"] = fileContents ?? "none";
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            ViewData["fileContents"] = fileContents ?? "none";
+            return View();
         }
 
 
@@ -134,9 +127,7 @@ namespace COMP4911Timesheets.Controllers
                                 Status = WorkPackage.OPENED,
                                 ProjectId = parentProject.ProjectId
                             };
-                            if (workPackageData["ParentWorkPackageCode"] != null 
-                            
-                            !workPackageData["ParentWorkPackageCode"].Equals(""))
+                            if (workPackageData["ParentWorkPackageCode"] != null && !workPackageData["ParentWorkPackageCode"].Equals(""))
                             {
                                 try
                                 {
@@ -179,11 +170,9 @@ namespace COMP4911Timesheets.Controllers
                                             {
                                                 WorkPackageId = package.WorkPackageId,
                                                 EmployeeId = employee.Id,
-                                                ProjectId = parentProject.ProjectId,
-                                                Status = ProjectEmployee.CURRENTLY_WORKING,
-                                                Role = ProjectEmployee.EMPLOYEE
+                                                ProjectId = parentProject.ProjectId
                                             };
-                                            
+
                                             _context.Add(projectEmployee);
                                             await _context.SaveChangesAsync();
 
