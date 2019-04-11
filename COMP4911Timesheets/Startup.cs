@@ -52,29 +52,7 @@ namespace COMP4911Timesheets
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<IService, VacationTimeService>();
-            services.AddScoped<ISickLeaveService, SickLeaveService>();
             Utility.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
-
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
-                {
-                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                    QueuePollInterval = TimeSpan.Zero,
-                    UseRecommendedIsolationLevel = true,
-                    UsePageLocksOnDequeue = true,
-                    DisableGlobalLocks = true
-                }));
-            // Add the processing server as IHostedService
-            services.AddHangfireServer();
-
-            //services.AddDefaultIdentity<IdentityUser>()
-            //    .AddDefaultUI(UIFramework.Bootstrap4)
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentity<Employee, ApplicationRole>(
                 options => options.Stores.MaxLengthForKeys = 128)
@@ -85,12 +63,15 @@ namespace COMP4911Timesheets
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.AddScoped<IService, VacationTimeService>();
+            services.AddScoped<ISickLeaveService, SickLeaveService>();
+            services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection")));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app,
             IHostingEnvironment env,
-            IBackgroundJobClient backgroundJobs,
             ApplicationDbContext context,
             RoleManager<ApplicationRole> roleManager,
             UserManager<Employee> userManager
@@ -125,6 +106,7 @@ namespace COMP4911Timesheets
             DummyData.InitializeAsync(app);
 
             app.UseHangfireDashboard();
+            app.UseHangfireServer();
             var manager = new RecurringJobManager();
             manager.AddOrUpdate("UPDATE-VACATION-TIME", Job.FromExpression(() => updateVacationTime()), "0 0 1 * * ", TimeZoneInfo.Local);
             manager.AddOrUpdate("UPDATE-SICK-LEAVE", Job.FromExpression(() => updateSickLeave()), "0 0 1 1 * ", TimeZoneInfo.Local);
