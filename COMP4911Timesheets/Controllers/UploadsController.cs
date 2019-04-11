@@ -143,7 +143,7 @@ namespace COMP4911Timesheets.Controllers
                                     var parentWorkPackage = parentProject.WorkPackages
                                         .Where(m =>
                                             m.WorkPackageCode.Equals(workPackageData["ParentWorkPackageCode"])
-                                            && m.ProjectId == parentProject.ProjectId)
+                                            && (m.ProjectId == parentProject.ProjectId))
                                         .FirstOrDefault();
                                     package.ParentWorkPackage = parentWorkPackage;
                                     package.ParentWorkPackageId = parentWorkPackage.WorkPackageId;
