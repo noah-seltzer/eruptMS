@@ -227,11 +227,10 @@ namespace COMP4911Timesheets.Controllers
                     TempData["startPer"] = lastWeekREReport != null ? lastWeekREReport.CompletedPercentage : 0;
                 }
 
-                if (totalBudget == 0 || workCompleted == 0) {
+                if (totalBudget <= 0 || workCompleted <= 0) {
                     TempData["compPer"] = 0;
                 } else {
                     var compPer = 100 * (workCompleted/totalBudget > 1 ? 1 : workCompleted/totalBudget);
-                    compPer = compPer == 100 && true ? 99 : compPer;
                     TempData["compPer"] = compPer;
                 }
 
@@ -298,6 +297,20 @@ namespace COMP4911Timesheets.Controllers
                 }
 
                 report.Status = ResponsibleEngineerReport.VALID;
+                
+                JObject json = JObject.Parse(report.ResponsibleEngineerEstimate);
+
+                bool workPackageNotCompleted = false;
+
+                foreach (var p in json.Properties()) {
+                    if ((int) p.Value != 0) {
+                        workPackageNotCompleted = true;
+                    }
+                }
+                
+                if (report.CompletedPercentage == 100 && workPackageNotCompleted) {
+                    report.CompletedPercentage = 99;
+                }
 
                 _context.Add(report);
 
@@ -450,7 +463,6 @@ namespace COMP4911Timesheets.Controllers
                             b => b.PayGradeId == pg.PayGradeId &&
                             b.Status == Budget.VALID &&
                             b.Type == Budget.ESTIMATE).REHour;
-
                     planned.Add(budg.ToString("N"));
                 } else {
                     planned.Add("0");
