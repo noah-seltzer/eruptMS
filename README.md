@@ -51,4 +51,6 @@ Stage 3: build container
 `docker-compose -f build.yml up --build`
 (optional) in production, run `docker-compose -f build.yml up --build -d`. the -d flag detaches your console from the container
 2. Point your browser to localhost:{the-port-you-chose)
-
+3. Sign in with 
+Username: cameron.lay@infosys.ca
+Password: Password123!
