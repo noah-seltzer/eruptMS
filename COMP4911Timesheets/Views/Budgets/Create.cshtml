@@ -1,0 +1,57 @@
+﻿@model COMP4911Timesheets.Models.Budget
+
+@{
+    ViewData["PageTitle"] = "Create";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Project Manager Budget</h4>
+<hr />
+<h5>@TempData["budgetInfo"]</h5>
+    <div class="row">
+        <div class="col-md-8 col-lg-6 well bs-component">
+            <form asp-action="Create" asp-route-wId="@TempData["wId"]" asp-route-pwId="@TempData["pwId"]">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Hour" class="control-label">Man-Days</label>
+                    <input asp-for="Hour" class="form-control" />
+                    <span asp-validation-for="Hour" class="text-danger"></span>
+                </div>
+                <!--
+        <div class="form-group">
+            <label asp-for="Status" class="control-label"></label>
+            <input asp-for="Status" class="form-control" />
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="WeekNumber" class="control-label"></label>
+            <input asp-for="WeekNumber" class="form-control" />
+            <span asp-validation-for="WeekNumber" class="text-danger"></span>
+        </div>      -->
+                <div class="form-group">
+                    <label asp-for="Type" class="control-label"></label>
+                    <select asp-for="Type" class="form-control searchDropDown">
+                        <option value="10">Project Manager Budget</option>
+                    </select>
+                    <span asp-validation-for="Type" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PayGradeId" class="control-label"></label>
+                    <select asp-for="PayGradeId" class="form-control searchDropDown" asp-items="ViewBag.PayLevel"></select>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }

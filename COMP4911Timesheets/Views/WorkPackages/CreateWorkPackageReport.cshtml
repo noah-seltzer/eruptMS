@@ -1,0 +1,99 @@
+﻿@model COMP4911Timesheets.Models.WorkPackageReport
+
+@{
+    ViewData["PageTitle"] = "Create WP Report";
+    ViewData["WPId"] = Model.WorkPackage.WorkPackageId;
+    ViewData["WPCode"] = Model.WorkPackage.WorkPackageCode;
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<h4>Work Package Report - @ViewData["WPCode"]</h4>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6 well bs-component">
+        <form asp-action="CreateWorkPackageReport">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" style="display: none;">
+                <label asp-for="WorkPackageId" class="control-label"></label>
+                <input asp-for="WorkPackageId" class="form-control" value=@ViewData["WPId"] />
+            </div>
+            <!--<div class="form-group">
+                <label asp-for="WeekNumber" class="control-label"></label>
+                <input asp-for="WeekNumber" class="form-control" />
+                <span asp-validation-for="WeekNumber" class="text-danger"></span>
+            </div>-->
+
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <!--
+
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StartingPercentage" class="control-label"></label>
+                <input asp-for="StartingPercentage" class="form-control" />
+                <span asp-validation-for="StartingPercentage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CompletedPercentage" class="control-label"></label>
+                <input asp-for="CompletedPercentage" class="form-control" />
+                <span asp-validation-for="CompletedPercentage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CostStarted" class="control-label"></label>
+                <input asp-for="CostStarted" class="form-control" />
+                <span asp-validation-for="CostStarted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CostFinished" class="control-label"></label>
+                <input asp-for="CostFinished" class="form-control" />
+                <span asp-validation-for="CostFinished" class="text-danger"></span>
+            </div>-->
+            <div class="form-group">
+                <label asp-for="WorkAccomplished" class="control-label"></label>
+                <input asp-for="WorkAccomplished" class="form-control" />
+                <span asp-validation-for="WorkAccomplished" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkAccomplishedNP" class="control-label"></label>
+                <input asp-for="WorkAccomplishedNP" class="form-control" />
+                <span asp-validation-for="WorkAccomplishedNP" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Problem" class="control-label"></label>
+                <input asp-for="Problem" class="form-control" />
+                <span asp-validation-for="Problem" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProblemAnticipated" class="control-label"></label>
+                <input asp-for="ProblemAnticipated" class="form-control" />
+                <span asp-validation-for="ProblemAnticipated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

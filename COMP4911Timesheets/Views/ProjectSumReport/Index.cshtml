@@ -1,0 +1,61 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Project>
+
+@{
+    ViewData["PageTitle"] = "Project Summary Reports";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                Project Code
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.CostingProposal)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.OriginalBudget)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProjectCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => item.CostingProposal)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => item.OriginalBudget)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
+            </td>
+            <td>
+                <a asp-action="Report" asp-route-id="@item.ProjectId" class="btn btn-primary btn-raised btn-sm">Report</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["PageTitle"] = "Administrative";
+    ViewBag.Display = ViewBag.Message != null ? "block" : "none";
+    ViewBag.ErrorDisplay = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-success">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.Message
+    </div>
+</div>
+<div class="@ViewBag.ErrorDisplay">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
+<div>
+    <a asp-action="Backup" class="btn btn-primary btn-sm btn-raised">Backup Database</a>
+</div>
+<br />
+<div>
+    <a asp-action="Restore" class="btn btn-primary btn-sm btn-raised">Restore Database</a>
+</div>
+<br />
+<div>
+    <a href='@ViewData["DomainName"]/hangfire' class="btn btn-primary btn-sm btn-raised">Job Scheduler</a>
+</div>

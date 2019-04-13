@@ -1,0 +1,148 @@
+﻿@model COMP4911Timesheets.ViewModels.ProjectListingModel
+
+@{
+    ViewData["PageTitle"] = "Projects";
+    var manage = Model.managedProjects.Count > 0;
+    var assign = Model.assignedProjects.Count > 0;
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
+@if (User.IsInRole("AD"))
+{
+    <p>
+        <a asp-action="Create">Create New</a> |
+        <a class="small-box-footer" asp-area="" asp-controller="Uploads" asp-action="Index">
+            Bulk Upload Work Packages
+        </a>
+    </p>
+}
+@using (Html.BeginForm())
+{
+    <p style=" @((manage || assign) ? "" : "display:none") ">
+        Find by name or project code: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+        <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+    </p>
+}
+
+<p style=" @((manage || assign) ? "display:none" : "") ">
+    No managed or assigned projects
+</p>
+<div style=" @(manage ? "" : "display:none") ">
+    <h3>Managed Projects</h3>
+    <table class="table well bs-component">
+        <thead>
+            <tr>
+                <th>
+                    Project Code
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Description
+                </th>
+                <th class="priority-2">
+                    Costing Proposal
+                </th>
+                <th class="priority-2">
+                    Original Budget
+                </th>
+                <th class="priority-2">
+                    Status
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.managedProjects)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProjectCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td class="priority-2">
+                        @Html.DisplayFor(modelItem => item.CostingProposal)
+                    </td>
+                    <td class="priority-2">
+                        @Html.DisplayFor(modelItem => item.OriginalBudget)
+                    </td>
+                    <td class="priority-2">
+                        @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
+                    </td>
+                    <td>
+                        @if(item.Status != Project.CLOSED && item.Status != Project.ARCHIVED) {
+                            <a asp-action="ProjectWorkPackges" asp-route-id="@item.ProjectId" asp-controller="WorkPackages">Work Packages</a><br />
+                            <a asp-action="Edit" asp-route-id="@item.ProjectId">Manage</a> <br />
+                        }
+                        @if(User.IsInRole("AD") || User.IsInRole("PM") || User.IsInRole("PA")) {
+                            @if(item.Status==Project.ARCHIVED) {
+                                <a asp-action="Reopen" asp-route-id="@item.ProjectId" asp-controller="Projects">Reopen</a><br/>
+                            } else if (item.Status!=Project.CLOSED) {
+                                <a asp-action="Close" asp-route-id="@item.ProjectId" asp-controller="Projects">Close</a><br/>
+                                <a asp-action="Archive" asp-route-id="@item.ProjectId" asp-controller="Projects">Archive</a><br/>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div style=" @(assign ? "" : "display:none") ">
+    <h3>Assigned Projects</h3>
+    <table class="table well bs-component">
+        <thead>
+            <tr>
+                <th>
+                    Project Code
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Description
+                </th>
+                <th class="priority-2">
+                    Status
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.assignedProjects)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProjectCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td class="priority-2">
+                        @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Project.Statuses[item.Status])
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ProjectId">Details</a> <br />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

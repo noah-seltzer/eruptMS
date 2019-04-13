@@ -1,8 +1,156 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["PageTitle"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Hi there</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core </a>.</p>
+    <h1 class="display-4">Dashboard</h1>
+    <p>COMP 4911 eRUPt Software Solutions</p>
 </div>
+
+<br/>
+
+<section class="content align-content-center">
+
+    <div class="row">
+    @if (User.IsInRole(role:"AD") || User.IsInRole(role: "HR"))
+    {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-aqua">
+                <div class="inner">
+                    <h4>Employees</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">people</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Employees" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-green">
+                <div class="inner">
+                    <h4>Pay Grades</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">attach_money</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="PayGrades" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        @if (User.IsInRole(role: "AD"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h4>Administrative</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">format_list_bulleted</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Admins" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        }
+    }
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-orange">
+                <div class="inner">
+                    <h4>Timesheets</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assessment</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Timesheets" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h4>New Timesheet</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">content_paste</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Timesheets" asp-action="Create">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-purple">
+                <div class="inner">
+                    <h4>TS Rejected</h4>
+                    <p>@ViewData["RejectedSheets"] - Need action</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assignment_late</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Timesheets" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+
+        @if(User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "AD"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-olive">
+                <div class="inner">
+                    <h4>Projects</h4>
+                    <p>&nbsp;</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assessment</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Projects" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        }
+        @if(User.IsInRole(role: "LM") || User.IsInRole(role: "AD") || User.IsInRole(role: "TA"))
+        {
+        <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-navy">
+                <div class="inner">
+                    <h4>Supervisory</h4>
+                    <p>@ViewData["TimesheetsNeeded"] - TS awaiting approval</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assignment_turned_in</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="LineManagers" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div>
+        <!-- <div class="col-lg-4 col-md-4 col-xs-6">
+            <div class="small-box bg-navy">
+                <div class="inner">
+                    <h4>Approve</h4>
+                    <p>@ViewData["TimesheetsNeeded"] - Need approval</p>
+                </div>
+                <div class="icon">
+                    <i class="material-icons">assignment_turned_in</i>
+                </div>
+                <a class="small-box-footer" asp-area="" asp-controller="Approve" asp-action="Index">
+                    More info <i class="material-icons">chevron_right</i>
+                </a>
+            </div>
+        </div> -->
+        }
+    </div>
+</section>
+

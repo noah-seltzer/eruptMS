@@ -1,0 +1,57 @@
+﻿@model COMP4911Timesheets.Models.Project
+
+@{
+    ViewData["PageTitle"] = "Details";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<div>
+    <h4>Project</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.ProjectCode)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.ProjectCode)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.CostingProposal)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.CostingProposal)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.OriginalBudget)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.OriginalBudget)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.MarkupRate)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ProjectId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,227 @@
+﻿@model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
+
+@{
+    ViewData["PageTitle"] = "Employees";
+    IEnumerable<LineManagerManagement>
+                approverList = ViewData["ApproverList"] as IEnumerable<LineManagerManagement>;
+    IEnumerable<LineManagerManagement>
+                requestList = ViewData["ProjectRequest"] as IEnumerable<LineManagerManagement>;
+}
+
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#employees" id="empBtn" data-toggle="tab" aria-expanded="true" class="btn btn-primary btn-raised">Employees</a></li>
+    &nbsp;
+    @if (User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+    {
+        <li><a href="#project" id="projBtn" data-toggle="tab" aria-expanded="false" class="btn btn-primary btn-raised">Projects</a></li>
+    }
+</ul>
+
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="employees">
+        @if (User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+        {
+            <h3 class="approval-heading">Employees Under Supervision</h3>
+            @using (Html.BeginForm())
+            {
+                <p>
+                    Find by name: @Html.TextBox("SearchString")
+                    <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+                    <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+                </p>
+            }
+            <div class="@((User.IsInRole(role: " TA") && User.IsInRole(role: "LM" )) ? "multiple-roles table-wrapper-scroll-y" : "" )">
+                <table class="table well bs-component">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.FirstName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.LastName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.Approver)
+                            </th>
+                            <th class="priority-2">
+                                @Html.DisplayNameFor(model => model.Employee.Title)
+                            </th>
+                            <th class="priority-2">
+                                @Html.DisplayNameFor(model => model.Employee.Email)
+                            </th>
+                            <th>
+                                Reqs Approval
+                            </th>
+                            @*
+                                <th>
+                                    PLevel
+                                </th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.Approver.Email)
+                                </td>
+                                <td class="priority-2">
+                                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Employee.Title])
+                                </td>
+                                <td class="priority-2">
+                                    @Html.DisplayFor(modelItem => item.Employee.Email)
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Employee.Id">
+                                        @item.Employee.Timesheets.Count
+                                    </a>
+                                </td>
+                                @*
+                                    <td class="priority-2">
+                                        @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
+                                    </td>*@
+                                @if (User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+                                {
+                                    <td>
+                                        <a asp-action="ChangeTA" asp-route-id="@item.Employee.Id">Change TA</a>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (User.IsInRole(role: "TA"))
+        {
+            <h3 class="approval-heading">Timesheets For Approval</h3>
+            @using (Html.BeginForm())
+            {
+                <p>
+                    Find by name: @Html.TextBox("ApproverSearch")
+                    <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+                    <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+                </p>
+            }
+            <div class="@((User.IsInRole(role: " TA") && User.IsInRole(role: "LM" )) ? "multiple-roles table-wrapper-scroll-y" : "" )">
+                <table class="table well bs-component">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.FirstName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.LastName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Employee.Approver)
+                            </th>
+                            <th class="priority-2">
+                                @Html.DisplayNameFor(model => model.Employee.Title)
+                            </th>
+                            <th class="priority-2">
+                                @Html.DisplayNameFor(model => model.Employee.Email)
+                            </th>
+                            <th title="Go to profile">
+                                Reqs Approval
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in approverList)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.FirstName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Employee.Approver.Email)
+                                </td>
+                                <td class="priority-2">
+                                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.JobTitles[item.Employee.Title])
+                                </td>
+                                <td class="priority-2">
+                                    @Html.DisplayFor(modelItem => item.Employee.Email)
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Employee.Id">
+                                        @item.Employee.Timesheets.Count
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+    @if (User.IsInRole(role: "LM") || User.IsInRole(role: "AD"))
+    {
+        <div class="tab-pane fade active in" id="project">
+            <h3 class="approval-heading">All Projects</h3>
+            <table class="table well bs-component">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Project.ProjectCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Project.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Project.ProjectRequests)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in requestList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Project.Name)
+                            </td>
+                            <td>
+                                @{
+                                    int sum = 0;
+                                    foreach (var projectRequest in item.Project.ProjectRequests)
+                                    {
+                                        sum += projectRequest.AmountRequested;
+                                    }
+                                }
+                                @Html.DisplayFor(modelItem => sum)
+                            </td>
+                            <td>
+                                <a asp-action="ViewRequests" asp-route-id="@item.Project.ProjectId">View Requests</a> |
+                                <a asp-action="RemoveEmployees" asp-route-id="@item.Project.ProjectId">Remove Employees</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        window.onload = function load() {
+            document.getElementById("empBtn").click();
+        }
+    </script>
+}

@@ -1,0 +1,40 @@
+﻿@model COMP4911Timesheets.Models.Timesheet
+
+@{
+    ViewData["PageTitle"] = "Create";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Timesheet</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6 col-lg-4 well bs-component">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @*<div class="form-group">
+                <label asp-for="WeekEnding" class="control-label"></label>
+                <input asp-for="WeekEnding" class="form-control" />
+                <span asp-validation-for="WeekEnding" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <label asp-for="WeekEnding" class="control-label"></label>
+                <select asp-for="WeekEnding" class="form-control" asp-items="ViewBag.fridays"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+            </div>
+            <p class="text-danger">@TempData["begin"] <a class="font-weight-bold font-italic" asp-area="Identity" 
+                asp-page="/Account/Manage/Signature" title="Go to profile" style="text-decoration:underline">@TempData["Link"]</a>@TempData["end"]
+            </p>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

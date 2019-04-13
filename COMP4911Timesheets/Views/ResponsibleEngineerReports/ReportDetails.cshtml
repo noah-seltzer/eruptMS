@@ -1,0 +1,138 @@
+@model COMP4911Timesheets.Models.ResponsibleEngineerReport
+@using Newtonsoft.Json.Linq;
+
+@{
+    ViewData["PageTitle"] = "Details";
+    var pLevels = ViewBag.pLevels;
+    var planned = ViewBag.planned;
+    var spentTD = ViewBag.spentTD;
+    var spentTW = ViewBag.spentTW;
+    var needed = ViewBag.needed;
+    var tableLength = ViewBag.tableLength;
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Responsible Engineer Report</h4>
+
+<div class="well bs-component">
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label class="control-label">Project Name</label>
+            <input value='@TempData["projectName"]' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label class="control-label">Work Package Name</label>
+            <input value="@Model.WorkPackage.Name" class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label class="control-label">Project Code</label>
+            <input value='@TempData["projectCode"]' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label class="control-label">Work Package Code</label>
+            <input value='@TempData["workPackageCode"]' class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label class="control-label">Project Manager</label>
+            <input value='@TempData["projectManager"]' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label class="control-label">Project Manager Assistant</label>
+            <input value='@TempData["projectManagerAssistant"]' class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label class="control-label">Responsible Engineer</label>
+            <input value='@TempData["projectResponsibleEngineer"]' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label class="control-label">Week Number</label>
+            <input value="@Model.WeekNumber" class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="well bs-component">
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label asp-for="StartingPercentage" class="control-label"></label>
+            <input  value='@Model.StartingPercentage' class="form-control-plaintext" readonly/>
+        </div>
+        <div class="form-group col-6">
+            <label asp-for="CompletedPercentage" class="control-label"></label>
+            <input value='@Model.CompletedPercentage' class="form-control-plaintext" readonly/>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="well bs-component">
+    <table>
+        @for (int i = 0; i < tableLength; i++) {
+            <tr class="row">
+                <td class="col-2">
+                    @Html.Raw(pLevels[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(planned[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTD[i])
+                </td>
+                <td class="col-2">
+                    @Html.Raw(spentTW[i])
+                </td>
+                @if (i == 0) {
+                    <td class="col-2">
+                        @Html.Raw(needed[i])
+                    </td>
+                } else {
+                    <td class="col-2">
+                        @TempData[pLevels[i]]
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+<br>
+
+<div class="well bs-component">
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label asp-for="Comments" class="control-label"></label>
+            <textarea class="form-control-plaintext" readonly>@Model.Comments</textarea>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label asp-for="WorkAccomplished" class="control-label"></label>
+            <textarea class="form-control-plaintext" readonly>@Model.WorkAccomplished</textarea>
+        </div>
+        <div class="form-group col-6">
+            <label asp-for="Problem" class="control-label"></label>
+            <textarea class="form-control-plaintext" readonly>@Model.Problem</textarea>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-6">
+            <label asp-for="WorkPlanned" class="control-label"></label>
+            <textarea class="form-control-plaintext" readonly>@Model.WorkPlanned</textarea>
+        </div>
+        <div class="form-group col-6">
+            <label asp-for="ProblemAnticipated" class="control-label"></label>
+            <textarea class="form-control-plaintext" readonly>@Model.ProblemAnticipated</textarea>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Reports" asp-route-id="@Model.WorkPackageId" asp-controller="ResponsibleEngineerReports">Back to List</a>
+</div>

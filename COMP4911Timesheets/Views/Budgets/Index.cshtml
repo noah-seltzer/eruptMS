@@ -1,0 +1,65 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Budget>
+
+@{
+    ViewData["PageTitle"] = "Budgets";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Hour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PayGrade)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hour)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WeekNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkPackage.WorkPackageId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PayGrade.PayGradeId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BudgetId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BudgetId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BudgetId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,60 @@
+@model COMP4911Timesheets.ViewModels.LineManagerManagement
+
+
+@{
+    ViewData["PageTitle"] = "Change TA";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Employee</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6 well bs-component">
+        <form asp-action="Edit" class="form-horizontal">
+            <div class="@ViewBag.Display">
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    @ViewBag.ErrorMessage
+                </div>
+            </div>
+            <input type="hidden" asp-for="Employee.ConcurrencyStamp" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Employee.FirstName" class="control-label"></label>
+                <input asp-for="Employee.FirstName" class="form-control" readonly/>
+                <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.LastName" class="control-label"></label>
+                <input asp-for="Employee.LastName" class="form-control" readonly/>
+                <span asp-validation-for="Employee.LastName" class="text-danger"></span>
+            </div>
+            <input asp-for="Employee.FlexTime" type="hidden" />
+            <input asp-for="Employee.Title" type="hidden" />
+            <input asp-for="Employee.Status" type="hidden" />
+            <input asp-for="Employee.VacationTime" type="hidden" />
+            <input asp-for="Employee.Email" type="hidden" />
+            <input asp-for="Employee.PhoneNumber" type="hidden" />
+            <input asp-for="Employee.SupervisorId" type="hidden" />
+            <div class="form-group">
+                <label asp-for="Employee.ApproverId" class="control-label"></label>
+                <select asp-for="Employee.ApproverId" class="form-control searchDropDown" asp-items="ViewBag.Approvers"></select>
+                <span asp-validation-for="Employee.ApproverId" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Employee.Id" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

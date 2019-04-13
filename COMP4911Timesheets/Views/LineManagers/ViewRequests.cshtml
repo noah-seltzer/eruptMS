@@ -1,0 +1,32 @@
+@model COMP4911Timesheets.ViewModels.LineManagerManagement
+@{
+    ViewData["PageTitle"] = "Requests";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<form asp-action="HandleRequests">
+    <div class="col-md-8 col-lg-6 row well bs-component">
+        <div class="col-8">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Project.ProjectId" />
+            @foreach (var projectRequest in Model.Project.ProjectRequests)
+            {
+                bool available = ((Dictionary<int, int>)ViewBag.num).ContainsKey(projectRequest.PayGrade.PayGradeId);
+                <div class="form-group">
+                    <label># of @projectRequest.PayGrade.PayLevel Level Request : </label>
+                    <input asp-for=@projectRequest.AmountRequested class="form-control " type="number" readonly />
+                    <a asp-action="AssignEmployees" asp-route-id="@projectRequest.ProjectRequestId">Assign Employees</a>
+                    <div style="@(available ? "" : "display:none" ) ">
+                        <span class="badge badge-success">
+                            @(available ? (((Dictionary<int, int>)ViewBag.num)[projectRequest.PayGrade.PayGradeId] + " Available") : "" )
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

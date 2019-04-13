@@ -1,0 +1,131 @@
+﻿@model IEnumerable<COMP4911Timesheets.ViewModels.EmployeeManagement>
+
+@{
+    ViewData["PageTitle"] = "Index";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>Assign Employees to Work Packages</h1>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.EmployeeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.Employee.Status)
+            </th>
+            <th class="priority-2">
+                Roles
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.EmployeeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeePay.PayGrade.PayLevel)
+            </td>
+            <td class="priority-2">
+                @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Employee.Statuses[item.Employee.Status])
+            </td>
+            <td>
+                @foreach (var role in item.Role)
+                {
+
+                    @if (role == ProjectEmployee.PROJECT_MANAGER)
+                    {
+                        <p>
+                            Project Manager
+                        </p>
+                    }
+
+                    @if (role == ProjectEmployee.PROJECT_ASSISTANT)
+                    {
+                        <p>
+                            Project Assistant
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.RESPONSIBLE_ENGINEER)
+                    {
+                        <p>
+                            Responsible Engineer
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.EMPLOYEE)
+                    {
+                        <p>
+                            Employee
+                        </p>
+                    }
+                    @if (role == ProjectEmployee.NOT_ASSIGNED)
+                    {
+                        <p>
+                            Not Assigned
+                        </p>
+                    }
+                }
+            </td>
+            @if (!item.Role.Contains(ProjectEmployee.RESPONSIBLE_ENGINEER))
+            {
+                <td>
+                    @Html.ActionLink("Assign RE", "AssignRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName, pId = @TempData["projectId"], wId = @TempData["workPackageId"] },
+                         new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("Remove RE", "RemoveRE", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName, pId = @TempData["projectId"], wId = @TempData["workPackageId"] },
+                         new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
+                </td>
+            }
+            @if (!item.Role.Contains(ProjectEmployee.EMPLOYEE))
+            {
+                <td>
+                    @Html.ActionLink("Assign Em", "AssignEm", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName, pId = @TempData["projectId"], wId = @TempData["workPackageId"] },
+                        new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("Remove Em", "RemoveEm", "WorkPackages", new { EmployeeId = item.Employee.Id, name = item.Employee.FirstName, pId = @TempData["projectId"], wId = @TempData["workPackageId"] },
+                        new { @class = "btn btn-primary btn-sm btn-raised", @role = "button" })
+                </td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@TempData["projectId"]">Back to List</a>

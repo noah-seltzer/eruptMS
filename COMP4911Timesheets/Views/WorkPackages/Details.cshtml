@@ -1,0 +1,179 @@
+﻿@model COMP4911Timesheets.Models.WorkPackage
+
+@{
+    ViewData["PageTitle"] = "Details";
+    ViewData["projectId"] = Model.ProjectId;
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<div>
+    <h4>Work Package</h4>
+    <hr />
+    @if (Model.Status != WorkPackage.CLOSED)
+    {
+        <p>
+            <a asp-action="Edit" asp-route-id="@Model.WorkPackageId">Edit</a>
+
+            @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && Model.Project.ProjectCode != "010" && Model.WorkPackageCode != "00000") {
+                <a>&nbsp;|&nbsp;</a>
+                <a asp-action="Reports" asp-route-id="@Model.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+            }
+        </p>
+    }
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WorkPackageCode)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WorkPackageCode)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Contractor)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Contractor)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Purpose)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Purpose)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Input)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Input)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Output)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Output)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Activity)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Activity)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Project.ProjectId)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.ParentWorkPackage)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.ParentWorkPackage.WorkPackageId)
+        </dd>
+    </dl>
+</div>
+
+<h4>Budget Plan</h4>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                PM Budget
+            </th>
+            <th>
+                RE Estimate
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Pay Grade Level
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Budgets)
+        {
+            if (item.Type == 10) { 
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.Hour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.REHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.PayGrade.PayLevel)
+                    </td>
+                    <td>
+                        $@Html.DisplayFor(model => item.PayGrade.Cost) / h
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                Actual Hours
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                Pay Grade Level
+            </th>
+            <th>
+                Cost
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Budgets)
+        {
+            if (item.Type == 20)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.Hour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Status)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.PayGrade.PayLevel)
+                    </td>
+                    <td>
+                        $@Html.DisplayFor(model => item.PayGrade.Cost) / h
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@ViewData["projectId"]">Back to List</a>
+</div>

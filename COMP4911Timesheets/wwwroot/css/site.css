@@ -1,56 +1,441 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+﻿ /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
-
 a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
+
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
 button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    font-size: 1rem;
+    line-height: inherit;
 }
 
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+  margin: 0;
+  height: 100%;
 }
+.body-container {
+  min-height: calc(100vh - 210px);
+  margin-bottom: 2em;
+}
+
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   white-space: nowrap;
   /* Set the fixed height of the footer here */
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
+
+}
+
+/* Custom responsive table styles
+-------------------------------------------------- */
+@media screen and (max-width: 768px) {
+    .priority-2 {
+        display: none;
+    }
+}
+
+.bs-component {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24) !important;
+}
+
+#logout-btn:hover {
+    color: #00bc8c !important;
+}
+
+.btn.logout {
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+}
+
+/* Multiple Select Input Box */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    color: #000000 !important;
+}
+
+/* Custom workpacke col width
+-------------------------------------------------- */
+
+.col-xs-1 {
+    width: 120px;
+}
+/* Custom workpacke row hover style
+-------------------------------------------------- */
+
+.hoverBg:hover {
+    background-color: #555459;
+    transition: all .6s ease-in-out;
+}
+
+.select2-results__option {
+    color: #444444 !important;
+}
+
+.select2-container--default .select2-selection--single {
+    padding: 0.375rem 0.75rem;
+    height: calc(2.15625rem + 2px);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 1.5 !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 0px !important;
+}
+
+.projectEmployeeList {
+    list-style: none;
+    padding-left: inherit;
+}
+
+.projectEmployeeList li {
+    padding-bottom: 8px;
+}
+
+.wpRow {
+    padding: 5px 19px;
+    overflow-wrap: break-word;
+}
+    
+
+/* Splash page styles
+-------------------------------------------------- */
+.small-box {
+    border-radius: 2px;
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1)
+}
+
+    .small-box > .inner {
+        padding: 10px
+    }
+
+    .small-box > .small-box-footer {
+        position: relative;
+        text-align: center;
+        padding: 3px 0;
+        color: #fff;
+        color: rgba(255,255,255,0.8);
+        display: block;
+        z-index: 10;
+        background: rgba(0,0,0,0.1);
+        text-decoration: none
+    }
+
+        .small-box > .small-box-footer:hover {
+            color: #fff;
+            background: rgba(0,0,0,0.15)
+        }
+
+    .small-box h3 {
+        font-size: 38px;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+        white-space: nowrap;
+        padding: 0
+    }
+
+    .small-box p {
+        font-size: 15px
+    }
+
+        .small-box p > small {
+            display: block;
+            color: #f9f9f9;
+            font-size: 13px;
+            margin-top: 5px
+        }
+
+    .small-box h3, .small-box p {
+        z-index: 5
+    }
+
+    .small-box .icon {
+        -webkit-transition: all .3s linear;
+        -o-transition: all .3s linear;
+        transition: all .3s linear;
+        position: absolute;
+        top: -25px;
+        right: 10px;
+        z-index: 0;
+        font-size: 90px;
+        color: rgba(0,0,0,0.15)
+    }
+
+    .small-box:hover {
+        text-decoration: none;
+        color: #f9f9f9
+    }
+
+        .small-box:hover .icon {
+            font-size: 95px
+        }
+
+@media (max-width:767px) {
+    .small-box {
+        text-align: center
+    }
+
+        .small-box .icon {
+            display: none
+        }
+
+        .small-box p {
+            font-size: 12px
+        }
+}
+
+.small-box-footer .material-icons {
+  vertical-align: middle !important;
+}
+
+.inner h4 {
+  color: white !important;
+}
+
+.icon .material-icons {
+  font-size: 70px !important;
+  top: -25px;
+}
+
+.small-box {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23) !important;
+}
+
+.bg-red, .bg-yellow, .bg-aqua, .bg-blue, .bg-light-blue, .bg-green, .bg-navy, .bg-teal, .bg-olive, .bg-lime, .bg-orange, .bg-fuchsia, .bg-purple, .bg-maroon, .bg-black, .bg-red-active, .bg-yellow-active, .bg-aqua-active, .bg-blue-active, .bg-light-blue-active, .bg-green-active, .bg-navy-active, .bg-teal-active, .bg-olive-active, .bg-lime-active, .bg-orange-active, .bg-fuchsia-active, .bg-purple-active, .bg-maroon-active, .bg-black-active, .callout.callout-danger, .callout.callout-warning, .callout.callout-info, .callout.callout-success, .alert-success, .alert-danger, .alert-error, .alert-warning, .alert-info, .label-danger, .label-info, .label-warning, .label-primary, .label-success, .modal-primary .modal-body, .modal-primary .modal-header, .modal-primary .modal-footer, .modal-warning .modal-body, .modal-warning .modal-header, .modal-warning .modal-footer, .modal-info .modal-body, .modal-info .modal-header, .modal-info .modal-footer, .modal-success .modal-body, .modal-success .modal-header, .modal-success .modal-footer, .modal-danger .modal-body, .modal-danger .modal-header, .modal-danger .modal-footer {
+    color: #fff !important
+}
+
+.bg-gray {
+    color: #000;
+    background-color: #d2d6de !important
+}
+
+.bg-gray-light {
+    background-color: #f7f7f7
+}
+
+.bg-black {
+    background-color: #111 !important
+}
+
+.bg-red, .callout.callout-danger, .alert-danger, .alert-error, .label-danger, .modal-danger .modal-body {
+    background-color: #dd4b39 !important
+}
+
+.bg-yellow, .callout.callout-warning, .alert-warning, .label-warning, .modal-warning .modal-body {
+    background-color: #f39c12 !important
+}
+
+.bg-aqua, .callout.callout-info, .alert-info, .label-info, .modal-info .modal-body {
+    background-color: #2196f3 !important
+}
+
+.bg-blue {
+    background-color: #0073b7 !important
+}
+
+.bg-light-blue, .label-primary, .modal-primary .modal-body {
+    background-color: #3c8dbc !important
+}
+
+.bg-green, .callout.callout-success, .alert-success, .label-success, .modal-success .modal-body {
+    background-color: #00a65a !important
+}
+
+.bg-navy {
+    background-color: #001f3f !important
+}
+
+.bg-teal {
+    background-color: #39cccc !important
+}
+
+.bg-olive {
+    background-color: #3d9970 !important
+}
+
+.bg-lime {
+    background-color: #01ff70 !important
+}
+
+.bg-orange {
+    background-color: #ff851b !important
+}
+
+.bg-fuchsia {
+    background-color: #f012be !important
+}
+
+.bg-purple {
+    background-color: #605ca8 !important
+}
+
+.bg-maroon {
+    background-color: #d81b60 !important
+}
+
+.bg-gray-active {
+    color: #000;
+    background-color: #b5bbc8 !important
+}
+
+.bg-black-active {
+    background-color: #000 !important
+}
+
+.bg-red-active, .modal-danger .modal-header, .modal-danger .modal-footer {
+    background-color: #d33724 !important
+}
+
+.bg-yellow-active, .modal-warning .modal-header, .modal-warning .modal-footer {
+    background-color: #db8b0b !important
+}
+
+.bg-aqua-active, .modal-info .modal-header, .modal-info .modal-footer {
+    background-color: #2196f3 !important
+}
+
+.bg-blue-active {
+    background-color: #005384 !important
+}
+
+.bg-light-blue-active, .modal-primary .modal-header, .modal-primary .modal-footer {
+    background-color: #357ca5 !important
+}
+
+.bg-green-active, .modal-success .modal-header, .modal-success .modal-footer {
+    background-color: #008d4c !important
+}
+
+.bg-navy-active {
+    background-color: #001a35 !important
+}
+
+.bg-teal-active {
+    background-color: #30bbbb !important
+}
+
+.bg-olive-active {
+    background-color: #368763 !important
+}
+
+.bg-lime-active {
+    background-color: #00e765 !important
+}
+
+.bg-orange-active {
+    background-color: #ff7701 !important
+}
+
+.bg-fuchsia-active {
+    background-color: #db0ead !important
+}
+
+.bg-purple-active {
+    background-color: #555299 !important
+}
+
+.bg-maroon-active {
+    background-color: #ca195a !important
+}
+
+[class^="bg-"].disabled {
+    opacity: .65;
+    filter: alpha(opacity=65)
+}
+
+/* Supervisory page styles
+-------------------------------------------------- */
+.approval-heading {
+    padding-bottom: 0.225em;
+}
+
+.multiple-roles {
+    position: relative;
+    max-height: 325px;
+    overflow: auto;
+    margin-bottom: 12px;
+  }
+
+  .table-wrapper-scroll-y {
+    display: block;
+  }
+
+  .single-role {
+    position: relative;
+    height: 525px;
+    overflow: auto;
+  }
+
+  .project-button {
+      float: right;
+  }
+.badge {
+    font-size: 85% !important;
+}
+
+.block {
+    display: block;
+}
+
+.none {
+    display: none;
+}
+
+.nav-tabs {
+    padding-bottom: 10px !important;
+    margin-bottom: 6px;
+}
+
+.timesheetTotal {
+    background-color: #222222;
+    font-weight: 600;
+}
+
+.overflow {
+    overflow: auto;
+    max-height: max-content;
+}
+
+table>thead {
+    color: #FFF !important;
+    background-color: #444 !important;
+    border-color: #98a2ac !important;
 }

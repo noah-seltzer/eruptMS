@@ -1,0 +1,217 @@
+@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
+
+@{
+    ViewData["PageTitle"] = "Index";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+}
+
+<h1>Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
+    <div class="@ViewBag.Display">
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @ViewBag.ErrorMessage
+        </div>
+    </div>
+
+    @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
+    {
+        <p>
+            <a asp-action="CreateWorkPackage" asp-route-id="@TempData["ProjectId"]">Create New Work Package</a> &nbsp;|&nbsp;
+
+            <a asp-action="ClosedWorkPackageInfo" asp-route-id="@TempData["ProjectId"]">Closed Work Package Info</a>
+        </p>
+    }
+    <div class="row well bs-component">
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.WorkPackageCode)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.Name)
+        </div>
+        <div class="col-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.Contractor)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.Purpose)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.Activity)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.Status)
+        </div>
+        <div class="col-xs-1">
+            @Html.DisplayNameFor(model => model.ParentWorkPackage)
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
+    {
+        @foreach (var item in Model)
+        {
+
+            @if (item.WorkPackageCode.Length == 5)
+            {
+                <div class="collapsed row wpRow @(item.ChildWorkPackages != null ? "hoverBg" : "") "
+                     data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+
+                    <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info dropdown-toggle" : "") ">
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </div>
+                    <div class="col-2">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </div>
+
+                    @if (item.Status == WorkPackage.OPENED)
+                    {
+                        <div class="col-xs-1">
+                            Opened
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xs-1">
+                            Archived
+                        </div>
+                    }
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </div>
+                </div>
+                <div>
+                    <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Create Child Work Package</a>&nbsp;|&nbsp;
+                    <a asp-action="Create" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add PM Budget Plan</a>&nbsp;|&nbsp;
+                    <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">Add RE Budget Plan</a>&nbsp;|&nbsp;
+                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Edit</a>&nbsp;|&nbsp;
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>&nbsp;|&nbsp;
+                    <a asp-action="AssignEmployee" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Assign Employee</a>
+                    @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
+                    {
+                        <a>&nbsp;|&nbsp;</a>
+                        <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+                    }
+                </div>
+
+            }
+            @if (item.WorkPackageCode.Length != 5)
+            {
+                <div class="row collapse wpRow @(item.ChildWorkPackages != null ? "hoverBg" : "") w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)"
+                     data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode" name="@item.ParentWorkPackage.WorkPackageCode">
+
+                    <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info dropdown-toggle" : "")">
+                        @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </div>
+                    <div class="col-2">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Contractor)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Purpose)
+                    </div>
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.Activity)
+                    </div>
+                    @if (item.Status == WorkPackage.OPENED)
+                    {
+                        <div class="col-xs-1">
+                            Opened
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-xs-1">
+                            Archived
+                        </div>
+                    }
+                    <div class="col-xs-1">
+                        @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                    </div>
+                </div>
+                <div class="row collapse w-@item.WorkPackageCode.Substring(0, @item.WorkPackageCode.Length - 1)" data-toggle="collapse" data-target=".w-@item.WorkPackageCode" id="@item.WorkPackageCode">
+
+                    <a asp-action="CreateChildWorkPackage" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Create Child Work Package</a>&nbsp;|&nbsp;
+                    <a asp-action="Create" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add PM Budget Plan&nbsp;</a>&nbsp;|&nbsp;
+                    <a asp-action="CreateRE" asp-route-id="@item.WorkPackageId" asp-controller="Budgets">&nbsp;Add RE Budget Plan&nbsp;</a>&nbsp;|&nbsp;
+                    <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">&nbsp;Edit&nbsp;</a>&nbsp;|&nbsp;
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">&nbsp;Details&nbsp;</a>&nbsp;|&nbsp;
+                    <a asp-action="AssignEmployee" class="@(item.ChildWorkPackages != null ? "btn-link disabled" : "")" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Assign Employee</a>
+                    @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
+                    {
+                        <a>&nbsp;|&nbsp;</a>
+                        <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+                    }
+                </div>
+            }
+        }
+    }
+
+    <br />
+
+    @if (User.Identity.IsAuthenticated && ((User.IsInRole(role: "RE") || User.IsInRole(role: "EM")) && ((!User.IsInRole(role: "PM") && !User.IsInRole(role: "AD") && !User.IsInRole(role: "PA")))))
+    {
+        @foreach (var item in Model)
+        {
+            <div class="row" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                </div>
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </div>
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </div>
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.Contractor)
+                </div>
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.Purpose)
+                </div>
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.Activity)
+                </div>
+
+                @if (item.Status == WorkPackage.OPENED)
+                {
+                    <div class="col-xs-1">
+                        Opened
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xs-1">
+                        Archived
+                    </div>
+                }
+                <div class="col-xs-1">
+                    @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                </div>
+            </div>
+
+            @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
+            {
+                <a>&nbsp;|&nbsp;</a>
+                <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+            }
+        }
+    }

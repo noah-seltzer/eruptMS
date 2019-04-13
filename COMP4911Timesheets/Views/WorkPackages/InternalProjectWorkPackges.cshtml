@@ -1,0 +1,143 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
+
+@{
+    ViewData["PageTitle"] = "Index";
+}
+
+<h1>Work Packages - @ViewData["projectName"] @ViewData["projectCode"]</h1>
+<h4>@TempData["info"]</h4>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
+{
+    <p>
+        <a asp-action="CreateInternalWorkPackage"  asp-route-id="@TempData["ProjectId"]">Create New Work Package</a> &nbsp|&nbsp
+
+        <a asp-action="ClosedWorkPackageInfo" asp-route-id="@TempData["ProjectId"]">Closed Work Package Info</a>
+    </p>
+}
+<div class="row well bs-component">
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.WorkPackageCode)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Name)
+    </div>
+    <div class="col-2">
+        @Html.DisplayNameFor(model => model.Description)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Contractor)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Purpose)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Activity)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.Status)
+    </div>
+    <div class="col-xs-1">
+        @Html.DisplayNameFor(model => model.ParentWorkPackage)
+    </div>
+</div>
+@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA")))
+{
+    @foreach (var item in Model)
+    {
+
+        <div class="row wpRow">                
+
+            <div class="col-xs-1 @(item.ChildWorkPackages != null ? "text-info" : "") ">
+                @Html.DisplayFor(modelItem => item.WorkPackageCode)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="col-2">
+                @Html.DisplayFor(modelItem => item.Description)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Contractor)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Purpose)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Activity)
+            </div>
+
+            @if (item.Status == WorkPackage.OPENED)
+            {
+                <div class="col-xs-1">
+                    Opened
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-1">
+                    Archived
+                </div>
+            }
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+            </div>
+        </div>
+        <div>
+            <a asp-action="Edit" asp-route-id="@item.WorkPackageId" asp-route-pId="@TempData["ProjectId"]">Edit</a> &nbsp|&nbsp
+            <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+        </div>     
+        
+    }
+
+}
+
+<br />
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole(role: "RE") && !User.IsInRole(role: "PM")))
+{
+    @foreach (var item in Model)
+    {
+        <div class="row" id="@item.WorkPackageCode" name="@item.WorkPackageCode">
+
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.WorkPackageCode)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Name)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Description)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Contractor)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Purpose)
+            </div>
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.Activity)
+            </div>
+
+            @if (item.Status == WorkPackage.OPENED)
+            {
+                <div class="col-xs-1">
+                    Opened
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-1">
+                    Archived
+                </div>
+            }
+            <div class="col-xs-1">
+                @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+            </div>
+        </div>
+
+        <div>
+            <a asp-action="CreateWorkPackageReport" asp-route-id="@item.WorkPackageId">Responsible Engineer Report </a>
+        </div>
+    }
+}

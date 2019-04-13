@@ -1,0 +1,90 @@
+﻿@model COMP4911Timesheets.ViewModels.EmployeeManagement
+
+@{
+    ViewData["PageTitle"] = "Details";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.EmployeeId)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.EmployeeId)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.FirstName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.FirstName)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.LastName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.LastName)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Title)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.JobTitles[this.Model.Employee.Title])
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.FlexTime)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.VacationTime)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.VacationTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Employee.Statuses[this.Model.Employee.Status])
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Approver)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.Approver.Email)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Supervisor)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.Supervisor.Email)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Email)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.Email)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.PayLevel)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.EmployeePay.PayGrade.PayLevel)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.EmployeePay.PayGrade.Cost)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.EmployeePay.PayGrade.Cost)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Employee.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

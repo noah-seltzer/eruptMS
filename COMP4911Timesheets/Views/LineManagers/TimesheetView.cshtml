@@ -1,0 +1,302 @@
+﻿@model COMP4911Timesheets.ViewModels.LineManagerManagement
+
+@{
+    ViewData["PageTitle"] = "Timesheet";
+    ViewBag.Display = ViewBag.ErrorMessage != null ? "block" : "none";
+    double mon = 0, tue = 0, wed = 0, thu = 0, fri = 0, sat = 0, sun = 0, earn = 0;
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+<div class="@ViewBag.Display">
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        @ViewBag.ErrorMessage
+    </div>
+</div>
+
+<div>
+    <h4>Timesheet</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.WeekEnding)
+        </dt>
+        <dd class="col-sm-8">
+            @Model.Timesheet.WeekEnding.ToString("yyyy/MM/dd")
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Timesheet.WeekNumber)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.FlexTime)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Timesheet.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @COMP4911Timesheets.Models.Timesheet.Statuses[Model.Timesheet.Status]
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Timesheet.Comments)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Timesheet.Comments)
+        </dd>
+
+    </dl>
+</div>
+
+<table class="table well bs-component table-responsive-sm">
+    <thead>
+        <tr>
+            <th>
+                Project
+            </th>
+            <th>
+                Work Package
+            </th>
+            <th>
+                Sat
+            </th>
+            <th>
+                Sun
+            </th>
+            <th>
+                Mon
+            </th>
+            <th>
+                Tue
+            </th>
+            <th>
+                Wed
+            </th>
+            <th>
+                Thu
+            </th>
+            <th>
+                Fri
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Notes
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Timesheet.TimesheetRows != null)
+        {
+            foreach (var item in Model.Timesheet.TimesheetRows)
+            {
+                <tr>
+                    <td>
+                        @item.WorkPackage.Project.Name
+                    </td>
+                    <td>
+                        @item.WorkPackage.Name
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SatHour)
+                        @{sat += item.SatHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SunHour)
+                        @{ sun += item.SunHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MonHour)
+                        @{ mon += item.MonHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TueHour)
+                        @{ tue += item.TueHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WedHour)
+                        @{ wed += item.WedHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ThuHour)
+                        @{ thu += item.ThuHour;}
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FriHour)
+                        @{fri += item.FriHour;}
+                    </td>
+                    <td class="timesheetTotal">
+                        @(item.SatHour + item.SunHour + item.MonHour + item.TueHour + item.WedHour + item.ThuHour + item.FriHour)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+
+                </tr>
+            }
+        }
+
+        <tr>
+            <td></td>
+            <td class="timesheetTotal">
+                Total
+            </td>
+            <td class="timesheetTotal">
+                @sat
+            </td>
+            <td class="timesheetTotal">
+                @sun
+            </td>
+            <td class="timesheetTotal">
+                @mon
+            </td>
+            <td class="timesheetTotal">
+                @tue
+            </td>
+            <td class="timesheetTotal">
+                @wed
+            </td>
+            <td class="timesheetTotal">
+                @thu
+            </td>
+            <td class="timesheetTotal">
+                @fri
+            </td>
+            <td class="timesheetTotal">
+                @(mon + tue + wed + thu + fri + sat + sun)
+            </td>
+            <td></td>
+
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                Flex Hour Earned
+            </td>
+            <td>
+                @if (sat > 8)
+                {
+                    earn += sat - 8;
+                    @(sat - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (sun > 8)
+                {
+                    earn += sun - 8;
+                    @(sun - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (mon > 8)
+                {
+                    earn += (mon - 8);
+                    @(mon - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (tue > 8)
+                {
+                    earn += (tue - 8);
+                    @(tue - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (wed > 8)
+                {
+                    earn += (wed - 8);
+                    @(wed - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (thu > 8)
+                {
+                    earn += (thu - 8);
+                    @(thu - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @if (fri > 8)
+                {
+                    earn += (fri - 8);
+                    @(fri - 8)
+                }
+                else
+                {
+                    @(0)
+                }
+            </td>
+            <td>
+                @earn
+            </td>
+            <td></td>
+
+        </tr>
+    </tbody>
+</table>
+<div>
+    <a asp-action="Approval" asp-route-id="@Model.Timesheet.TimesheetId" class="btn btn-info btn-raised">Approve</a>
+
+
+
+    <button onclick="showBox()" class="btn btn-danger btn-raised">Reject</button>
+</div>
+<div id="myDIV" style="display:none">
+    <form asp-action="Reject">
+        <div class="form-group">
+            <label asp-for="Timesheet.Comments" class="control-label"></label>
+            <input asp-for="Timesheet.Comments" class="form-control" required/>
+            <span asp-validation-for="Timesheet.Comments" class="text-danger"></span>
+        </div>
+        <input type="hidden" asp-for="Timesheet.TimesheetId" />
+        <input type="submit" value="Submit Rejection" class="btn btn-danger btn-raised" />
+    </form>
+</div>
+<script>
+
+    function showBox() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+<br />
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

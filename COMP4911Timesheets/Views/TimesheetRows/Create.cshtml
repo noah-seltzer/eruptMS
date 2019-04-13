@@ -1,0 +1,73 @@
+﻿@model COMP4911Timesheets.Models.TimesheetRow
+
+@{
+    ViewData["PageTitle"] = "Create";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>TimesheetRow</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4 well bs-component">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="TimesheetId" />
+            <div class="form-group">
+                <label asp-for="SatHour" class="control-label"></label>
+                <input asp-for="SatHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="SatHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SunHour" class="control-label"></label>
+                <input asp-for="SunHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="SunHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MonHour" class="control-label"></label>
+                <input asp-for="MonHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="MonHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TueHour" class="control-label"></label>
+                <input asp-for="TueHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="TueHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WedHour" class="control-label"></label>
+                <input asp-for="WedHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="WedHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ThuHour" class="control-label"></label>
+                <input asp-for="ThuHour" class="form-control" type="number" max="24" min="0" />
+                <span asp-validation-for="ThuHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FriHour" class="control-label"></label>
+                <input asp-for="FriHour" class="form-control" type="number" max="24" min="0"/>
+                <span asp-validation-for="FriHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkPackageId" class="control-label"></label>
+                <select asp-for="WorkPackageId" class="form-control searchDropDown" asp-items="ViewBag.WorkPackageId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Back to List", "Edit", "Timesheets", new { id = Model.TimesheetId }, null)
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

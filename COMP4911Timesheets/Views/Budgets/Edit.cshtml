@@ -1,0 +1,59 @@
+﻿@model COMP4911Timesheets.Models.Budget
+
+@{
+    ViewData["PageTitle"] = "Edit";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Budget</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6 well bs-component">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BudgetId" />
+            <div class="form-group">
+                <label asp-for="Hour" class="control-label"></label>
+                <input asp-for="Hour" class="form-control" />
+                <span asp-validation-for="Hour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WeekNumber" class="control-label"></label>
+                <input asp-for="WeekNumber" class="form-control" />
+                <span asp-validation-for="WeekNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkPackageId" class="control-label"></label>
+                <select asp-for="WorkPackageId" class="form-control searchDropDown" asp-items="ViewBag.WorkPackageId"></select>
+                <span asp-validation-for="WorkPackageId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PayGradeId" class="control-label"></label>
+                <select asp-for="PayGradeId" class="form-control searchDropDown" asp-items="ViewBag.PayGradeId"></select>
+                <span asp-validation-for="PayGradeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

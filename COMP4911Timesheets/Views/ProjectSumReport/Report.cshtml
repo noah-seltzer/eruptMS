@@ -1,0 +1,83 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.ProjectSumReport>
+
+@{
+    ViewData["PageTitle"] = "Project Summary Reports";
+}
+
+<h1>Project Summary Report</h1>
+<p>Project Title: @ViewData["ProjectName"]</p>
+<table class="table well bs-component table-responsive-sm">
+    <thead>
+        <tr>
+            <th>
+                Work Packages
+            </th>
+            <th>
+                PM Estimates Cost / Man-Days
+            </th>
+            <th>
+                $Actuals Cost / Man-Days
+            </th>
+            <th>
+                $Estimates Cost / Man-Days
+            </th>
+            <th>
+                %@Html.DisplayNameFor(model => model.Variance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>Complete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageName) ( @Html.DisplayFor(modelItem => item.WorkPackageCode) )
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.PMCost) /  @Html.DisplayFor(modelItem => item.PMHour)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.ACost) /  @Html.DisplayFor(modelItem => item.AHour)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.RECost) /  @Html.DisplayFor(modelItem => item.REHour)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Variance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Complete)
+                </td>
+            </tr>
+        }
+
+            <tr>
+                <td>
+                    Subtotal
+                </td>
+                <td>
+                    $@TempData["PMCostTotal"] / @TempData["PMHourTotal"]
+                </td>
+                <td>
+                    $@TempData["ACostTotal"] / @TempData["AHourTotal"]
+                </td>
+                <td>
+                    $@TempData["RECostTotal"] / @TempData["REHourTotal"]
+                </td>
+                <td>@TempData["VarianceTotal"]</td>
+                <td></td>
+                <td></td>
+            </tr>
+
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

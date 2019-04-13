@@ -1,0 +1,59 @@
+@model COMP4911Timesheets.ViewModels.NewProject
+
+@{
+    ViewData["PageTitle"] = "Create";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Project</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6 well bs-component">
+        <form asp-action="Create" class="form-horizontal">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProjectCode" class="control-label"></label>
+                <input asp-for="ProjectCode" class="form-control" required />
+                <span asp-validation-for="ProjectCode" class="text-danger">@ViewBag.CodeError</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectManager" class="control-label"></label>
+                <select asp-for="ProjectManager" class="form-control searchDropDown" asp-items="ViewBag.MEmployees"></select>
+                <span asp-validation-for="ProjectManager" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManagersAssistant" class="control-label"></label>
+                <select asp-for="ManagersAssistant" class="form-control searchDropDown" asp-items="ViewBag.AEmployees"></select>
+                <span asp-validation-for="ManagersAssistant" class="text-danger"></span>
+                <span class="text-danger">@ViewBag.MgrIsAssist</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MarkupRate" class="control-label"></label>
+                <input asp-for="MarkupRate" type="number" class="form-control" required min="0" value="1" />
+                <span asp-validation-for="MarkupRate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

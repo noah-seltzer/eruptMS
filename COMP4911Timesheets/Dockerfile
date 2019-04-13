@@ -1,20 +1,17 @@
-FROM microsoft/dotnet:2.2-aspnetcore-runtime AS base
+FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
-FROM microsoft/dotnet:2.2-sdk AS build
-WORKDIR /src
-COPY ["COMP4911Timesheets/COMP4911Timesheets.csproj", "COMP4911Timesheets/"]
-RUN dotnet restore "COMP4911Timesheets/COMP4911Timesheets.csproj"
-COPY . .
-WORKDIR "/src/COMP4911Timesheets"
-RUN dotnet build "COMP4911Timesheets.csproj" -c Release -o /app
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
 
-FROM build AS publish
-RUN dotnet publish "COMP4911Timesheets.csproj" -c Release -o /app
+# Copy everything else and build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+# Build runtime image
+FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=build-env /app/out .
+RUN ls
 ENTRYPOINT ["dotnet", "COMP4911Timesheets.dll"]

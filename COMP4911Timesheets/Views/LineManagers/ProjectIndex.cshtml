@@ -1,0 +1,54 @@
+@model IEnumerable<COMP4911Timesheets.ViewModels.LineManagerManagement>
+
+@{
+    ViewData["PageTitle"] = "All Projects";
+}
+
+<p>
+    <a asp-action="Index" class="btn btn-info btn-raised project-button btn-lg">Employees</a>
+</p>
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectRequests)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @{
+                        int sum = 0;
+                        foreach (var projectRequest in item.Project.ProjectRequests) {
+                            sum += projectRequest.AmountRequested;
+                        }
+                    }
+                    @Html.DisplayFor(modelItem => sum)
+                </td>
+                <td>
+                    <a asp-action="ViewRequests" asp-route-id="@item.Project.ProjectId">View Requests</a> |
+                    <a asp-action="RemoveEmployees" asp-route-id="@item.Project.ProjectId">Remove Employees</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

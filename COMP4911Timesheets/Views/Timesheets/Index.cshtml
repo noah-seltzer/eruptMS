@@ -1,0 +1,80 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.Timesheet>
+
+@{
+    ViewData["PageTitle"] = "Timesheets";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+@using (Html.BeginForm())
+{
+    <p>
+        Find by week ending: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+        <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+    </p>
+}
+<table class="table well bs-component">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WeekEnding)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.WeekNumber)
+            </th>
+            <th class="priority-2">
+                @Html.DisplayNameFor(model => model.FlexTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.WeekEnding.ToString("yyyy/MM/dd")
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+                <td class="priority-2">
+                    @Html.DisplayFor(modelItem => item.FlexTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Timesheet.Statuses[item.Status])
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employee.LastName)
+                </td>
+                <td>
+                    @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                       COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Submitted & Not Approved" ||
+                       COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.TimesheetId">View </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Details" asp-route-id="@item.TimesheetId">Details </a>
+                    }
+                    @if (COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Not Submitted & Not Approved" ||
+                       COMP4911Timesheets.Models.Timesheet.Statuses[item.Status] == "Rejected & Need Resubmission")
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.TimesheetId"> | Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

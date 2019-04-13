@@ -1,0 +1,130 @@
+﻿@model COMP4911Timesheets.Models.Timesheet
+
+@{
+    ViewData["PageTitle"] = "Delete";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Timesheet</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekEnding)
+        </dt>
+        <dd class="col-sm-8">
+            @Model.WeekEnding.ToString("yyyy/MM/dd")
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.FlexTime)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.FlexTime)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => COMP4911Timesheets.Models.Timesheet.Statuses[Model.Status])
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.LastName)
+        </dd>
+
+    </dl>
+    <table class="table well bs-component table-responsive-sm">
+        <thead>
+            <tr>
+                <th>
+                    Project
+                </th>
+                <th>
+                    Work Package
+                </th>
+                <th>
+                    Sat
+                </th>
+                <th>
+                    Sun
+                </th>
+                <th>
+                    Mon
+                </th>
+                <th>
+                    Tue
+                </th>
+                <th>
+                    Wed
+                </th>
+                <th>
+                    Thu
+                </th>
+                <th>
+                    Fri
+                </th>
+                <th>
+                    Notes
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.TimesheetRows != null)
+            {
+                foreach (var item in Model.TimesheetRows)
+                {
+                    <tr>
+                        <td>
+                            @item.WorkPackage.Project.Name
+                        </td>
+                        <td>
+                            @item.WorkPackage.Name
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SatHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SunHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.MonHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TueHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.WedHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ThuHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FriHour)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Notes)
+                        </td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="TimesheetId" />
+        <input type="submit" value="Delete" class="btn btn-danger btn-raised" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

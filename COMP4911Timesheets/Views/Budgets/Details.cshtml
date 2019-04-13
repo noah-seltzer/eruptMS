@@ -1,0 +1,54 @@
+﻿@model COMP4911Timesheets.Models.Budget
+
+@{
+    ViewData["PageTitle"] = "Details";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<div>
+    <h4>Budget</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Hour)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Hour)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WeekNumber)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WeekNumber)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Type)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Type)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.WorkPackage)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.WorkPackage.WorkPackageId)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.PayGrade)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.PayGrade.PayGradeId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.BudgetId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

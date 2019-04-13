@@ -1,0 +1,92 @@
+﻿@model COMP4911Timesheets.ViewModels.LineManagerManagement
+
+@{
+    ViewData["PageTitle"] = "Timesheet Approval";
+}
+
+<h2>@ViewData["PageTitle"]</h2>
+
+<div>
+    <h4>Employee</h4>
+    <hr />
+    <dl class="row col-lg-6 well bs-component">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Email)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.Email)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.FirstName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.FirstName)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.LastName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.Employee.LastName)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Employee.Title)
+        </dt>
+        <dd class="col-sm-8">
+            @Employee.JobTitles[Model.Employee.Title]
+        </dd>
+
+    </dl>
+</div>
+<table class="table  well bs-component">
+    <thead>
+        <tr>
+
+            <th>
+                Week Ending
+            </th>
+            <th>
+                Week Number
+            </th>
+            <th>
+                Flex Time
+            </th>
+            <th>
+                Status
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ 
+            foreach (var item in Model.Employee.Timesheets)
+            {
+                <tr>
+
+                    <td>
+                        @{string date = item.WeekEnding.ToString("yyyy/MM/dd");}
+                        @Html.DisplayFor(modelItem => date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeekNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FlexTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => COMP4911Timesheets.Models.Timesheet.Statuses[item.Status])
+                    </td>
+
+                    <td>
+                        <a asp-action="TimesheetView" asp-route-id="@item.TimesheetId" class="btn btn-primary btn-raised">View</a>
+                    </td>
+                </tr>
+
+            }
+        }
+    </tbody>
+
+
+</table>
+
+<a asp-action="Index">Back to List</a>

@@ -1,0 +1,63 @@
+﻿@model COMP4911Timesheets.Models.WorkPackage
+
+@{
+    ViewData["PageTitle"] = "Create Work Package";
+}
+
+<h1>@ViewData["PageTitle"]</h1>
+
+<h4>Work Package</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8 col-lg-6 well bs-component">
+        <form asp-action="Create" asp-route-id="@TempData["ProjectId"]">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" required/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Contractor" class="control-label"></label>
+                <input asp-for="Contractor" class="form-control" />
+                <span asp-validation-for="Contractor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Purpose" class="control-label"></label>
+                <input asp-for="Purpose" class="form-control" />
+                <span asp-validation-for="Purpose" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input" class="control-label"></label>
+                <input asp-for="Input" class="form-control" />
+                <span asp-validation-for="Input" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Output" class="control-label"></label>
+                <input asp-for="Output" class="form-control" />
+                <span asp-validation-for="Output" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Activity" class="control-label"></label>
+                <input asp-for="Activity" class="form-control" />
+                <span asp-validation-for="Activity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-raised" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="ProjectWorkPackges" asp-controller="WorkPackages" asp-route-id="@TempData["projectId"]">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

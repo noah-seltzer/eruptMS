@@ -1,0 +1,115 @@
+﻿@model IEnumerable<COMP4911Timesheets.Models.WorkPackage>
+@{
+    ViewData["PageTitle"] = "Work Packages";
+    List<WorkPackage> wps = ViewData["wps"] as List<WorkPackage>;
+    var hasWps = wps.Count() > 0;
+}
+<h1>@ViewData["PageTitle"]</h1>
+
+@if (User.Identity.IsAuthenticated && User.IsInRole(role: "AD"))
+{
+    <p>
+        <a asp-action="Index" asp-controller="Uploads">Bulk Upload Work Packages</a>
+    </p>
+}
+@using (Html.BeginForm())
+{
+<p style=" @((hasWps) ? "" : "display:none") ">
+    Find by WP or project: @Html.TextBox("SearchString")
+    <input type="submit" value="Search" class="btn btn-primary btn-sm btn-raised" />
+    <a asp-action="Index" class="btn btn-warning btn-sm btn-raised">Reset</a>
+</p>
+}
+
+<p style=" @((hasWps) ? "display:none" : "") ">
+    No assigned work packages
+</p>
+<table class="table well bs-component" style=" @((hasWps) ? "" : "display:none") ">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.ProjectCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkPackageCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Contractor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Purpose)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Input)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Output)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ParentWorkPackage)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkPackageCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contractor)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Purpose)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Input)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Output)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Activity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ParentWorkPackage.WorkPackageCode)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.WorkPackageId">Details</a>
+
+                    @if(User.Identity.IsAuthenticated && (User.IsInRole(role: "AD") || User.IsInRole(role: "PM") || User.IsInRole(role: "PA") || User.IsInRole(role: "RE")) && item.Project.ProjectCode != "010" && item.WorkPackageCode != "00000")
+                    {
+                        <br>
+                        <a asp-action="Reports" asp-route-id="@item.WorkPackageId" asp-controller="ResponsibleEngineerReports">Responsible Engineer Reports</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
