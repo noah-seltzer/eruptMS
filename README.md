@@ -1,6 +1,11 @@
-# IMPORTANT (for developers)
+# Erupt Management Systems
 
-# IMPORTANT 
+Academic project by an 11-member team developing a project management system for a fictional company with 2000+ employees.
+
+• Web application built with ASP.NET Core MVC with Entity Framework Core, SQL Server, Docker, and Bootstrap
+• For managing employees, projects, work packages within projects, timesheets, and report generation
+
+# IMPORTANT For Developers
 
 
 change the default connection in COMP4911Timesheets/appsettings.json
@@ -21,17 +26,8 @@ Edmund is using "Server=tcp:127.0.0.1,1433;Database=Erupt;UID=sa;PWD=Password123
 [Code Conventions](/docs/conventions.md)
 [Database Setup](/docs/dbsetup.md)
 
-# Environments
 
-http://deimos.edu.bcit.ca -> TEST
-
-http://deimos.edu.bcit.ca:5000 -> STAGE
-
-http://deimos.edu.bcit.ca:5001 -> UAT (not initilized, builds will fail for the time being)
-
-http://deimos.edu.bcit.ca:5001 -> JENKINS (noah's branch)
-
-#### Production Deployment Instructions
+#### Deployment Instructions
 
 Pre-install: 
 - Create an mssql database which can be accessed by the intended host
